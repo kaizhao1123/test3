@@ -1,6 +1,7 @@
 package test3;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
@@ -447,8 +448,14 @@ public class ClimatePanel extends JPanel{
 		jtab.setLayout(new BorderLayout());	
 				
 		databaseTable = mt1.buildMyTable(tableColumnName, tableData1);	// the table with data from the AWS
+		int rowcount1 = databaseTable.getRowCount();
+		int colcount1 = databaseTable.getColumnCount();			
+		mt1.setColor(rowcount1-1,rowcount1-1,1,colcount1,Color.cyan);
 		customTable = mt2.buildMyTable(tableColumnName, tableData2);      // the table without data.
-
+		int rowcount2 = customTable.getRowCount();
+		int colcount2 = customTable.getColumnCount();			
+		mt2.setColor(rowcount2-1,rowcount2-1,1,colcount2,Color.cyan);
+		
 		scrollPane = new JScrollPane(databaseTable);	
 		scrollPane.setPreferredSize(new Dimension(210,250));
         jtab.add(scrollPane,BorderLayout.CENTER);       
@@ -527,6 +534,9 @@ public class ClimatePanel extends JPanel{
 		currentElement = countyData.get(index);
 		tableData1 = getTableData(currentElement);         
 		databaseTable = mt1.buildMyTable(tableColumnName, tableData1);
+		int rowcount1 = databaseTable.getRowCount();
+		int colcount1 = databaseTable.getColumnCount();			
+		mt1.setColor(rowcount1-1,rowcount1-1,1,colcount1,Color.cyan);
 		scrollPane.setViewportView(databaseTable);
 		
 		valueOfPre.setText(currentElement.data[0]);
@@ -534,6 +544,8 @@ public class ClimatePanel extends JPanel{
 		valueOfOCV.setText(currentElement.data[27]);
 		valueOfLRV.setText(currentElement.data[28]);
 		valueOfAna.setText(currentElement.data[26]);
+		
+
 	}
 	
 	public void setParent(MainFrame frame) {

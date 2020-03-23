@@ -31,10 +31,10 @@ public class TableModel extends AbstractTableModel{
         	 }
         	 
     	 }
-    	 /*for(int i = 0; i < s.length; i ++) {
+    	 for(int i = 0; i < s.length; i ++) {
     		 np[l-1][i] = s[i];
-    	 }*/
-    	 np[l-1] = s;
+    	 }
+    	 
     	 p = np;
  	 
      }
