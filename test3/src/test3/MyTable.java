@@ -1,21 +1,13 @@
 package test3;
 import java.awt.Color;
 import java.awt.Component;
-import java.text.DecimalFormat;
-
-import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 
 
-
 public class MyTable implements TableModelListener{
-
-	
-	//implements TableModelListener
-	
 	
 	JTable ntable;
 	TableModel model;
@@ -23,10 +15,7 @@ public class MyTable implements TableModelListener{
 	String[] columnNamess;
 	Object[][] dataa;
 	Color cc = Color.lightGray;
-	
-	
-	
-	
+
 	public JTable buildMyTable(String[] s, Object[][] o) {
 
 		columnNamess = s;
@@ -39,17 +28,11 @@ public class MyTable implements TableModelListener{
 	    model.addRow(model.getEachSum());
 				
 		ntable = new JTable(model);
-				
+		
 		int rowcount = ntable.getRowCount();
-		int colcount = ntable.getColumnCount();
-		//setColor(0,rowcount-3,1,2, Color.yellow);
-		
-		setColor(rowcount-1,rowcount-1,1,colcount,Color.cyan);	
-			
-		//model.getColumnClass(0);
-		
-		ntable.setVisible(true);
-		//ntable.setSize(100,100);
+		int colcount = ntable.getColumnCount();		
+		setColor(rowcount-1,rowcount-1,1,colcount,Color.cyan);			
+		ntable.setVisible(true);;
 		return ntable;
 	}
 

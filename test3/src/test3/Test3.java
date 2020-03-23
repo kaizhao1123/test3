@@ -16,7 +16,7 @@ public class Test3 {
 				int width = (int)screenSize.getWidth()*3/5;
 				int height = (int)screenSize.getHeight()*3/5;
 				
-				String path = "C:/Users/kaizhao/Desktop/AWSdata.xlsx";
+				String path = "C:/Users/Kai Zhao/Desktop/AWSdata.xlsx";
 				JFrame frame = null;				
 				InputData example;
 				
@@ -32,7 +32,7 @@ public class Test3 {
 				frame.setLocation(((int)screenSize.getWidth()/2-width/2), (int)(screenSize.getHeight()/2-height/2));
 				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 				frame.setVisible(true);
-				frame.setMinimumSize(new Dimension(960,460));
+				frame.setMinimumSize(new Dimension(960,540));
 				frame.setResizable(false);
 			}
 		});

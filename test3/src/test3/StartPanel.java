@@ -86,7 +86,7 @@ public class StartPanel extends JPanel{
 						 
 		gbc.gridx = 3;
 		gbc.gridy = 4;
-		String[] source = {" ","MWPS","NRCS-2008}"};
+		String[] source = {" ","MWPS","NRCS-2008"};
 		JComboBox ds = new JComboBox(source);
 		ds.setSelectedIndex(0);
 		ds.addActionListener(new ActionListener()
@@ -160,16 +160,16 @@ public class StartPanel extends JPanel{
 					try {												
 						int index = pane.indexOfTab("climate");
 						if(climate == null) {
-							climate = new ClimatePanel(pane,data,sourceForData);
+							climate = new ClimatePanel(pane,climateData,sourceForData);
 							climate.setParent(parent);
 							pane.add("climate", climate);
 							
 						}
 						else {
 							pane.remove(index);
-							climate = new ClimatePanel(pane,data,sourceForData);
-							climate.setParent(parent);
-							pane.add("climate", climate);														
+							climate = new ClimatePanel(pane,climateData,sourceForData);
+							climate.setParent(parent);	
+							pane.insertTab("climate", null, climate, null, index);
 						}
 						pane.setSelectedIndex(pane.indexOfTab("climate"));
 

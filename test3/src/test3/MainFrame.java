@@ -97,8 +97,9 @@ public class MainFrame extends JFrame {
 				+ "	---	Use of this software and information involves some risks, and the entire risk as to the results and<br/>"
 				+ "performance of the software and accompanying information is the user's responsibility and liability.</html> ";
 		
-		BufferedImage myPicture = ImageIO.read(new File("C:/Users/kaizhao/Desktop/1.png"));
-		JLabel picLabel = new JLabel(new ImageIcon(myPicture));
+		//BufferedImage myPicture = ImageIO.read(new File("C:/Users/Kai Zhao/Desktop/1.png"));
+		
+		//JLabel picLabel = new JLabel(new ImageIcon(myPicture));
 		
 		JLabel label1 = new JLabel(introductionLabel1);
 		label1.setFont(new Font("Arial Narrow",Font.BOLD,30));
@@ -117,10 +118,11 @@ public class MainFrame extends JFrame {
 		//gc.anchor = GridBagConstraints.LINE_END;
 		//gc.fill = GridBagConstraints.HORIZONTAL;
 		//gc.anchor = GridBagConstraints.LINE_START;
-		gc.gridheight = 5;
-		gc.gridx = 0;
-		gc.gridy = 0;
-		introPanel.add(picLabel, gc);
+		
+		//gc.gridheight = 5;
+		//gc.gridx = 0;
+		//gc.gridy = 0;
+		//introPanel.add(picLabel, gc);
 		
 		gc.gridheight = 1;
 		gc.gridx = 1;

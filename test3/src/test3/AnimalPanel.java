@@ -21,6 +21,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTable;
 import javax.swing.event.ListSelectionEvent;
 
 import test3.InputData.animalInfo;
@@ -53,8 +54,9 @@ public class AnimalPanel extends JPanel {
 	HashMap<String, JList<String>> selectedMap = new HashMap<>();		 // K is element,  V is the JList where the element come from
 	
 	String[] animal = {"Beef","Dairy","Goat","Horse","Poultry", "Sheep","Swine","Veal"};
-	String[] columnNamess = {"<html> Animal <br> (species) </html>",
+	String[] columnNamess = {"<html> Animal  </html>",
 			"<html>Animal <br> (type) </html>",
+			"<html>Quantity </html>",
 			"<html>Weight <br> (lbs) </html>",
 			"<html>Manure <br> (cu.ft/day/AU) </html>",
 			"<html> VS <br> (lbs/day/AU) </html>",
@@ -63,17 +65,18 @@ public class AnimalPanel extends JPanel {
 			"<html> VS <br> (lbs/day) </html>",
 			"<html> TS <br> (lbs/day) </html>",
 			"<html>Manure <br> (lbs/day) </html>"};
-	Object[][] dataa = {{"Feeder Calf","Beef","0","0","0","0","0","0","0","0","0"},
-	{"Feeder Beef","Beef","1","2","3","4","5","0","0","0","0"},
-	{"Feeder Beef","Beef","1","2","3","4","5","0","0","0","0"},
-	{"Feeder Beef","Beef","1","2","3","4","5","0","0","0","0"}}; 
+	/*Object[][] dataa = {{"Feeder Calf","Beef","0","0","0","0","0","0","0","0","0","0"},
+						{"Feeder Beef","Beef","0","1","2","3","4","5","0","0","0","0"},
+	{"Feeder Beef","Beef","0","1","2","3","4","5","0","0","0","0"},
+	{"Feeder Beef","Beef","0","1","2","3","4","5","0","0","0","0"}}; */
+	Object[][] dataa;
 		
 	
-	public AnimalPanel(JTabbedPane pane, InputData data, String source) {
+	public AnimalPanel(JTabbedPane pane, ArrayList<animalInfo> data, String source) {
 
-		data.readAnimalSheet("animal");
-		animalData = data.filterByDataSource(source, data.allAnimalData);		
-		
+		animalData = data;	
+
+				
 		// build list to store different type of animal
 		ArrayList<animalInfo> beef = filterByType("Beef",animalData);
 		ArrayList<animalInfo> dairy = filterByType("Dairy",animalData);
@@ -164,8 +167,10 @@ public class AnimalPanel extends JPanel {
 
 	    // initial table
 		MyTable mm = new MyTable();	
-	    tableScrollPane = new JScrollPane(mm.buildMyTable(columnNamess, dataa)); 
-		tableScrollPane.setPreferredSize(new Dimension(800,160));
+		JTable jtable = mm.buildMyTable(columnNamess, dataa);
+		jtable.getTableHeader().setPreferredSize(new Dimension(10,35));
+	    tableScrollPane = new JScrollPane(jtable); 
+		tableScrollPane.setPreferredSize(new Dimension(800,120));
 			
 		// initial the labels and buttons
 	    jl1 = new JLabel("Choices");
@@ -227,6 +232,15 @@ public class AnimalPanel extends JPanel {
 					}							
 				}						
 			);
+	    confirm.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e){						
+						updateTabel();					
+						JTable newtable = mm.buildMyTable(columnNamess, dataa);
+						newtable.getTableHeader().setPreferredSize(new Dimension(10,35));
+						tableScrollPane.setViewportView(newtable);
+					}							
+	    		}						
+	    	);
 	    
 	    /**
 	     * set the layout
@@ -270,7 +284,7 @@ public class AnimalPanel extends JPanel {
 		add(confirm,gc);
 		
 		
-		gc.insets = new Insets(20,10,5,10);
+		//gc.insets = new Insets(20,10,5,10);
 		gc.gridx = 0;
 		gc.gridy = 7;
 		gc.gridwidth = 8;
@@ -337,8 +351,7 @@ public class AnimalPanel extends JPanel {
 	   	
     }
     
-    private void removeAllFromSelectedList() {
-    	 
+    private void removeAllFromSelectedList() {  	 
       	DefaultListModel<String> model = (DefaultListModel<String>) selectedList.getModel();     	
      	int size = model.getSize();  
      	if(model != null) {
@@ -413,6 +426,44 @@ public class AnimalPanel extends JPanel {
         		}       		
         	}    	  	    	    		
     	}    	
+    }
+    
+    private void updateTabel() {
+
+    	DefaultListModel<String> model = (DefaultListModel<String>) selectedList.getModel();     	
+     	int size = model.getSize();     	
+     	dataa = new Object[size][11];
+     	int i = 0;
+     	while(i < size) {  
+			String item = model.getElementAt(i);							
+			animalInfo ele = getInfoByName(item, animalData);
+			Object[] rawData = new Object[11];
+			String quantity = "0";
+			String weight = "0";
+			String m = ele.data[0];
+			String ts = ele.data[2];
+			String vs = ele.data[3];
+			double qDou = Double.parseDouble(quantity);
+			double wDou = Double.parseDouble(weight);
+			double mDou = Double.parseDouble(m);
+			double tsDou = Double.parseDouble(ts);
+			double vsDou = Double.parseDouble(vs);
+		         		         		 
+			rawData[0] = item;
+			rawData[1] = ele.type;
+			rawData[2] = quantity;
+			rawData[3] = weight;
+			rawData[4] = m;
+			rawData[5] = vs;
+			rawData[6] = ts;
+			rawData[7] = Double.toString(mDou * qDou * wDou / 1000);
+			rawData[8] = Double.toString(vsDou * qDou * wDou / 1000);
+			rawData[9] = Double.toString(tsDou * qDou * wDou / 1000);
+			rawData[10] = Double.toString(mDou * qDou * wDou * 60 / 1000);
+			dataa[i] = rawData;
+			i++;          		
+		}
+    	    	
     }
     
 	public void setParent(MainFrame frame) {

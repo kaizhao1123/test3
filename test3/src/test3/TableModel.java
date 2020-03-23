@@ -1,7 +1,6 @@
 package test3;
 
 import java.text.DecimalFormat;
-
 import javax.swing.table.AbstractTableModel;
 
 public class TableModel extends AbstractTableModel{
@@ -15,29 +14,37 @@ public class TableModel extends AbstractTableModel{
 	 }
 	 
      public void addRow(String[] s){
-   	 
-    	 int l = p.length + 1 ;
-    	 int cl = n.length;
-
-    	 Object[][] np = new Object[l][cl];   	   	 
-    	 int npl = np.length;
-    	 
-    	 for(int i = 0; i < p.length; i ++) {
-    		 for (int j = 0 ; j < n.length; j ++){
-    			 np[i][j] = p[i][j];
-    		 }
+    	 Object[][] np = null;
+    	 int l;
+    	 int cl = n.length;;
+    	 if(p == null) {
+    		 l = 1;
+    		 np = new Object[l][cl]; 
+    	 }   		 
+    	 else {
+    		 l = p.length + 1 ;
+        	 np = new Object[l][cl];   	   	        	 
+        	 for(int i = 0; i < p.length; i++) {
+        		 for (int j = 0 ; j < n.length; j ++){
+        			 np[i][j] = p[i][j];
+        		 }
+        	 }
+        	 
     	 }
- 	 
-    	 for(int i = 0; i < s.length; i ++) {
+    	 /*for(int i = 0; i < s.length; i ++) {
     		 np[l-1][i] = s[i];
-    	 }  	
+    	 }*/
+    	 np[l-1] = s;
     	 p = np;
-    	 
+ 	 
      }
      
      @Override
      public int getRowCount() {
-         return p.length;
+    	 if(p == null)
+    		 return 0;
+    	 else
+    		 return p.length;
      }
 
      @Override
@@ -78,30 +85,39 @@ public class TableModel extends AbstractTableModel{
      }
      
      public double getSum(int column) {	
-	    double sum1 = 0.0;
-	    for(int i = 0; i < getRowCount(); i++) {
-	        String ddd = (String) getValueAt(i, column);	
-	        for(int j = 0; j < ddd.length(); j++) {
-	        	if(!Character.isDigit(ddd.charAt(j)) && ddd.charAt(j) != '.') {
-	        		return 0.0;
-	        	}
-	        }
-	        Double val = Double.parseDouble(ddd);
-	        sum1 += val;	       
-	    }	   
-	    DecimalFormat df = new DecimalFormat("0.00");	    
-        return Double.parseDouble(df.format(sum1));	 
+	    if(p == null)
+	    	return Double.parseDouble(new DecimalFormat("0.00").format(0.0));
+	    else {
+	    	double sum1 = 0.0;
+		    for(int i = 0; i < getRowCount(); i++) {
+		        String ddd = (String) getValueAt(i, column);	
+		        for(int j = 0; j < ddd.length(); j++) {
+		        	if(!Character.isDigit(ddd.charAt(j)) && ddd.charAt(j) != '.') {
+		        		return 0.0;
+		        	}
+		        }
+		        Double val = Double.parseDouble(ddd);
+		        sum1 += val;	       
+		    }	   
+		    DecimalFormat df = new DecimalFormat("0.00");	    
+	        return Double.parseDouble(df.format(sum1));	 	    	
+	    }   	
 	 }
      
-     public double getNewSum(int column) {	
- 	    double sum1 = 0.0;
- 	    for(int i = 0; i < getRowCount() - 1 ; i++) {
- 	        String ddd = (String) getValueAt(i, column);		        
- 	        Double val = Double.parseDouble(ddd);
- 	        sum1 += val;	       
- 	    }	   
- 	    DecimalFormat df = new DecimalFormat("0.00");	    
-         return Double.parseDouble(df.format(sum1));	 
+     public double getNewSum(int column) {    	 
+    	 if(p == null)    		
+    		 return 0.0;
+    	 else {
+    		 
+    		 double sum1 = 0.0;
+	 	     for(int i = 0; i < getRowCount() - 1 ; i++) {
+	 	         String ddd = (String) getValueAt(i, column);		        
+	 	         Double val = Double.parseDouble(ddd);
+	 	         sum1 += val;	       
+	 	     }	   
+	 	     DecimalFormat df = new DecimalFormat("0.00");	    
+	         return Double.parseDouble(df.format(sum1));	
+    	 }    			     
  	 }
 	
      public String[] getEachSum() {
