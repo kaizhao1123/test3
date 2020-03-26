@@ -13,7 +13,7 @@ public class TableModel extends AbstractTableModel{
 		 p = o;
 	 }
 	 
-     public void addRow(String[] s){
+     public void addTotalRow(String[] s){
     	 Object[][] np = null;
     	 int l;
     	 int cl = n.length;;
@@ -37,6 +37,58 @@ public class TableModel extends AbstractTableModel{
     	 
     	 p = np;
  	 
+     }
+     
+     public void addRow(String[] s) {
+    	 int l = p.length + 1 ;
+    	 int cl = n.length;
+    	 Object[][] np = new Object[l][cl];   	   	        	 
+    	 for(int i = 0; i < p.length-1; i++) {
+    		 for (int j = 0 ; j < n.length; j++){
+    			 np[i][j] = p[i][j];
+    		 }
+    	 }    	 
+    	 for(int i = 0; i < s.length; i ++) {
+    		 np[l-2][i] = s[i];
+    	 }    
+    	 for(int i = 0; i < n.length; i++) {
+    		 np[l-1][i] = p[l-2][i];   		 
+    	 }
+    	 p = np;      	 
+     }
+     
+     public void deleteRow(int row) {
+    	 int l = p.length - 1 ;
+    	 int cl = n.length;
+    	 Object[][] np = new Object[l][cl];  
+    	 for(int i = 0; i < row; i++) {
+    		 for (int j = 0 ; j < n.length; j++){
+    			 np[i][j] = p[i][j];
+    		 }
+    	 }
+    	 for(int i = row-1; i < p.length-1; i++) {
+    		 for (int j = 0 ; j < n.length; j++){
+    			 np[i][j] = p[i+1][j];
+    		 }
+    	 } 
+    	 p = np;
+    	 
+     }
+     
+     public boolean isContained(String s) {
+    	 for(int i = 0; i < p.length; i++) {
+    		 if(p[i][0] == s)
+    			 return true;
+    	 }
+    	 return false;
+     }
+     
+     public int rowOfElement(String s) {
+    	 for(int i = 0; i < p.length; i++) {
+    		 if(p[i][0] == s)
+    			 return i+1;
+    	 }
+    	 return -1;
      }
      
      @Override

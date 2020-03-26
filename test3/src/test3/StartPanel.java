@@ -165,18 +165,20 @@ public class StartPanel extends JPanel{
 							pane.add("climate", climate);
 							
 						}
-						else {
+						/*else {
 							pane.remove(index);
 							climate = new ClimatePanel(pane,climateData,sourceForData);
 							climate.setParent(parent);	
 							pane.insertTab("climate", null, climate, null, index);
-						}
+						}*/
 						pane.setSelectedIndex(pane.indexOfTab("climate"));
-
+						ds.setEnabled(false);
+						st.setEnabled(false);
 					} catch (Exception e1) {
 						e1.printStackTrace();
 					}					
-				}			
+				}
+
 			}			
 		});
 		this.add(okBt, gbc);

@@ -489,12 +489,15 @@ public class ClimatePanel extends JPanel{
 									animal.setParent(parent);									
 									pane.add("animal",animal);
 								}
-								else {
+								/*else {
 									pane.remove(index);
+									
+									//System.out.print(index);
+									
 									animal = new AnimalPanel(pane,animalData,source);
 									animal.setParent(parent);
 									pane.insertTab("animal", null, animal, null, index);													
-								}
+								}*/
 								pane.setSelectedIndex(pane.indexOfTab("animal"));
 
 							} catch (Exception e1) {

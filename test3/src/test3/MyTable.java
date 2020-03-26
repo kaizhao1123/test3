@@ -25,7 +25,7 @@ public class MyTable implements TableModelListener{
 		model.buildModel(columnNamess,dataa);
 		
 	    model.addTableModelListener(this);
-	    model.addRow(model.getEachSum());
+	    model.addTotalRow(model.getEachSum());
 				
 		ntable = new JTable(model);
 		
