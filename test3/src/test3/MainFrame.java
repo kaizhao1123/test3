@@ -26,35 +26,36 @@ import test3.InputData.stationInfo;
 public class MainFrame extends JFrame {
 	
 	private static final long serialVersionUID = 1L;
-	//public BasicDataPanel basic;
-	//public RcnPanel rcn;
-	//public RainfallDischargeDataPanel rd;
 	
+	String testword = "Test";
+	
+	public JPanel mainPane;
 	public JTabbedPane tabbedPane;
+	
 	public StartPanel startPane;
 	public ClimatePanel climatePane;
+	public AnimalPanel animalPane;
+	public AddAnimalDialog addAnimalDialog;
 	
 	
-	public MenuBar menubar;	
-	public JPanel mainPane;
+	public MenuBar menubar;		
 	public InputData excelData;			//for tabbedPanes 
 	public InputData excelData_1;   	//for menubar
-	public ArrayList<stationInfo> stationData;
+
 	
 	public MainFrame(InputData data, int width, int height) throws IOException {
 		super("AWM"); 												//the title of the window		
 		mainPane = new JPanel();   	                                //include the menubarPane and tabbedPane		
-		tabbedPane = new JTabbedPane();                             //include the list of panels in tab
-				
+		tabbedPane = new JTabbedPane();                             //include the list of panels in tab				
 		excelData = data;											
 			
 		createTabbedPanes(tabbedPane, width, height);	
-		createMainPane(mainPane, tabbedPane, startPane, climatePane);		
-		getContentPane().add(mainPane);	
+		createMainPane(mainPane, tabbedPane, startPane, climatePane, animalPane);		
+		add(mainPane);	
 	}
 	
-	private void createMainPane(JPanel mainPane, JTabbedPane tabbedPane, StartPanel start, ClimatePanel climate) {
-		Container[] containers =  {start, climate};		
+	private void createMainPane(JPanel mainPane, JTabbedPane tabbedPane, StartPanel start, ClimatePanel climate, AnimalPanel animal) {
+		Container[] containers =  {start, climate, animal};		
 		menubar = new MenuBar(excelData_1, containers) ;		
 		mainPane.setLayout(new BorderLayout());
 		mainPane.add(menubar, BorderLayout.NORTH);
@@ -110,7 +111,6 @@ public class MainFrame extends JFrame {
 
 		
 		JPanel introPanel = new JPanel();
-		//setLayout(new BorderLayout());
 		introPanel.setLayout(new GridBagLayout());
 		GridBagConstraints gc = new GridBagConstraints();
 		
@@ -161,22 +161,11 @@ public class MainFrame extends JFrame {
 		 * add the function panels to the tabbedPane
 		 */
 		
-		//MainFrame ref = this;
-		startPane = new StartPanel(pane, excelData);
+
+		startPane = new StartPanel(excelData);
 		startPane.setParent(this);
-		
-		//climatePane = new ClimatePanel(null);
-		//climatePane.setParent(this);
-		//climatePane.setVisible(false);
-		
-		//basic.setRFDCalc(rd);
-		
-
-		
-				
+					
 		pane.addTab("Introduction", introPanel);
-		pane.addTab("Start", startPane);
-		//pane.addTab("Climate", climatePane);
+		pane.addTab("Start", startPane);		
 	}
-
 }

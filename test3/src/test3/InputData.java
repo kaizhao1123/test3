@@ -44,13 +44,17 @@ public class InputData {
 		int index;
 		
 		
-		animalInfo(String n, String t, String s, String[] d, int i ){
+		public animalInfo(String n, String t, String s, String[] d, int i ){
 			name = n;
 			type = t;
 			dataSource = s;
 			data = d;
 			index = 0;
 		}
+	}
+	
+	public InputData() {
+		
 	}
 	
 	public InputData(String path) throws IOException {

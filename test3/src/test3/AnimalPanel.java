@@ -2,6 +2,7 @@ package test3;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -16,22 +17,23 @@ import java.util.HashMap;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
-import javax.swing.event.ListSelectionEvent;
-
 import test3.InputData.animalInfo;
 
 public class AnimalPanel extends JPanel {
-	MainFrame parent = null;
-	ArrayList<InputData.animalInfo> animalData;
+	MainFrame parent;
+	JTabbedPane pane;
+	ArrayList<InputData.animalInfo> animalData;     // the animal data from the database
+	ArrayList<InputData.animalInfo> newAnimalDataset = new ArrayList<InputData.animalInfo>();  // the animal data created by the customer;
+	animalInfo newAnimalInfo;
+	AddAnimalDialog modelDialog;
 	
-	
+	String testword = "animal.....";
 	
 	Font font = new Font("Arial Narrow", Font.PLAIN, 13);   
     JLabel jl1, jl2, jl3,jl4,jl5,jl6;	
@@ -56,7 +58,7 @@ public class AnimalPanel extends JPanel {
 	HashMap<String, JList<String>> selectedMap = new HashMap<>();		 // K is element,  V is the JList where the element come from
 	
 	String[] animal = {"Beef","Dairy","Goat","Horse","Poultry", "Sheep","Swine","Veal"};
-	String[] columnNamess = {"<html> Animal  </html>",
+	String[] columnNamess = {"<html> Animal  </html>",           // the header of table
 			"<html>Animal <br> (type) </html>",
 			"<html>Quantity </html>",
 			"<html>Weight <br> (lbs) </html>",
@@ -71,11 +73,11 @@ public class AnimalPanel extends JPanel {
 						{"Feeder Beef","Beef","0","1","2","3","4","5","0","0","0","0"},
 	{"Feeder Beef","Beef","0","1","2","3","4","5","0","0","0","0"},
 	{"Feeder Beef","Beef","0","1","2","3","4","5","0","0","0","0"}}; */
-	Object[][] dataa;
+	Object[][] dataa;											// the data of table
 	MyTable mTable;
 	JTable jtable;
 	
-	public AnimalPanel(JTabbedPane pane, ArrayList<animalInfo> data, String source) {
+	public AnimalPanel(ArrayList<animalInfo> data, String source) {
 
 		animalData = data;	
 
@@ -215,8 +217,7 @@ public class AnimalPanel extends JPanel {
 		
 	    // add listeners of each button
 	    add.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e){							
-						
+					public void actionPerformed(ActionEvent e){													
 						addToSelectedList();
 					}							
 				}						
@@ -241,22 +242,17 @@ public class AnimalPanel extends JPanel {
 			);
 	    newAnimal.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e){						
-						//removeAllFromSelectedList();
+						String source = parent.startPane.sourceForData;
+						String station = parent.startPane.stationForData;						
+				    	modelDialog = new AddAnimalDialog(mTable,jtable,source,station);
+				    	modelDialog.setParent(parent);
 					}							
 				}						
 			);
 	    deleteRow.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e){						
-						int row = jtable.getSelectedRow();
-						
-						System.out.print("aaaaaaa");
-						System.out.print(row);
-						
-						String item = mTable.model.p[row][0].toString();
-						
-						System.out.print("bbb");
-						System.out.print(item);
-						
+						int row = jtable.getSelectedRow();					
+						String item = mTable.model.p[row][0].toString();					
 						DefaultListModel<String> model = (DefaultListModel<String>) selectedList.getModel(); 
 						if(model.contains(item)) {
 							model.remove(model.indexOf(item));							
@@ -267,8 +263,6 @@ public class AnimalPanel extends JPanel {
 				     		addToModel(ele,oldModel,animalData);
 				     		selectedMap.remove(item, oldList); 
 				     		deleteTableRow(item);
-				     		
-							System.out.print("ccc");
 						}
 						else
 							deleteTableRow(item);
@@ -369,8 +363,7 @@ public class AnimalPanel extends JPanel {
      		model.remove(index);
      		JList oldList =  selectedMap.get(item);							
      		DefaultListModel<String> oldModel = (DefaultListModel<String>) oldList.getModel();
-     		animalInfo ele = getInfoByName(item, animalData);
-     		//oldModel.add(ele.index ,item);
+     		animalInfo ele = getInfoByName(item, animalData);    		
      		addToModel(ele,oldModel,animalData);
      		selectedMap.remove(item, oldList); 
      		deleteTableRow(item);

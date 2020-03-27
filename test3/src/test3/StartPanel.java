@@ -22,19 +22,21 @@ import test3.InputData.stationInfo;
 public class StartPanel extends JPanel{
 
 	MainFrame parent;
-	//JTabbedPane mainPane;
+	JTabbedPane pane;
+	
 	ClimatePanel climate = null;
 	InputData climateDataSet;
 	String sourceForData;
+	String stationForData;
 	ArrayList<InputData.stationInfo> stateList;
 	ArrayList<InputData.stationInfo> climateData;
 	
 	JTextField ownerName = new JTextField();
 	JTextField designerName = new JTextField();
 	
-	public StartPanel(JTabbedPane pane, InputData data) {
-		//mainPane = pane;
-		
+	
+	public StartPanel(InputData data) {
+	
 		climateDataSet = data;   	
 		climateDataSet.readClimateSheet("Climate");
 		
@@ -126,7 +128,10 @@ public class StartPanel extends JPanel{
 					int index = st.getSelectedIndex();
 					String stateName = state[index];
 					climateData = climateDataSet.filterByState(stateName, climateDataSet.allClimateData);
-					//System.out.println(stateList.size());					
+									
+					st.setPrototypeDisplayValue(st.getSelectedItem());
+					stationForData = (String) st.getPrototypeDisplayValue();					
+					
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
@@ -156,14 +161,14 @@ public class StartPanel extends JPanel{
 					System.out.print("Nothing selected");            //must select one data source, otherwise, the button doesn't work					
 				}
 				else if( (ds.getSelectedIndex() == 1 || ds.getSelectedIndex() == 2) && st.getSelectedIndex() != 0){     //select the first or second data source
-
-					try {												
-						int index = pane.indexOfTab("climate");
+					
+					try {
+						pane = parent.tabbedPane;
+						int index = pane.indexOfTab("climate");					
 						if(climate == null) {
-							climate = new ClimatePanel(pane,climateData,sourceForData);
+							climate = new ClimatePanel(climateData,sourceForData);
 							climate.setParent(parent);
-							pane.add("climate", climate);
-							
+							pane.add("climate", climate);							
 						}
 						/*else {
 							pane.remove(index);
@@ -200,15 +205,7 @@ public class StartPanel extends JPanel{
 		// add  *** Help ***
 		gbc.gridx = 5;
 		gbc.gridy = 12;
-		this.add(new JButton("Help"), gbc);
-		
-		// set this frame ***
-		//setSize(500,400);
-		//setPreferredSize(getSize());
-		//setResizable(false);
-		//setVisible(true);
-		//setDefaultCloseOperation(EXIT_ON_CLOSE);	
-		
+		this.add(new JButton("Help"), gbc);			
 		
 	}
 	

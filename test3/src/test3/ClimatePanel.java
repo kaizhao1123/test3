@@ -35,6 +35,7 @@ import test3.InputData.animalInfo;
 
 public class ClimatePanel extends JPanel{
 	MainFrame parent;
+	JTabbedPane pane;
 	AnimalPanel animal = null;
 	
 	// Initial the data structure
@@ -63,8 +64,7 @@ public class ClimatePanel extends JPanel{
 	};
 	
 	// Initial the frame structure
-	//JFrame jf;
-	
+
 	MyTable mt1 = new MyTable();  // used for download the existing AWM data
 	MyTable mt2 = new MyTable();  // used for input data by the custom
 	
@@ -83,11 +83,8 @@ public class ClimatePanel extends JPanel{
 	JComboBox bStation = new JComboBox();;
 
 	
-	public ClimatePanel(JTabbedPane pane, ArrayList<InputData.stationInfo> data, String source) {		
+	public ClimatePanel(ArrayList<InputData.stationInfo> data, String source) {		
 		
-		
-		//data.readClimateSheet("climate");
-		//climateData = data.allClimateData;
 		climateData = data;
 
 		
@@ -476,7 +473,7 @@ public class ClimatePanel extends JPanel{
 				{
 					public void actionPerformed(ActionEvent e){
 						   //select the first or second data source
-						
+						pane = parent.tabbedPane;
 						if(idata == null) {
 							idata = parent.excelData;
 							idata.readAnimalSheet("animal");							
@@ -485,8 +482,8 @@ public class ClimatePanel extends JPanel{
 							try {												
 								int index = pane.indexOfTab("animal");
 								if(animal == null) {
-									animal = new AnimalPanel(pane,animalData,source);
-									animal.setParent(parent);									
+									animal = new AnimalPanel(animalData,source);
+									animal.setParent(parent);								
 									pane.add("animal",animal);
 								}
 								/*else {
@@ -499,7 +496,6 @@ public class ClimatePanel extends JPanel{
 									pane.insertTab("animal", null, animal, null, index);													
 								}*/
 								pane.setSelectedIndex(pane.indexOfTab("animal"));
-
 							} catch (Exception e1) {
 								e1.printStackTrace();
 							}					
