@@ -285,7 +285,7 @@ public class AddAnimalDialog extends JDialog{
 		
 	}
 	
-	public boolean allNotEmpty(String[] s) {
+	private boolean allNotEmpty(String[] s) {
 		if(s != null) {
 			for(int i = 0; i < s.length; i++) {
 				if(s[i].equals(" "))

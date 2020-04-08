@@ -140,10 +140,22 @@ public class StartPanel extends JPanel{
 		this.add(st, gbc);
 		
 		// add  *** Operating Period Setup ***
+		JButton buttonSetup = new JButton("Operating Period Setup");
+		buttonSetup.addActionListener(new ActionListener()                   //After selected the data source, open the climate frame with data;
+		{
+			public void actionPerformed(ActionEvent e){												
+				try {
+					OperatingPeriodDialog periodDialog	= new OperatingPeriodDialog();
+					periodDialog.setParent(parent);
+				} catch (Exception e1) {
+						e1.printStackTrace();
+				}					
+			}								
+		});
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.gridx = 3;
 		gbc.gridy = 8;
-		this.add(new JButton("Operating Period Setup"), gbc);
+		this.add(buttonSetup, gbc);
 		
 		//gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.gridx = 3;
