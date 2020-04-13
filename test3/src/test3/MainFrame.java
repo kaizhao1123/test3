@@ -27,39 +27,37 @@ public class MainFrame extends JFrame {
 	
 	private static final long serialVersionUID = 1L;
 	
-	String testword = "Test";
-	
-	public JPanel mainPane;
+	public JPanel mainPanel;     //the main panel include the MenuBar and tabbedPane
 	public JTabbedPane tabbedPane;
 	
-	public StartPanel startPane;
-	public ClimatePanel climatePane;
-	public AnimalPanel animalPane;
+	public StartPanel startPanel;
+	public ClimatePanel climatePanel;
+	public AnimalPanel animalPanel;
 	public AddAnimalDialog addAnimalDialog;
 	
 	
 	public MenuBar menubar;		
-	public InputData excelData;			//for tabbedPanes 
-	public InputData excelData_1;   	//for menubar
+	public InputData excelData;			// Be uesed for tabbedPanel 
+	public InputData excelData_1;   	// Be used for menubar
 
 	
 	public MainFrame(InputData data, int width, int height) throws IOException {
 		super("AWM"); 												//the title of the window		
-		mainPane = new JPanel();   	                                //include the menubarPane and tabbedPane		
+		mainPanel = new JPanel();   	                                //include the menubarPane and tabbedPane		
 		tabbedPane = new JTabbedPane();                             //include the list of panels in tab				
 		excelData = data;											
 			
 		createTabbedPanes(tabbedPane, width, height);	
-		createMainPane(mainPane, tabbedPane, startPane, climatePane, animalPane);		
-		add(mainPane);	
+		createMainPane(mainPanel, tabbedPane, startPanel, climatePanel, animalPanel);		
+		add(mainPanel);	
 	}
 	
-	private void createMainPane(JPanel mainPane, JTabbedPane tabbedPane, StartPanel start, ClimatePanel climate, AnimalPanel animal) {
+	private void createMainPane(JPanel main, JTabbedPane tab, StartPanel start, ClimatePanel climate, AnimalPanel animal) {
 		Container[] containers =  {start, climate, animal};		
 		menubar = new MenuBar(excelData_1, containers) ;		
-		mainPane.setLayout(new BorderLayout());
-		mainPane.add(menubar, BorderLayout.NORTH);
-		mainPane.add(tabbedPane);
+		main.setLayout(new BorderLayout());
+		main.add(menubar, BorderLayout.NORTH);
+		main.add(tabbedPane);
 	}
 	
 	private void createTabbedPanes(JTabbedPane pane, int width, int height) throws IOException {
@@ -162,10 +160,10 @@ public class MainFrame extends JFrame {
 		 */
 		
 
-		startPane = new StartPanel(excelData);
-		startPane.setParent(this);
+		startPanel = new StartPanel(excelData);
+		startPanel.setParent(this);
 					
 		pane.addTab("Introduction", introPanel);
-		pane.addTab("Start", startPane);		
+		pane.addTab("Start", startPanel);		
 	}
 }

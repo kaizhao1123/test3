@@ -36,7 +36,7 @@ import test3.InputData.animalInfo;
 public class ClimatePanel extends JPanel{
 	MainFrame parent;
 	JTabbedPane pane;
-	AnimalPanel animal = null;
+	AnimalPanel animalPanel = null;
 	
 	// Initial the data structure
 	ArrayList<InputData.stationInfo> climateData;
@@ -47,7 +47,7 @@ public class ClimatePanel extends JPanel{
 	InputData.stationInfo currentElement;
 	String[] months = {"January","February","March","April","May","June","July","August","September","October","November","December"};
 	String[] tableColumnName = {" ","Prec(in)","Evap(in)"};
-	Object[][] tableData1;      //custom data
+	Object[][] tableData1;      //the data from the database
 	Object[][] tableData2 = {
  		    {"January","0.00","0.00"},    
             {"February","0.00","0.00"}, 
@@ -63,36 +63,36 @@ public class ClimatePanel extends JPanel{
             {"December","0.00","0.00"},
 	};
 	
-	// Initial the frame structure
-
+	/***
+	 * Initial the frame structure:
+	 * 1. separate into two parts: up and down. 
+	 * 2. separate the second part into two parts: left and right.
+	 ***/
+	
+	
 	MyTable mt1 = new MyTable();  // used for download the existing AWM data
-	MyTable mt2 = new MyTable();  // used for input data by the custom
-	
-	JLabel label;
 	JTable databaseTable;
+	MyTable mt2 = new MyTable();  // used for input data by the customer
 	JTable customTable;
-	JScrollPane scrollPane;	
+	//JLabel label;		
+	JScrollPane scrollPane;	  // used for table
 	JPanel secondLeft;
-	JPanel locationPanel;
-	JPanel customPanel;
-	
-	// the values in different textfields	
+	JPanel databasePlacePanel;	// the panel of county and station, used to get the data from the database
+	JPanel customerPlacePanel;		// the panel of county and station, used to input the data by the customer
 	JTextField valueOfPre;
 	JTextField valueOfKVAL;
 	JTextField valueOfOCV;
 	JTextField valueOfLRV;
 	JTextField valueOfAna;
-	JComboBox bCounty;
-	JComboBox bStation = new JComboBox();;
+	JComboBox bCounty;		// to display the county
+	JComboBox bStation = new JComboBox();   // to display the station
 
 	
 	public ClimatePanel(ArrayList<InputData.stationInfo> data, String source) {		
 		
 		climateData = data;
-
-		
-		// Initial data (to get the first(current) element info and show in the frame)
-		
+	
+		// Initial data (to get the first(current) element info to be displayed in the frame)		
 		currentElement = climateData.get(0);			
 		countyData = new ArrayList<InputData.stationInfo>();		
 		for(int i = 0; i < climateData.size(); i ++) {
@@ -106,14 +106,9 @@ public class ClimatePanel extends JPanel{
 		valueOfOCV = new JTextField(currentElement.data[27]);
 		valueOfLRV = new JTextField(currentElement.data[28]);
 		valueOfAna = new JTextField(currentElement.data[26]);
-		
-		
-		
-    	/***k***
-    	 * Get all county names with corresponding stations from the climateData, and to show in "select county:" and "select station:"
-    	 ***z***/
-		
-		HashMap<String, ArrayList<String>> countyStationMap = new HashMap<>();
+					   	
+    	//Get all county names with corresponding stations from the climateData, used to show in "select county:" and "select station:"   			
+		HashMap<String, ArrayList<String>> countyStationMap = new HashMap<>();  // store the county and its stations
 		for(InputData.stationInfo element : climateData) { 			
 			String key = element.county;
 			if(!countyStationMap.containsKey(key)) {
@@ -126,7 +121,7 @@ public class ClimatePanel extends JPanel{
     	}   
 		
     	/***k***
-		 * Set up the layout and add components into it
+		 * Set up the border layout and add components into it
 		 * Split the screen into two parts: 	A. firstLine(north), B.secondPart(center)
 		 ***z***/								
 		BorderLayout border= new BorderLayout(); 
@@ -143,18 +138,10 @@ public class ClimatePanel extends JPanel{
 		
 		/***k***
 		 * A. build the first part , which including two child panel:  "Select Climate Data Source" and "Options for Evaluating Monthly Net Prec - Evap"
-		 ***z***/
-		
+		 ***z***/		
 		JPanel firstPart = new JPanel(); 
-		GridBagLayout firstLineLayOut = new GridBagLayout();
-		GridBagConstraints gbc1 =  new GridBagConstraints();		
-		firstPart.setLayout(firstLineLayOut);
 
-		// A.1 : the panel for "Select Climate Data Source"	
-		gbc1.gridx = 0;
-		gbc1.gridy = 1;
-		gbc1.fill = GridBagConstraints.BOTH;
-		
+		// A.1 : the panel for "Select Climate Data Source". Two radio buttons correspond to two placePanels.		
 		JPanel scds = new JPanel();
 		scds.setLayout(new GridLayout(2,1));
 		JRadioButton r1 = new JRadioButton("Use AWM Database");
@@ -174,8 +161,8 @@ public class ClimatePanel extends JPanel{
 					valueOfLRV.setText(currentElement.data[28]);
 					valueOfAna.setText(currentElement.data[26]);					
 					scrollPane.setViewportView(databaseTable);
-					secondLeft.remove(customPanel);
-					secondLeft.add(locationPanel,0);
+					secondLeft.remove(customerPlacePanel);			
+					secondLeft.add(databasePlacePanel,0);
 					secondLeft.updateUI();
 				} catch (Exception e1) {
 					// TODO Auto-generated catch block
@@ -194,8 +181,8 @@ public class ClimatePanel extends JPanel{
 					valueOfLRV.setText("0");
 					valueOfAna.setText("0");
 					scrollPane.setViewportView(customTable);
-					secondLeft.remove(locationPanel);
-					secondLeft.add(customPanel,0);
+					secondLeft.remove(databasePlacePanel);
+					secondLeft.add(customerPlacePanel,0);
 					secondLeft.updateUI();
 				} catch (Exception e1) {
 					// TODO Auto-generated catch block
@@ -204,13 +191,8 @@ public class ClimatePanel extends JPanel{
 			}
 		});		
 		scds.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(),"Select Climate Data Source"));		
-		firstPart.add(scds, gbc1);  // add the panel into the firstpart panel
-
-		// A.2 :  the panel for "Options for Evaluating Monthly Net Prec - Evap"	
-		gbc1.gridx = 1;
-		gbc1.gridy = 1;
-		gbc1.gridwidth = 2;
 		
+		// A.2 :  the panel for "Options for Evaluating Monthly Net Prec - Evap"					
 		JPanel mnpe = new JPanel();
 		mnpe.setLayout(new GridLayout(3,2));
 		JRadioButton r3 = new JRadioButton("If prec - evap < 0 then set net value to 0              ");
@@ -225,35 +207,45 @@ public class ClimatePanel extends JPanel{
 		r5.addActionListener(sliceActionListener);
 		mnpe.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(),"Options for Evaluating Monthly Net Prec - Evap"));	
 		
+		// setup the layout of the first part
+		GridBagLayout firstLineLayOut = new GridBagLayout();
+		GridBagConstraints gbc1 =  new GridBagConstraints();		
+		firstPart.setLayout(firstLineLayOut);
+		gbc1.gridx = 0;
+		gbc1.gridy = 1;
+		gbc1.fill = GridBagConstraints.BOTH;
+		firstPart.add(scds, gbc1);  // add the panel into the firstpart panel
+		gbc1.gridx = 1;
+		gbc1.gridy = 1;
+		gbc1.gridwidth = 2;			
 		firstPart.add(mnpe, gbc1);   //add the panel into the firstpart panel
-		this.add(firstPart,border.NORTH);  // add the first part into the frame.
 		
-	
+		this.add(firstPart,border.NORTH);  // add the first part into the frame.
+			
 		/***k***
 		 * B. Build the second part, which including two child panel: secondLeft and secondRight. 
 		 * 	  The "secondLeft" includes panel("location"), panel("Precipitation"), label("lagoon loading rates"), panel(RDM), panel(NDM);
 		 *    and the "secondRight" includes "table" and "buttons".
 		 ***z***/
-		
-		
+				
 		// build the main panel of the second part
 		JPanel secondPart = new JPanel(); 
 		secondPart.setLayout(new GridBagLayout());
 		GridBagConstraints gbcTwo =  new GridBagConstraints();	
-		
+				
 		//B.L build the panel: secondLeft		
 		gbcTwo.gridx = 0;
 		gbcTwo.gridy = 0;
 		gbcTwo.fill = GridBagConstraints.BOTH;
-				
-		
+						
 		secondLeft = new JPanel();   
 		secondLeft.setLayout(new GridBagLayout());
 		GridBagConstraints gbcTwoLeft =  new GridBagConstraints();		
 				
-		// B.L.1 : the panel for "selecting location"
+		// B.L.1 : the panel for "selecting location"		
+		databasePlacePanel = new JPanel();	
 		
-		locationPanel = new JPanel();		
+		// to get all counties and order them		
 		String[] listOfCounty = new String[countyStationMap.size()];				
 		Set<String> keySet = countyStationMap.keySet();
 		int count = 0;
@@ -267,11 +259,10 @@ public class ClimatePanel extends JPanel{
 		bCounty = new JComboBox(listOfCounty);				
 		bCounty.setPreferredSize(new Dimension(230,25));
 		//bCounty.setSelectedIndex(0);
-		bCounty.addActionListener(new ActionListener()                //state listener: select different state name to get corresponding data.
+		bCounty.addActionListener(new ActionListener()    //state listener: select different state name to get corresponding data.
 				{
 					public void actionPerformed(ActionEvent e){
-						try {
-							
+						try {							
 							int index = bCounty.getSelectedIndex();
 							String countyName = listOfCounty[index];							
 							countyData = new ArrayList<>();
@@ -283,8 +274,7 @@ public class ClimatePanel extends JPanel{
 							ArrayList<String> countyValue = countyStationMap.get(countyName);
 							String[] staList = convertToStringList(countyValue);
 							DefaultComboBoxModel stationModel = new DefaultComboBoxModel(staList);		
-							bStation.setModel(stationModel);	
-							
+							bStation.setModel(stationModel);								
 							if(countyData.size() == 1) {
 								refreshData(0);
 							}
@@ -316,20 +306,22 @@ public class ClimatePanel extends JPanel{
 						}
 					}
 				});
-		locationPanel.setLayout(new GridBagLayout());
+		
+		// setup the layout of the databasePlacePandl
+		databasePlacePanel.setLayout(new GridBagLayout());
 		GridBagConstraints gcl = new GridBagConstraints();		
 		gcl.anchor = GridBagConstraints.NORTHWEST;
 		gcl.insets = new Insets(5,10,0,10);
 		gcl.gridx = 0;
 		gcl.gridy = 0;
-		locationPanel.add(labelCounty,gcl);
+		databasePlacePanel.add(labelCounty,gcl);
 		gcl.gridx = 1;
-		locationPanel.add(bCounty,gcl);
+		databasePlacePanel.add(bCounty,gcl);
 		gcl.gridx = 0;
 		gcl.gridy = 1;
-		locationPanel.add(labelStation,gcl);
+		databasePlacePanel.add(labelStation,gcl);
 		gcl.gridx = 1;
-		locationPanel.add(bStation,gcl);
+		databasePlacePanel.add(bStation,gcl);
 					
 		//// B.L.2 : the panel for "Precipitation"  
        
@@ -356,6 +348,7 @@ public class ClimatePanel extends JPanel{
 		JLabel jl1 = new JLabel("lbx VS/cu. ft/day");
 		JLabel jl2 = new JLabel("lbx VS/cu. ft/day");
 		
+		// setup the layout of the rationalPanel
 		rationalPanel.setLayout(new GridBagLayout());
 		GridBagConstraints gbcRa = new GridBagConstraints();
 		gbcRa.fill = GridBagConstraints.NORTHWEST;
@@ -399,15 +392,14 @@ public class ClimatePanel extends JPanel{
 		nrcsPanel.add(valueOfAna);nrcsPanel.add(jl3);
 		nrcsPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(),"NRCS Design Method"));
         
-		
-		
+				
 		// setup for layout of left
 		gbcTwoLeft.anchor = GridBagConstraints.NORTHWEST;
 		gbcTwoLeft.insets = new Insets(0,10,0,10);
 		
 		gbcTwoLeft.gridx = 0;
 		gbcTwoLeft.gridy = 0;
-		secondLeft.add(locationPanel,gbcTwoLeft);
+		secondLeft.add(databasePlacePanel,gbcTwoLeft);
 		gbcTwoLeft.gridy = 1;
 		secondLeft.add(prePanel,gbcTwoLeft);
 		gbcTwoLeft.gridy = 2;
@@ -420,7 +412,7 @@ public class ClimatePanel extends JPanel{
         
         // the panel of "Entering location" for customer
         
-        customPanel = new JPanel();
+        customerPlacePanel = new JPanel();
         JLabel labelEnterCounty = new JLabel("Enter County: ");
         JLabel labelEnterStation = new JLabel("Enter Station: ");
         JTextField textEnterCounty = new JTextField();
@@ -428,20 +420,20 @@ public class ClimatePanel extends JPanel{
         JTextField textEnterStation = new JTextField();
         textEnterStation.setPreferredSize(new Dimension(230,25));
         
-        customPanel.setLayout(new GridBagLayout());
+        customerPlacePanel.setLayout(new GridBagLayout());
         GridBagConstraints gcEnter = new GridBagConstraints();		
 		gcEnter.anchor = GridBagConstraints.NORTHWEST;
 		gcEnter.insets = new Insets(5,10,0,10);
 		gcEnter.gridx = 0;
 		gcEnter.gridy = 0;
-		customPanel.add(labelEnterCounty,gcEnter);
+		customerPlacePanel.add(labelEnterCounty,gcEnter);
 		gcEnter.gridx = 1;
-		customPanel.add(textEnterCounty,gcEnter);
+		customerPlacePanel.add(textEnterCounty,gcEnter);
 		gcEnter.gridx = 0;
 		gcEnter.gridy = 1;
-		customPanel.add(labelEnterStation,gcEnter);
+		customerPlacePanel.add(labelEnterStation,gcEnter);
 		gcEnter.gridx = 1;
-		customPanel.add(textEnterStation,gcEnter);
+		customerPlacePanel.add(textEnterStation,gcEnter);
         
         
 
@@ -503,11 +495,11 @@ public class ClimatePanel extends JPanel{
 						}							
 						animalData = idata.filterByDataSource(source, idata.allAnimalData);
 							try {												
-								int index = pane.indexOfTab("animal");
-								if(animal == null) {
-									animal = new AnimalPanel(animalData,source);
-									animal.setParent(parent);								
-									pane.add("animal",animal);
+								//int index = pane.indexOfTab("animal");
+								if(animalPanel == null) {
+									animalPanel = new AnimalPanel(animalData,source);
+									animalPanel.setParent(parent);								
+									pane.add("animal",animalPanel);
 								}
 								/*else {
 									pane.remove(index);
@@ -565,10 +557,10 @@ public class ClimatePanel extends JPanel{
 		valueOfKVAL.setText(currentElement.data[25]);
 		valueOfOCV.setText(currentElement.data[27]);
 		valueOfLRV.setText(currentElement.data[28]);
-		valueOfAna.setText(currentElement.data[26]);
-		
-
+		valueOfAna.setText(currentElement.data[26]);		
 	}
+	
+	
 	
 	public void setParent(MainFrame frame) {
 		this.parent = frame;

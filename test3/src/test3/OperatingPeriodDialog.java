@@ -16,10 +16,13 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 public class OperatingPeriodDialog extends JDialog{
 	MainFrame parent;
+	JTabbedPane pane;
+	LocationPanel locationPanel;
 	
     Boolean firstOption = true;
 	Boolean secondOption = false;
@@ -69,7 +72,7 @@ public class OperatingPeriodDialog extends JDialog{
 		operatingPeriod = boxEM.getSelectedItem().toString() + "-" + boxEM.getSelectedItem().toString();
 		ButtonGroup bg = new ButtonGroup();			
 		bg.add(r1);bg.add(r2);
-
+		
 		r1.setSelected(true);
 		r1.addActionListener(new ActionListener()
 		{
@@ -86,7 +89,14 @@ public class OperatingPeriodDialog extends JDialog{
 					secondOperatingPeriod = null;
 					panel.remove(thirdPanel);
 					panel.updateUI();
-										
+					
+					pane = parent.tabbedPane;
+					int index = pane.indexOfTab("location");  	  // it is associate with location panel.				
+					if(index >= 0) {
+						locationPanel = (LocationPanel) pane.getComponentAt(index);
+						locationPanel.update1();
+					}
+			    	
 					
 				} catch (Exception e1) {
 					// TODO Auto-generated catch block
@@ -113,7 +123,13 @@ public class OperatingPeriodDialog extends JDialog{
 					secondOperatingPeriod = boxEM.getItemAt((boxEM.getSelectedIndex()+1)%12).toString()  + "-" + boxBM.getItemAt((boxBM.getSelectedIndex()+11)%12).toString();
 					textSecondOP.setText(secondOperatingPeriod);
 					panel.updateUI();
-
+					
+					pane = parent.tabbedPane;
+					int index = pane.indexOfTab("location");    // it is associate with location panel.
+					if(index >= 0) {
+						locationPanel = (LocationPanel) pane.getComponentAt(index);
+						locationPanel.update2();
+					}
 				} catch (Exception e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -205,7 +221,13 @@ public class OperatingPeriodDialog extends JDialog{
 				
 		// the 5th part
 		buttonOK.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e){					
+			public void actionPerformed(ActionEvent e){	
+				if(locationPanel != null) {
+					if(firstOption)
+						locationPanel.update1();
+					if(secondOption)
+						locationPanel.update2();
+				}
 				dispose();								
 			}							
 		}						

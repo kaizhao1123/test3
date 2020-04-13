@@ -23,6 +23,7 @@ public class StartPanel extends JPanel{
 
 	MainFrame parent;
 	JTabbedPane pane;
+	OperatingPeriodDialog periodDialog;
 	
 	ClimatePanel climate = null;
 	InputData climateDataSet;
@@ -34,6 +35,7 @@ public class StartPanel extends JPanel{
 	JTextField ownerName = new JTextField();
 	JTextField designerName = new JTextField();
 	
+	Boolean hasChosenPeriod = false;
 	
 	public StartPanel(InputData data) {
 	
@@ -145,8 +147,15 @@ public class StartPanel extends JPanel{
 		{
 			public void actionPerformed(ActionEvent e){												
 				try {
-					OperatingPeriodDialog periodDialog	= new OperatingPeriodDialog();
-					periodDialog.setParent(parent);
+					if(hasChosenPeriod.equals(false)) {
+						periodDialog = new OperatingPeriodDialog();
+						periodDialog.setParent(parent);
+						hasChosenPeriod = true;
+					}
+					else {
+						periodDialog.show();
+					}
+					
 				} catch (Exception e1) {
 						e1.printStackTrace();
 				}					
@@ -176,7 +185,7 @@ public class StartPanel extends JPanel{
 					
 					try {
 						pane = parent.tabbedPane;
-						int index = pane.indexOfTab("climate");					
+						//int index = pane.indexOfTab("climate");					
 						if(climate == null) {
 							climate = new ClimatePanel(climateData,sourceForData);
 							climate.setParent(parent);
@@ -191,6 +200,12 @@ public class StartPanel extends JPanel{
 						pane.setSelectedIndex(pane.indexOfTab("climate"));
 						ds.setEnabled(false);
 						st.setEnabled(false);
+						if(hasChosenPeriod.equals(false)) {
+							periodDialog = new OperatingPeriodDialog();
+							periodDialog.setParent(parent);
+							hasChosenPeriod = true;
+							periodDialog.setVisible(false);
+						}
 					} catch (Exception e1) {
 						e1.printStackTrace();
 					}					

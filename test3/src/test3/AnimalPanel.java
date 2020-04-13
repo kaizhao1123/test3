@@ -28,10 +28,13 @@ import test3.InputData.animalInfo;
 public class AnimalPanel extends JPanel {
 	MainFrame parent;
 	JTabbedPane pane;
-	ArrayList<InputData.animalInfo> animalData;     // the animal data from the database
-	ArrayList<InputData.animalInfo> newAnimalDataset = new ArrayList<InputData.animalInfo>();  // the animal data created by the customer;
-	animalInfo newAnimalInfo;
+	LocationPanel locationPanel;
 	AddAnimalDialog modelDialog;
+	
+	ArrayList<animalInfo> animalData;     // the animal data from the database
+	//ArrayList<InputData.animalInfo> newAnimalDataset = new ArrayList<InputData.animalInfo>();  // the animal data created by the customer;
+	animalInfo newAnimalInfo;
+	ArrayList<animalInfo> reportedAnimal = new ArrayList<animalInfo>(); // the animals showed in the table, including all selected and new build animals, used to generate report
 	
 	String testword = "animal.....";
 	
@@ -39,23 +42,25 @@ public class AnimalPanel extends JPanel {
     JLabel jl1, jl2, jl3,jl4,jl5,jl6;	
 	JScrollPane choicesScrollPane;
 	JScrollPane selectedScrollPane;
-	JScrollPane tableScrollPane;	
+	JScrollPane tableScrollPane;
+	MyTable mTable;
+	JTable jtable;
 	JComboBox animalType;
-	JButton add;
-	JButton remove;
-	JButton addAll;
-	JButton removeAll;
-	JButton newAnimal;
-	JButton deleteRow;
-	JButton ok;
-	JButton help;
+	JButton buttonAdd;
+	JButton buttonRemove;
+	JButton buttonAddAll;
+	JButton buttonRemoveAll;
+	JButton buttonNewAnimal;
+	JButton buttonDeleteRow;
+	JButton buttonOK;
+	JButton buttonHelp;
 
 	JList<String> choicesList;            // to display the choices
 	JList<String> selectedList; 		  // to display the selected 	
 	DefaultListModel<String> selectedModel;
 
 	HashMap<String, JList<String>> choicesMap = new HashMap<>();          // K is the name of animal type, V is the original JList respond the name
-	HashMap<String, JList<String>> selectedMap = new HashMap<>();		 // K is element,  V is the JList where the element come from
+	HashMap<String, JList<String>> selectedMap = new HashMap<>();		 // K is element,  V is the JList where the element come from.
 	
 	String[] animal = {"Beef","Dairy","Goat","Horse","Poultry", "Sheep","Swine","Veal"};
 	String[] columnNamess = {"<html> Animal  </html>",           // the header of table
@@ -74,15 +79,14 @@ public class AnimalPanel extends JPanel {
 	{"Feeder Beef","Beef","0","1","2","3","4","5","0","0","0","0"},
 	{"Feeder Beef","Beef","0","1","2","3","4","5","0","0","0","0"}}; */
 	Object[][] dataa;											// the data of table
-	MyTable mTable;
-	JTable jtable;
+
 	
 	public AnimalPanel(ArrayList<animalInfo> data, String source) {
 
 		animalData = data;	
 
 				
-		// build list to store different type of animal
+		// build several lists to store different type of animal
 		ArrayList<animalInfo> beef = filterByType("Beef",animalData);
 		ArrayList<animalInfo> dairy = filterByType("Dairy",animalData);
 		ArrayList<animalInfo> goat = filterByType("Goat",animalData);
@@ -91,9 +95,7 @@ public class AnimalPanel extends JPanel {
 		ArrayList<animalInfo> sheep = filterByType("Sheep",animalData);
 		ArrayList<animalInfo> swine = filterByType("Swine",animalData);
 		ArrayList<animalInfo> veal = filterByType("Veal",animalData);
-		
-
-				
+						
 		// build each Jlist for each type of animal, and store in the map
         DefaultListModel<String> beefModel = new DefaultListModel<>();  
         InputElementIntoModel(beef,beefModel);
@@ -144,7 +146,7 @@ public class AnimalPanel extends JPanel {
 	    choicesMap.put("veal",vealList);
 	    
 	    
-	    //initial beef as the default data in choices
+	    //initial beef as the first display data in choices
 	    choicesList = beefList;
 	    choicesScrollPane = new JScrollPane(choicesList);
 	    choicesScrollPane.setPreferredSize(new Dimension(120,160));
@@ -190,66 +192,66 @@ public class AnimalPanel extends JPanel {
 	    jl4.setFont(font);
 	    jl5.setFont(font);
 	    jl6.setFont(font);	    
-	    add = new JButton("Add >");
-	    add.setFont(font);
-	    add.setPreferredSize(new Dimension(100,25));
-	    remove = new JButton("< Remove");	
-	    remove.setFont(font);
-	    remove.setPreferredSize(new Dimension(100,25));
-	    addAll = new JButton("Add All >>");
-	    addAll.setFont(font);
-	    addAll.setPreferredSize(new Dimension(100,25));
-	    removeAll =new JButton("<<Remove All");
-	    removeAll.setFont(font);
-	    removeAll.setPreferredSize(new Dimension(100,25));
-		newAnimal = new JButton("New Animal");
-		newAnimal.setFont(font);
-		newAnimal.setPreferredSize(new Dimension(100,25));	
-		deleteRow = new JButton("delete Row");
-		deleteRow .setFont(font);
-		deleteRow .setPreferredSize(new Dimension(100,25));	
-		ok = new JButton("ok");
-		ok.setFont(font);
-	    ok.setPreferredSize(new Dimension(100,25));
-		help = new JButton("help");
-		help.setFont(font);
-	    help.setPreferredSize(new Dimension(100,25));
+	    buttonAdd = new JButton("Add >");
+	    buttonAdd.setFont(font);
+	    buttonAdd.setPreferredSize(new Dimension(100,25));
+	    buttonRemove = new JButton("< Remove");	
+	    buttonRemove.setFont(font);
+	    buttonRemove.setPreferredSize(new Dimension(100,25));
+	    buttonAddAll = new JButton("Add All >>");
+	    buttonAddAll.setFont(font);
+	    buttonAddAll.setPreferredSize(new Dimension(100,25));
+	    buttonRemoveAll =new JButton("<<Remove All");
+	    buttonRemoveAll.setFont(font);
+	    buttonRemoveAll.setPreferredSize(new Dimension(100,25));
+	    buttonNewAnimal = new JButton("New Animal");
+	    buttonNewAnimal.setFont(font);
+	    buttonNewAnimal.setPreferredSize(new Dimension(100,25));	
+	    buttonDeleteRow = new JButton("delete Row");
+	    buttonDeleteRow .setFont(font);
+	    buttonDeleteRow .setPreferredSize(new Dimension(100,25));	
+	    buttonOK = new JButton("ok");
+	    buttonOK.setFont(font);
+	    buttonOK.setPreferredSize(new Dimension(100,25));
+	    buttonHelp = new JButton("help");
+	    buttonHelp.setFont(font);
+	    buttonHelp.setPreferredSize(new Dimension(100,25));
 		
 	    // add listeners of each button
-	    add.addActionListener(new ActionListener() {
+	    buttonAdd.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e){													
 						addToSelectedList();
 					}							
 				}						
 			);
-	    remove.addActionListener(new ActionListener() {
+	    buttonRemove.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e){						
 						removeFromSelectedList();
 					}							
 				}						
 			);
-	    addAll.addActionListener(new ActionListener(){
+	    buttonAddAll.addActionListener(new ActionListener(){
 					public void actionPerformed(ActionEvent e){						
 						addAllToSelectedList();
 					}							
 				}						
 			);
-	    removeAll.addActionListener(new ActionListener() {
+	    buttonRemoveAll.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e){						
 						removeAllFromSelectedList();
 					}							
 				}						
 			);
-	    newAnimal.addActionListener(new ActionListener() {
+	    buttonNewAnimal.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e){						
-						String source = parent.startPane.sourceForData;
-						String station = parent.startPane.stationForData;						
+						String source = parent.startPanel.sourceForData;
+						String station = parent.startPanel.stationForData;						
 				    	modelDialog = new AddAnimalDialog(mTable,jtable,source,station);
 				    	modelDialog.setParent(parent);
 					}							
 				}						
 			);
-	    deleteRow.addActionListener(new ActionListener() {
+	    buttonDeleteRow.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e){						
 						int row = jtable.getSelectedRow();					
 						String item = mTable.model.p[row][0].toString();					
@@ -264,12 +266,35 @@ public class AnimalPanel extends JPanel {
 				     		selectedMap.remove(item, oldList); 
 				     		deleteTableRow(item);
 						}
-						else
-							deleteTableRow(item);
+						else {
+							if(!item.equals("Total"))
+								deleteTableRow(item);
+						}
+							
 					}							
 				}						
 			);
-
+	    buttonOK.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e){	
+				pane = parent.tabbedPane;
+				if(locationPanel == null) {
+					
+					locationPanel = new LocationPanel(reportedAnimal);
+					locationPanel.setParent(parent);								
+					pane.add("location",locationPanel);
+					
+					if(parent.startPanel.periodDialog.secondOption == true) {
+						locationPanel.update2();
+					}
+					
+				}
+				else {
+					//get the location table and add column.
+				}
+				pane.setSelectedIndex(pane.indexOfTab("location"));
+			}							
+		}						
+	);
 	    
 	    /**
 	     * set the layout
@@ -301,20 +326,20 @@ public class AnimalPanel extends JPanel {
 		gc.insets = new Insets(2,10,2,10);
 		gc.gridx = 2;
 		gc.gridy = 2;
-		add(add,gc);
+		add(buttonAdd,gc);
 		gc.gridy = 3;
-		add(remove,gc);
+		add(buttonRemove,gc);
 		gc.gridy = 4;
-		add(addAll,gc);
+		add(buttonAddAll,gc);
 		gc.gridy = 5;
-		add(removeAll, gc);
+		add(buttonRemoveAll, gc);
 		
 		gc.insets = new Insets(30,0,0,0);
 		gc.gridx = 4;
 		gc.gridy = 6;
-		add(newAnimal,gc);
+		add(buttonNewAnimal,gc);
 		gc.gridx = 5;
-		add(deleteRow,gc);
+		add(buttonDeleteRow,gc);
 		
 		
 		gc.insets = new Insets(5,0,0,0);
@@ -335,9 +360,9 @@ public class AnimalPanel extends JPanel {
 		gc.gridy = 11;
 		add(jl6,gc);
 		gc.gridx = 5;
-		add(help,gc);
+		add(buttonHelp,gc);
 		gc.gridx = 6;
-		add(ok,gc);
+		add(buttonOK,gc);
 
 
 
@@ -416,6 +441,8 @@ public class AnimalPanel extends JPanel {
 				mTable.model.mySetValueAt(mTable.model.getNewSum(i), mTable.model.getRowCount()-1, i);
 			}						
 			jtable.updateUI();
+			animalInfo a = getByName(reportedAnimal, item);
+			reportedAnimal.remove(a);
  		}
     }
     
@@ -451,10 +478,15 @@ public class AnimalPanel extends JPanel {
     			mTable.model.addRow(rowData);
                
     			for(int i = 2; i < rowData.length; i++) {
-    				mTable.model.mySetValueAt(mTable.model.getNewSum(i), mTable.model.getRowCount()-1, i);
+    				if(i == 3 || i == 4 || i == 5 || i == 6) {
+    					mTable.model.mySetValueAt("N/A", mTable.model.getRowCount()-1, i);
+    					
+    				}    					
+    				else
+    					mTable.model.mySetValueAt(mTable.model.getNewSum(i), mTable.model.getRowCount()-1, i);
     			}						
     			jtable.updateUI();
-         	 	
+         	 	reportedAnimal.add(ele);
      		}
      		
     }
@@ -524,6 +556,16 @@ public class AnimalPanel extends JPanel {
     			return true;
     	}
     	return false;
+    }
+    
+    public animalInfo getByName(ArrayList<animalInfo> list, String n) {
+    	animalInfo res = null;
+    	for(int i = 0; i < list.size(); i++) {
+    		if(list.get(i).name.equals(n)) {
+    			res = list.get(i);
+    		}
+    	}
+    	return res;
     }
     
 	public void setParent(MainFrame frame) {

@@ -16,6 +16,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 
@@ -25,12 +26,14 @@ import test3.InputData.animalInfo;
 public class AddAnimalDialog extends JDialog{
 
 	MainFrame parent;
+	JTabbedPane pane;
+	
 	MyTable myTable;
     JTable jTable;
     String source;
     String station;
     
-    animalInfo newAnimal;
+    //animalInfo newAnimal;
     
 	public AddAnimalDialog(MyTable mt, JTable jt, String sour, String sta){
 		 
@@ -39,13 +42,8 @@ public class AddAnimalDialog extends JDialog{
 		source = sour;
 		station = sta;
 		
-		JDialog dialog = this;
-		
+		JDialog dialog = this;		
 		JPanel panel = new JPanel();
-		
-    	panel.setLayout(new GridBagLayout());
-		GridBagConstraints gc = new GridBagConstraints();		
-		gc.anchor = GridBagConstraints.NORTHWEST;
 		
 		JLabel animalName = new JLabel("Animal Name:");
 		JLabel animalType = new JLabel("Animal Type:");
@@ -64,12 +62,7 @@ public class AddAnimalDialog extends JDialog{
 		JLabel unit41 = new JLabel("lbs/ton");
 		JLabel unit42 = new JLabel("lbs/ton");
 		JLabel unit43 = new JLabel("lbs/ton");
-		
-		
-		
-	   ;
-		
-	    
+			    
 	    JTextField valOfAN = new JTextField(" ");
 		valOfAN.setPreferredSize(new Dimension(70,20));
 		String[] animal = {"Beef","Dairy","Goat","Horse","Poultry", "Sheep","Swine","Veal"};
@@ -123,7 +116,6 @@ public class AddAnimalDialog extends JDialog{
 				if(allNotEmpty(dataSet)) {
 					InputData newInputData = new InputData();
 					animalInfo ele = newInputData.new animalInfo(n, t , source, dataSet, 0);
-					newAnimal = ele;
 					DecimalFormat df = new DecimalFormat("0.00");	        		
 	         		String[] rowData = new String[11];
 	    			String quantity = "0";
@@ -152,14 +144,12 @@ public class AddAnimalDialog extends JDialog{
 	    			myTable.model.addRow(rowData);	    					
 					for(int i = 2; i < myTable.model.p[0].length; i++) {
 						myTable.model.mySetValueAt(myTable.model.getNewSum(i), myTable.model.getRowCount()-1, i);
-					}					
-
-			    	AnimalPanel ap = (AnimalPanel) parent.tabbedPane.getComponentAt(3);
+					}
+					pane = parent.tabbedPane;
+					int index = pane.indexOfTab("animal");
+			    	AnimalPanel ap = (AnimalPanel) pane.getComponentAt(index);
 			    	ap.newAnimalInfo = ele;
-			    	ap.newAnimalDataset.add(ap.newAnimalInfo);
-			    	
-			    	System.out.print(ap.newAnimalDataset.get(0).name);
-					
+			    	ap.reportedAnimal.add(ap.newAnimalInfo);					
 					jTable.updateUI();
 					dialog.dispose();
 				}
@@ -173,9 +163,7 @@ public class AddAnimalDialog extends JDialog{
 			}							
 		}						
 		);
-		
-		
-		
+						
 		// build the panel for "Manure Master Only"
 		JPanel mmoPanel = new JPanel();
 		mmoPanel.setLayout(new GridBagLayout());
@@ -211,9 +199,11 @@ public class AddAnimalDialog extends JDialog{
 		mmoPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(),"Manure Master Only"));
 		mmoPanel.setPreferredSize(new Dimension(350,120));
 		
-		
-		//////////////////////
-		// set the layout of panel
+
+		// set the layout of panel		
+    	panel.setLayout(new GridBagLayout());
+		GridBagConstraints gc = new GridBagConstraints();		
+		gc.anchor = GridBagConstraints.NORTHWEST;
 		gc.insets = new Insets(10,10,5,5);
 		gc.gridx = 0;
 		gc.gridy = 0;
