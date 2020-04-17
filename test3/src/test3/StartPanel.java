@@ -23,9 +23,9 @@ public class StartPanel extends JPanel{
 
 	MainFrame parent;
 	JTabbedPane pane;
-	OperatingPeriodDialog periodDialog;
-	
+	OperatingPeriodDialog periodDialog;	
 	ClimatePanel climate = null;
+	
 	InputData climateDataSet;
 	String sourceForData;
 	String stationForData;
@@ -34,9 +34,7 @@ public class StartPanel extends JPanel{
 	
 	JTextField ownerName = new JTextField();
 	JTextField designerName = new JTextField();
-	
-	Boolean hasChosenPeriod = false;
-	
+		
 	public StartPanel(InputData data) {
 	
 		climateDataSet = data;   	
@@ -51,8 +49,6 @@ public class StartPanel extends JPanel{
     	for(InputData.stationInfo element : climateDataSet.allClimateData) {  		
     		allStateNames.add(element.state);   		
     	}
-
-	
 		/***k***
 		 * Set up the layout and add components into it
 		 ***z***/
@@ -143,19 +139,13 @@ public class StartPanel extends JPanel{
 		
 		// add  *** Operating Period Setup ***
 		JButton buttonSetup = new JButton("Operating Period Setup");
+		periodDialog = new OperatingPeriodDialog();		
 		buttonSetup.addActionListener(new ActionListener()                   //After selected the data source, open the climate frame with data;
 		{
 			public void actionPerformed(ActionEvent e){												
 				try {
-					if(hasChosenPeriod.equals(false)) {
-						periodDialog = new OperatingPeriodDialog();
-						periodDialog.setParent(parent);
-						hasChosenPeriod = true;
-					}
-					else {
-						periodDialog.show();
-					}
-					
+					periodDialog.setVisible(true);
+					periodDialog.setParent(parent);				
 				} catch (Exception e1) {
 						e1.printStackTrace();
 				}					
@@ -184,8 +174,7 @@ public class StartPanel extends JPanel{
 				else if( (ds.getSelectedIndex() == 1 || ds.getSelectedIndex() == 2) && st.getSelectedIndex() != 0){     //select the first or second data source
 					
 					try {
-						pane = parent.tabbedPane;
-						//int index = pane.indexOfTab("climate");					
+						pane = parent.tabbedPane;				
 						if(climate == null) {
 							climate = new ClimatePanel(climateData,sourceForData);
 							climate.setParent(parent);
@@ -200,12 +189,7 @@ public class StartPanel extends JPanel{
 						pane.setSelectedIndex(pane.indexOfTab("climate"));
 						ds.setEnabled(false);
 						st.setEnabled(false);
-						if(hasChosenPeriod.equals(false)) {
-							periodDialog = new OperatingPeriodDialog();
-							periodDialog.setParent(parent);
-							hasChosenPeriod = true;
-							periodDialog.setVisible(false);
-						}
+						periodDialog.setParent(parent);
 					} catch (Exception e1) {
 						e1.printStackTrace();
 					}					
@@ -233,7 +217,7 @@ public class StartPanel extends JPanel{
 		gbc.gridx = 5;
 		gbc.gridy = 12;
 		this.add(new JButton("Help"), gbc);			
-		
+    		
 	}
 	
 	public void setParent(MainFrame frame) {

@@ -120,11 +120,15 @@ public class TableModel extends AbstractTableModel{
      }
 
      @Override
-     public boolean isCellEditable(int rowIndex, int columnIndex) {        
-         return true;
-     }
-		
-     
+     public boolean isCellEditable(int rowIndex, int columnIndex) {  
+    	 String s = "<html>Animal <br> (type) </html>";
+    	 String colName = n[columnIndex].toString();
+    	 if(columnIndex == 0  || s == colName )   			 
+    		 return false;
+    	 else
+    		 return true;
+     }	 
+
      @Override
      public void setValueAt(Object value, int row, int col) {
          p[row][col] = value;

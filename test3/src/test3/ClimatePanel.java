@@ -463,6 +463,7 @@ public class ClimatePanel extends JPanel{
 		int rowcount1 = databaseTable.getRowCount();
 		int colcount1 = databaseTable.getColumnCount();			
 		mt1.setColor(rowcount1-1,rowcount1-1,1,colcount1,Color.cyan);
+		
 		customTable = mt2.buildMyTable(tableColumnName, tableData2);      // the table without data.
 		int rowcount2 = customTable.getRowCount();
 		int colcount2 = customTable.getColumnCount();			

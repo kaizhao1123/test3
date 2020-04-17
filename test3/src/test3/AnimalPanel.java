@@ -437,9 +437,17 @@ public class AnimalPanel extends JPanel {
     	if(mTable.model.isContained(item)) {
  			int row = mTable.model.rowOfElement(item); 			
  			mTable.model.deleteRow(row);
- 			for(int i = 2; i < mTable.model.getColumnCount(); i++) {
-				mTable.model.mySetValueAt(mTable.model.getNewSum(i), mTable.model.getRowCount()-1, i);
-			}						
+ 			//for(int i = 2; i < mTable.model.getColumnCount(); i++) {
+			//	mTable.model.mySetValueAt(mTable.model.getNewSum(i), mTable.model.getRowCount()-1, i);
+			//}
+			for(int i = 2; i < mTable.model.getColumnCount(); i++) {
+				if(i == 3 || i == 4 || i == 5 || i == 6) {
+					mTable.model.mySetValueAt("N/A", mTable.model.getRowCount()-1, i);
+					
+				}    					
+				else
+					mTable.model.mySetValueAt(mTable.model.getNewSum(i), mTable.model.getRowCount()-1, i);
+			}
 			jtable.updateUI();
 			animalInfo a = getByName(reportedAnimal, item);
 			reportedAnimal.remove(a);

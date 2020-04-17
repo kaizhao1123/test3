@@ -1,6 +1,8 @@
 package test3;
 import java.awt.Color;
 import java.awt.Component;
+import java.text.DecimalFormat;
+
 import javax.swing.JTable;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
@@ -31,7 +33,8 @@ public class MyTable implements TableModelListener{
 		
 		//int rowcount = ntable.getRowCount();
 		//int colcount = ntable.getColumnCount();		
-		//setColor(rowcount-1,rowcount-1,1,colcount,Color.cyan);			
+		//setColor(rowcount-1,rowcount-1,1,colcount,Color.cyan);	
+		
 		ntable.setVisible(true);;
 		return ntable;
 	}
@@ -74,9 +77,49 @@ public class MyTable implements TableModelListener{
 
 
 	@Override
-    public void tableChanged(TableModelEvent e) { 		
-        int col = e.getColumn();  		            
-        model.mySetValueAt(model.getNewSum(col), model.getRowCount()-1, col);       
+    public void tableChanged(TableModelEvent e) { 
+		// set the total value per column.
+        int col = e.getColumn();  	
+        String colname = model.getColumnName(col);
+        // used in table of animalPanel
+        if(colname.equals("<html>Weight <br> (lbs) </html>") ||
+           colname.equals("<html>Manure <br> (cu.ft/day/AU) </html>") ||
+           colname.equals("<html> VS <br> (lbs/day/AU) </html>") ||
+           colname.equals("<html> TS <br> (lbs/day/AU) </html>") )
+        	model.mySetValueAt("N/A", model.getRowCount()-1, col); 
+        // used in normal table, such as table in climatePanel
+        else
+        	model.mySetValueAt(model.getNewSum(col), model.getRowCount()-1, col);  
+        
+        // set other value per row. 
+        // used for that the element of same row changed will lead to other element change.
+        
+        if(colname.equals("<html>Weight <br> (lbs) </html>") ||
+           colname.equals("<html>Manure <br> (cu.ft/day/AU) </html>") ||
+           colname.equals("<html> VS <br> (lbs/day/AU) </html>") ||
+           colname.equals("<html> TS <br> (lbs/day/AU) </html>") ||
+           colname.equals("<html>Quantity </html>")){
+        	
+        	//int row = model.rowOfElement(e.toString());
+        	int row = ntable.getSelectedRow();        
+            Object[] ele = model.p[row];
+            DecimalFormat df = new DecimalFormat("0.00");
+            double qDou = Double.parseDouble(ele[2].toString());
+    		double wDou = Double.parseDouble(ele[3].toString());
+    		double mDou = Double.parseDouble(ele[4].toString());
+    		double tsDou = Double.parseDouble(ele[6].toString());
+    		double vsDou = Double.parseDouble(ele[5].toString());
+            
+    		ele[7] = df.format(mDou * qDou * wDou / 1000);
+    		ele[8] = df.format(vsDou * qDou * wDou / 1000);
+    		ele[9] = df.format(tsDou * qDou * wDou / 1000);
+    		ele[10] = df.format(mDou * qDou * wDou * 60 / 1000);
+    		for(int i = 0; i < 4; i++) {
+    			model.mySetValueAt(model.getNewSum(7+i), model.getRowCount()-1, 7+i);  
+    		}        	        	
+        }
+        
+      
         ntable.repaint();
     }
 }

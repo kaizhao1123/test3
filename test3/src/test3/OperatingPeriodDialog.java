@@ -261,7 +261,7 @@ public class OperatingPeriodDialog extends JDialog{
 		container.add(panel);   	
     	container.setVisible(true);    	
     	setSize(new Dimension(440,240));
-    	setVisible(true);
+    	setVisible(false);
 	}
 	
 	
