@@ -1,4 +1,4 @@
-package test3;
+package Panels;
 
 import java.awt.Container;
 import java.awt.Dimension;

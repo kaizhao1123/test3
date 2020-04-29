@@ -1,4 +1,4 @@
-package test3;
+package Panels;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -15,6 +15,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+
+import Entity.AnimalInfo;
+import Entity.MyTable;
 
 
 
@@ -43,7 +46,7 @@ public class LocationPanel extends JPanel {
     String firstPeriod;
     String secondPeriod;
     
-	public LocationPanel(ArrayList<InputData.animalInfo> animals) {
+	public LocationPanel(ArrayList<AnimalInfo> animals) {
 		// get the column name of the table
 		int size = animals.size() + 1;
 		String[] name = new String[size];

@@ -1,4 +1,4 @@
-package test3;
+package Panels;
 
 import java.awt.Container;
 import java.awt.Dimension;
@@ -20,8 +20,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 
-import test3.MyTable;
-import test3.InputData.animalInfo;
+import Entity.AnimalInfo;
+import Entity.MyTable;
 
 public class AddAnimalDialog extends JDialog{
 
@@ -33,7 +33,7 @@ public class AddAnimalDialog extends JDialog{
     String source;
     String station;
     
-    //animalInfo newAnimal;
+    //AnimalInfo newAnimal;
     
 	public AddAnimalDialog(MyTable mt, JTable jt, String sour, String sta){
 		 
@@ -114,8 +114,8 @@ public class AddAnimalDialog extends JDialog{
 				dataSet[10] = station;
 				
 				if(allNotEmpty(dataSet)) {
-					InputData newInputData = new InputData();
-					animalInfo ele = newInputData.new animalInfo(n, t , source, dataSet, 0);
+					
+					AnimalInfo ele = new AnimalInfo(n, t , source, dataSet, 0);
 					DecimalFormat df = new DecimalFormat("0.00");	        		
 	         		String[] rowData = new String[11];
 	    			String quantity = "0";
@@ -149,7 +149,7 @@ public class AddAnimalDialog extends JDialog{
 					int index = pane.indexOfTab("animal");
 			    	AnimalPanel ap = (AnimalPanel) pane.getComponentAt(index);
 			    	ap.newAnimalInfo = ele;
-			    	ap.reportedAnimal.add(ap.newAnimalInfo);					
+			    	ap.animalInTable.add(ap.newAnimalInfo);					
 					jTable.updateUI();
 					dialog.dispose();
 				}
