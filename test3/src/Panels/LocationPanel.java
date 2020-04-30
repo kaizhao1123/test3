@@ -16,19 +16,27 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 
+import AWS.PanelManager;
 import Entity.AnimalInfo;
 import Entity.MyTable;
 
 
 
 public class LocationPanel extends JPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	MainFrame parent;
 	JTabbedPane pane;
+	PanelManager panelManager;
 	OperatingPeriodDialog periodDialog;
 	
 	//String[] columnName = {"Location","Beef Cow","Sedentary Horse"};    
 	String[] columnName;
 	Object data[][];
+	ArrayList<AnimalInfo> animalsList;
+	
 	
 	JPanel panel = this;
 	GridBagConstraints gc;
@@ -46,13 +54,18 @@ public class LocationPanel extends JPanel {
     String firstPeriod;
     String secondPeriod;
     
-	public LocationPanel(ArrayList<AnimalInfo> animals) {
+	public LocationPanel(PanelManager pm) {
 		// get the column name of the table
-		int size = animals.size() + 1;
+		//
+		panelManager = pm;
+		animalsList = panelManager.getDataFromAnimalPanel();
+		
+		
+		int size = animalsList.size() + 1;
 		String[] name = new String[size];
 		name[0] = "Location";
 		for(int i = 1; i < size; i++) {
-			name[i] = animals.get(i - 1).name;
+			name[i] = animalsList.get(i - 1).name;
 		}
 		columnName = name;
 		
@@ -109,13 +122,15 @@ public class LocationPanel extends JPanel {
 				int row2 = databaseTable2.getSelectedRow();
 				if(row1 < 0 && row2 >= 0) {
 					row = row2;
-					item = myTable2.model.p[row][0].toString();
+					item = myTable2.model.data[row][0].toString();
+					deleteTableRow(item);
 				}													
-				else {
+				else if(row1 >= 0 && row2 < 0){
 					row = row1;
-					item = myTable1.model.p[row][0].toString();
+					item = myTable1.model.data[row][0].toString();
+					deleteTableRow(item);
 				}																		
-				deleteTableRow(item);
+				
 			}							
 		}						
 		);

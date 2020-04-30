@@ -25,6 +25,7 @@ import javax.swing.JTable;
 import AWS.PanelManager;
 import Entity.AnimalInfo;
 import Entity.MyTable;
+import Entity.OutputOfAnimalTable;
 
 public class AnimalPanel extends JPanel {
 	/**
@@ -45,6 +46,7 @@ public class AnimalPanel extends JPanel {
 	AnimalInfo newAnimalInfo; // to build new animal info
 	ArrayList<AnimalInfo> animalInTable; // the animals showed in the table, including all selected and new build
 										 // animals, used to generate report
+	ArrayList<OutputOfAnimalTable> animalPanelOutput;  // store the output of panel: the name, the quantity and the weight of each animal
 	
 	String[]  columnNamess = { "<html> Animal  </html>", // the header of table
 			"<html>Animal <br> (type) </html>", "<html>Quantity </html>", "<html>Weight <br> (lbs) </html>",
@@ -79,7 +81,7 @@ public class AnimalPanel extends JPanel {
 		panelManager = pm;
 
 		// get animal dataset
-		animalData = panelManager.filterByDataSource(panelManager.outputOfStartPanel[0], panelManager.allAnimalData);
+		animalData = panelManager.filterByDataSource(panelManager.startPanelOutput[0], panelManager.allAnimalData);
 
 		// initial this panel
 		initialData();
@@ -257,8 +259,8 @@ public class AnimalPanel extends JPanel {
 		});
 		buttonNewAnimal.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String source = panelManager.outputOfStartPanel[0];
-				String station = panelManager.outputOfStartPanel[1];
+				String source = panelManager.startPanelOutput[0];
+				String station = panelManager.startPanelOutput[1];
 				modelDialog = new AddAnimalDialog(mTable, jtable, source, station);
 				modelDialog.setParent(parent);
 			}
@@ -267,17 +269,18 @@ public class AnimalPanel extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				int row = jtable.getSelectedRow();
 				if (row != -1) {
-					String item = mTable.model.p[row][0].toString();
+					String item = mTable.model.data[row][0].toString();
 					DefaultListModel<String> model = (DefaultListModel<String>) selectedList.getModel();
 					if (model.contains(item)) {
 						model.remove(model.indexOf(item));
 						JList<String> oldList = selectedMap.get(item);
 						DefaultListModel<String> oldModel = (DefaultListModel<String>) oldList.getModel();
 						AnimalInfo ele = getInfoByName(item, animalData);
-						// oldModel.add(ele.index ,item);
 						addToModel(ele, oldModel, animalData);
 						selectedMap.remove(item, oldList);
 						deleteTableRow(item);
+						
+						
 					} else {
 						if (!item.equals("Total"))
 							deleteTableRow(item);
@@ -290,8 +293,9 @@ public class AnimalPanel extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				pane = parent.tabbedPane;
 				if (locationPanel == null) {
-
-					locationPanel = new LocationPanel(animalInTable);
+					getOutput();
+					panelManager.storeAnimalPanelOutput(animalPanelOutput);
+					locationPanel = new LocationPanel(panelManager);
 					locationPanel.setParent(parent);
 					pane.add("location", locationPanel);
 
@@ -301,12 +305,26 @@ public class AnimalPanel extends JPanel {
 
 				} else {
 					// get the location table and add column.
+					
 				}
 				pane.setSelectedIndex(pane.indexOfTab("location"));
 			}
 		});
 	}
 
+	private void getOutput() {
+		animalPanelOutput = new ArrayList<>();
+		for(int i = 0; i < animalInTable.size(); i++) {
+			AnimalInfo ani = animalInTable.get(i);
+			String quantity = mTable.model.data[i][2].toString();
+			String weight = mTable.model.data[i][3].toString();
+			OutputOfAnimalTable ele = new OutputOfAnimalTable(ani,quantity,weight);
+			animalPanelOutput.add(ele);
+		}
+		
+		
+	}
+	
 	private void initialLayout(GridBagConstraints gc) {
 
 		gc.anchor = GridBagConstraints.NORTHWEST;

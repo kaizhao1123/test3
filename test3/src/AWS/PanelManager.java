@@ -12,6 +12,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import Entity.AnimalInfo;
 import Entity.ClimateInfo;
+import Entity.OutputOfAnimalTable;
 
 
 public class PanelManager {
@@ -21,8 +22,9 @@ public class PanelManager {
 	public ArrayList<ClimateInfo> allClimateData = new ArrayList<>();
 	public ArrayList<AnimalInfo> allAnimalData = new ArrayList<>();
 	
-	public String[] outputOfStartPanel = new String[2];
-	
+	public String[] startPanelOutput = new String[2];
+	public ArrayList<String> climatePanelOutout;
+	public ArrayList<OutputOfAnimalTable> animalPanelOutput;
 	
 	public PanelManager(String path) throws IOException {
 		InputStream fis = new FileInputStream(path);		
@@ -94,18 +96,10 @@ public class PanelManager {
 		}	
 		return list;
 	}
-	
-	/*public HashSet<String> getSet(ArrayList<ClimateInfo> data) {
-		HashSet<String> allStateNames = new HashSet();
-    	allStateNames.add(" ");  	
-    	for(ClimateInfo element : data) {  		
-    		allStateNames.add(element.state);   		
-    	}
-    	return allStateNames;
-	}*/
+
 	// store output data
 	public void storeStartPanelOutput(String[] s) {
-		outputOfStartPanel = s;
+		startPanelOutput = s;
 	}
 	
 	
@@ -114,23 +108,6 @@ public class PanelManager {
 	/***
 	 * manage climate panel
 	 ***/
-	
-	// build a hashmap to store the county and its stations
-	/*public HashMap<String, ArrayList<String>> getMap(ArrayList<ClimateInfo> data){
-		HashMap<String, ArrayList<String>> countyStationMap = new HashMap<>();  
-		for(ClimateInfo element : data) { 			
-			String key = element.county;
-			if(!countyStationMap.containsKey(key)) {
-				ArrayList<String> value = new ArrayList<>();
-				value.add(element.name);
-	    		countyStationMap.put(key, value);   	
-			}
-			else
-				countyStationMap.get(key).add(element.name);				
-		}
-		return countyStationMap; 
-	}*/
-	//
 	public ArrayList<ClimateInfo> filterByCounty(String name, ArrayList<ClimateInfo> upperLevelData) {
 		ArrayList<ClimateInfo> list = new ArrayList<>();
 		for(ClimateInfo ele : upperLevelData) {
@@ -139,6 +116,11 @@ public class PanelManager {
 			}
 		}	
 		return list;
+	}
+	
+	// store output data
+	public void storeClimatePanelOutput(ArrayList<String> list) {
+		climatePanelOutout = list;
 	}
 	
 	
@@ -156,23 +138,23 @@ public class PanelManager {
 		return list;
 	}
 	
-	/*public String[] getTypes(ArrayList<AnimalInfo> data) {
-		ArrayList<String> list = new ArrayList<>();
-		for(AnimalInfo a : data) {
-			if(list.contains(a.type)) {
-				continue;
-			}
-			else
-				list.add(a.type);
-		}		
-		
-		String[] sList = new String[list.size()];
-		for(int i = 0; i < list.size();i++) {
-			sList[i] = list.get(i);
-		}
-		Arrays.sort(sList);	
-		return sList;
+	// store output data
+	public void storeAnimalPanelOutput(ArrayList<OutputOfAnimalTable> o) {
+		animalPanelOutput = o;
+	}
 
-	}*/
-
+	
+	/***
+	 * manage location panel
+	 ***/
+	public ArrayList<AnimalInfo> getDataFromAnimalPanel(){
+		ArrayList<AnimalInfo> list = new ArrayList<>();
+		for(OutputOfAnimalTable ele : animalPanelOutput) {
+			list.add(ele.aniInfo);
+		}				
+		return list;
+	}
+	
+	
+	
 }

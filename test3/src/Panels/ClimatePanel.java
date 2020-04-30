@@ -52,6 +52,7 @@ public class ClimatePanel extends JPanel {
 	HashMap<String, ArrayList<String>> countyStationMap; // store the county and its stations
 	String[] listOfCounty; // list all county
 	String[] listOfStation; // list all station per county
+	ArrayList<String> climatePanelOutput;
 
 	// data for table
 	String[] months = { "January", "February", "March", "April", "May", "June", "July", "August", "September",
@@ -64,13 +65,13 @@ public class ClimatePanel extends JPanel {
 			{ "September", "0.00", "0.00" }, { "October", "0.00", "0.00" }, { "November", "0.00", "0.00" },
 			{ "December", "0.00", "0.00" }, };
 
+	
 	// declare the elements in the panel
 	JRadioButton r1, r2, r3, r4, r5;
 	ButtonGroup bg1, bg2;
-	JLabel labelCounty, labelStation, labelInches, labelPrecipitation, labelRate, labelKval, labelOcv, labelLrv,
+	JLabel labelCounty, labelStation, labelEnterCounty,labelEnterStation, labelInches, labelPrecipitation, labelRate, labelKval, labelOcv, labelLrv,
 			labelAlr;
 	JLabel jl1, jl2, jl3;
-
 	MyTable mt1 = new MyTable(); // used for download the existing AWM data
 	JTable databaseTable;
 	MyTable mt2 = new MyTable(); // used for input data by the customer
@@ -86,13 +87,16 @@ public class ClimatePanel extends JPanel {
 	JTextField valueOfAna;
 	JComboBox bCounty; // to display the county
 	JComboBox bStation = new JComboBox(); // to display the station
+	JTextField textEnterCounty;
+	JTextField textEnterStation;
+
 	JButton buttonHelp, buttonOK;
 	
 	public ClimatePanel(PanelManager pm) {
 
 		panelManager = pm;
 		// get input data
-		climateDataByState = panelManager.filterByState(panelManager.outputOfStartPanel[1],
+		climateDataByState = panelManager.filterByState(panelManager.startPanelOutput[1],
 				panelManager.allClimateData);
 
 		// initial this panel
@@ -115,6 +119,50 @@ public class ClimatePanel extends JPanel {
 
 	}
 	
+	private void getOutput() {
+		climatePanelOutput = new ArrayList<>();
+		if(r1.isSelected()) {
+			if(bCounty.getSelectedIndex() < 0)
+			{
+				climatePanelOutput.add(bCounty.getItemAt(0).toString());
+			}
+			else				
+				climatePanelOutput.add(bCounty.getSelectedItem().toString());	
+			if(bStation.getSelectedIndex() < 0)
+			{
+				climatePanelOutput.add(bStation.getItemAt(0).toString());
+			}
+			else				
+				climatePanelOutput.add(bStation.getSelectedItem().toString());
+		}
+		else {
+			climatePanelOutput.add(textEnterCounty.getText());
+			climatePanelOutput.add(textEnterStation.getText());
+		}
+		
+		climatePanelOutput.add(valueOfPre.getText());
+		climatePanelOutput.add(valueOfKVAL.getText());
+		climatePanelOutput.add(valueOfOCV.getText());
+		climatePanelOutput.add(valueOfLRV.getText());
+		climatePanelOutput.add(valueOfAna.getText());
+		
+		if(r1.isSelected()) {
+			for(int i = 1; i < mt1.model.getColumnCount(); i++) {
+				for(int j = 0; j < mt1.model.getRowCount(); j++) {
+					climatePanelOutput.add(mt1.model.data[j][i].toString());
+				}
+			}									
+		}
+		else {
+			for(int i = 1; i < mt2.model.getColumnCount(); i++) {
+				for(int j = 0; j < mt2.model.getRowCount(); j++) {
+					climatePanelOutput.add(mt2.model.data[j][i].toString());
+				}
+			}									
+		}
+		
+		
+	}
 	private void initialData() {
 		currentElement = climateDataByState.get(0);
 		climateDataByCounty = panelManager.filterByCounty(currentElement.county, climateDataByState);
@@ -161,6 +209,13 @@ public class ClimatePanel extends JPanel {
 		DefaultComboBoxModel stationModel = new DefaultComboBoxModel(listOfStation);
 		bStation.setModel(stationModel);
 		bStation.setPreferredSize(new Dimension(230, 25));
+		
+		labelEnterCounty = new JLabel("Enter County: ");
+		labelEnterStation = new JLabel("Enter Station: ");
+		textEnterCounty = new JTextField();
+		textEnterCounty.setPreferredSize(new Dimension(230, 25));
+		textEnterStation = new JTextField();
+		textEnterStation.setPreferredSize(new Dimension(230, 25));
 
 		labelInches = new JLabel("inches");
 		labelPrecipitation = new JLabel("25 Yr. -24 Hr. Storm Precipitation:");
@@ -195,11 +250,11 @@ public class ClimatePanel extends JPanel {
 		add(buildChildPanel_1(), border.NORTH);
 		add(buildChildPanel_2(), border.CENTER);
 	}
-
+		
 	private JPanel buildChildPanel_1() {
 		JPanel firstPart = new JPanel();
-		// the panel for "Select Climate Data Source". Two radio buttons correspond to
-		// two placePanels.
+		
+		// the panel for "Select Climate Data Source". Two radio buttons correspond to two placePanels.
 		JPanel scds = new JPanel();
 		scds.setLayout(new GridLayout(2, 1));
 		scds.add(r1);
@@ -346,12 +401,6 @@ public class ClimatePanel extends JPanel {
 
 	private JPanel buildCustomerPlacePanel() {
 		customerPlacePanel = new JPanel();
-		JLabel labelEnterCounty = new JLabel("Enter County: ");
-		JLabel labelEnterStation = new JLabel("Enter Station: ");
-		JTextField textEnterCounty = new JTextField();
-		textEnterCounty.setPreferredSize(new Dimension(230, 25));
-		JTextField textEnterStation = new JTextField();
-		textEnterStation.setPreferredSize(new Dimension(230, 25));
 
 		customerPlacePanel.setLayout(new GridBagLayout());
 		GridBagConstraints gcEnter = new GridBagConstraints();
@@ -519,7 +568,7 @@ public class ClimatePanel extends JPanel {
 				try {
 					// int index = pane.indexOfTab("animal");
 					if (animalPanel == null) {
-						// animalPanel = new AnimalPanel(animalData,source);
+						panelManager.storeClimatePanelOutput(climatePanelOutput);
 						animalPanel = new AnimalPanel(panelManager);
 						animalPanel.setParent(parent);
 						pane.add("animal", animalPanel);

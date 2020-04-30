@@ -102,7 +102,7 @@ public class MyTable implements TableModelListener{
         	
         	//int row = model.rowOfElement(e.toString());
         	int row = ntable.getSelectedRow();        
-            Object[] ele = model.p[row];
+            Object[] ele = model.data[row];
             DecimalFormat df = new DecimalFormat("0.00");
             double qDou = Double.parseDouble(ele[2].toString());
     		double wDou = Double.parseDouble(ele[3].toString());
