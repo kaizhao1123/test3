@@ -21,21 +21,22 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 
 import Entity.AnimalInfo;
-import Entity.MyTable;
+import Entity.AnimalTable;
+import Entity.ClimateTable;
 
 public class AddAnimalDialog extends JDialog{
 
 	MainFrame parent;
 	JTabbedPane pane;
 	
-	MyTable myTable;
+	AnimalTable myTable;
     JTable jTable;
     String source;
     String station;
     
     //AnimalInfo newAnimal;
     
-	public AddAnimalDialog(MyTable mt, JTable jt, String sour, String sta){
+	public AddAnimalDialog(AnimalTable mt, JTable jt, String sour, String sta){
 		 
 		myTable = mt;
 		jTable = jt;

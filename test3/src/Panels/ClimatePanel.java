@@ -32,7 +32,7 @@ import javax.swing.JTextField;
 
 import AWS.PanelManager;
 import Entity.ClimateInfo;
-import Entity.MyTable;
+import Entity.ClimateTable;
 
 public class ClimatePanel extends JPanel {
 	/**
@@ -72,9 +72,9 @@ public class ClimatePanel extends JPanel {
 	JLabel labelCounty, labelStation, labelEnterCounty,labelEnterStation, labelInches, labelPrecipitation, labelRate, labelKval, labelOcv, labelLrv,
 			labelAlr;
 	JLabel jl1, jl2, jl3;
-	MyTable mt1 = new MyTable(); // used for download the existing AWM data
+	ClimateTable mt1 = new ClimateTable(); // used for download the existing AWM data
 	JTable databaseTable;
-	MyTable mt2 = new MyTable(); // used for input data by the customer
+	ClimateTable mt2 = new ClimateTable(); // used for input data by the customer
 	JTable customTable;
 	JScrollPane scrollPane; // used for table
 	JPanel secondLeft;
@@ -560,11 +560,7 @@ public class ClimatePanel extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				// select the first or second data source
 				pane = parent.tabbedPane;
-				// if(idata == null) {
-				// idata = parent.excelData;
-				// idata.readAnimalSheet("animal");
-				// }
-				// animalData = idata.filterByDataSource(source, idata.allAnimalData);
+
 				try {
 					// int index = pane.indexOfTab("animal");
 					if (animalPanel == null) {

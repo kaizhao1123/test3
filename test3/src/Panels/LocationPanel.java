@@ -6,6 +6,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
@@ -18,7 +20,8 @@ import javax.swing.JTextField;
 
 import AWS.PanelManager;
 import Entity.AnimalInfo;
-import Entity.MyTable;
+import Entity.ClimateTable;
+import Entity.LocationTable;
 
 
 
@@ -31,17 +34,17 @@ public class LocationPanel extends JPanel {
 	JTabbedPane pane;
 	PanelManager panelManager;
 	OperatingPeriodDialog periodDialog;
-	
-	//String[] columnName = {"Location","Beef Cow","Sedentary Horse"};    
+	  
 	String[] columnName;
-	Object data[][];
+	Object data1[][];   // for table1
+	Object data2[][];	// for table2
 	ArrayList<AnimalInfo> animalsList;
-	
-	
+	int rowIndex;  //  the row index of selected to delete
+		
 	JPanel panel = this;
 	GridBagConstraints gc;
-    MyTable myTable1;
-    MyTable myTable2;   
+    LocationTable myTable1;
+    LocationTable myTable2;   
     JTable databaseTable1;
     JTable databaseTable2;
     JLabel label_3;
@@ -78,14 +81,14 @@ public class LocationPanel extends JPanel {
 		label_3 = new JLabel(" ");
 		label_4 = new JLabel(" ");
         
-        myTable1 = new MyTable();
-        databaseTable1 = myTable1.buildMyTable(columnName, data); 
+        myTable1 = new LocationTable();
+        databaseTable1 = myTable1.buildMyTable(columnName, data1); 
         scrollPane1 = new JScrollPane(databaseTable1);	
         scrollPane1.setPreferredSize(new Dimension(480,100));
       
         
-        myTable2 = new MyTable();
-        databaseTable2 = myTable2.buildMyTable(columnName, data); 
+        myTable2 = new LocationTable();
+        databaseTable2 = myTable2.buildMyTable(columnName, data2); 
         scrollPane2 = new JScrollPane(databaseTable2);	
         scrollPane2.setPreferredSize(new Dimension(480,100));
             
@@ -100,15 +103,27 @@ public class LocationPanel extends JPanel {
 				if(textLocation != null) {
 					String s = textLocation.getText();
 					int col = myTable1.model.getColumnCount();
-					String[] data = new String[col];
-					data[0] = s;
+					String[] dataTable1 = new String[col];
+					dataTable1[0] = s;
 					for(int i = 1 ; i < col; i++) {
-						data[i] = "0";
+						dataTable1[i] = "0";
 					}
-					myTable1.model.addRow(data);
-					databaseTable1.updateUI();							
-					myTable2.model.addRow(data);
+					
+					String[] dataTable2 = new String[col];
+					dataTable2[0] = s;
+					for(int i = 1 ; i < col; i++) {
+						dataTable2[i] = "0";
+					}
+					
+					myTable1.model.addRow(dataTable1);
+					data1 = myTable1.model.data;
+					//columnNamess = myTable1.model.n;
+					databaseTable1.updateUI();
+					
+					myTable2.model.addRow(dataTable2);
+					data2 = myTable2.model.data;
 					databaseTable2.updateUI();
+					
 					textLocation.setText("");
 				}
 			}							
@@ -116,20 +131,9 @@ public class LocationPanel extends JPanel {
         );
         buttonDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e){	
-				int row;
-				String item;
-				int row1 = databaseTable1.getSelectedRow();	
-				int row2 = databaseTable2.getSelectedRow();
-				if(row1 < 0 && row2 >= 0) {
-					row = row2;
-					item = myTable2.model.data[row][0].toString();
-					deleteTableRow(item);
-				}													
-				else if(row1 >= 0 && row2 < 0){
-					row = row1;
-					item = myTable1.model.data[row][0].toString();
-					deleteTableRow(item);
-				}																		
+				deleteTableRow();
+				data1 = myTable1.model.data;
+				data2 = myTable2.model.data;															
 				
 			}							
 		}						
@@ -143,6 +147,24 @@ public class LocationPanel extends JPanel {
 			}							
 		}						
 		);
+        
+        databaseTable1.addMouseListener(new MouseAdapter(){
+            public void mouseClicked(MouseEvent e) {              
+              int r= databaseTable1.getSelectedRow();
+              rowIndex = r;
+              databaseTable2.isRowSelected(rowIndex);
+              databaseTable2.changeSelection(rowIndex, 0,false, false);
+            }
+        }); 
+	    
+	    databaseTable2.addMouseListener(new MouseAdapter(){
+            public void mouseClicked(MouseEvent e) {              
+              int r= databaseTable2.getSelectedRow();              
+              rowIndex = r;
+              databaseTable1.isRowSelected(rowIndex);
+              databaseTable1.changeSelection(rowIndex, 0,false, false);
+            }
+        });
         
      // setup layout
         panel.setLayout(new GridBagLayout());
@@ -238,18 +260,18 @@ public class LocationPanel extends JPanel {
     	label_4.setText("2nd Operating Period: " + secondPeriod);
     }
     
-    private void deleteTableRow(String item) {
-	   	
-		int row1 = myTable1.model.rowOfElement(item);
-		int row2 = myTable2.model.rowOfElement(item);
-		myTable1.model.deleteRow(row1);
-		myTable2.model.deleteRow(row2);
-		for(int i = 1; i < myTable1.model.getColumnCount(); i++) {
-			myTable1.model.mySetValueAt(myTable1.model.getNewSum(i), myTable1.model.getRowCount()-1, i);
-			myTable2.model.mySetValueAt(myTable2.model.getNewSum(i), myTable2.model.getRowCount()-1, i);
-		}						
-		databaseTable1.updateUI();
-		databaseTable2.updateUI();		
+    private void deleteTableRow() {	   
+		if(rowIndex != data1.length - 1 &&
+		   rowIndex != data2.length - 1) {
+			myTable1.model.deleteRow(rowIndex+1);
+			myTable2.model.deleteRow(rowIndex+1);
+			for(int i = 1; i < myTable1.model.getColumnCount(); i++) {
+				myTable1.model.mySetValueAt(myTable1.model.getNewSum(i), myTable1.model.getRowCount()-1, i);
+				myTable2.model.mySetValueAt(myTable2.model.getNewSum(i), myTable2.model.getRowCount()-1, i);
+			}						
+			databaseTable1.updateUI();
+			databaseTable2.updateUI();
+		}
     }
 	
 	

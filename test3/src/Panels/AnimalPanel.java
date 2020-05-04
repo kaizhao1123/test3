@@ -24,7 +24,8 @@ import javax.swing.JTable;
 
 import AWS.PanelManager;
 import Entity.AnimalInfo;
-import Entity.MyTable;
+import Entity.AnimalTable;
+import Entity.ClimateTable;
 import Entity.OutputOfAnimalTable;
 
 public class AnimalPanel extends JPanel {
@@ -62,7 +63,7 @@ public class AnimalPanel extends JPanel {
 	JScrollPane choicesScrollPane;
 	JScrollPane selectedScrollPane;
 	JScrollPane tableScrollPane;
-	MyTable mTable;
+	AnimalTable mTable;
 	JTable jtable;
 	JComboBox<String> animalType;
 	JButton buttonAdd;
@@ -219,7 +220,7 @@ public class AnimalPanel extends JPanel {
 		animalType.setSelectedIndex(0);
 
 		// initial table
-		mTable = new MyTable();
+		mTable = new AnimalTable();
 		jtable = mTable.buildMyTable(columnNamess, dataa);
 		jtable.getTableHeader().setPreferredSize(new Dimension(10, 35));
 		tableScrollPane = new JScrollPane(jtable);
