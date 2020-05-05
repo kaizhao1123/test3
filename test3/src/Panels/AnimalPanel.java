@@ -313,19 +313,6 @@ public class AnimalPanel extends JPanel {
 		});
 	}
 
-	private void getOutput() {
-		animalPanelOutput = new ArrayList<>();
-		for(int i = 0; i < animalInTable.size(); i++) {
-			AnimalInfo ani = animalInTable.get(i);
-			String quantity = mTable.model.data[i][2].toString();
-			String weight = mTable.model.data[i][3].toString();
-			OutputOfAnimalTable ele = new OutputOfAnimalTable(ani,quantity,weight);
-			animalPanelOutput.add(ele);
-		}
-		
-		
-	}
-	
 	private void initialLayout(GridBagConstraints gc) {
 
 		gc.anchor = GridBagConstraints.NORTHWEST;
@@ -388,6 +375,18 @@ public class AnimalPanel extends JPanel {
 		gc.gridx = 6;
 		add(buttonOK, gc);
 	}
+	
+	private void getOutput() {
+		animalPanelOutput = new ArrayList<>();
+		for(int i = 0; i < animalInTable.size(); i++) {
+			AnimalInfo ani = animalInTable.get(i);
+			String quantity = mTable.model.data[i][2].toString();
+			String weight = mTable.model.data[i][3].toString();
+			OutputOfAnimalTable ele = new OutputOfAnimalTable(ani,quantity,weight);
+			animalPanelOutput.add(ele);
+		}				
+	}
+	
 
 	private void addToSelectedList() {
 		int index = choicesList.getSelectedIndex();

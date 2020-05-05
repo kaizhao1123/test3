@@ -79,16 +79,31 @@ public class TableModel extends AbstractTableModel {
 		data = np;
 	}
 
-	public void deleteColumn(String s) {
-		String[] nc = new String[columnName.length-1];
-		for(int i = 0; i < columnName.length; i++) {
-			for(int j = 0; j < nc.length; j++)
-			if(columnName[i] != s) {
-				nc[i] = columnName[i];
+	public void addColumn() {
+		int rl = data.length;
+		int cl = data[0].length + 1;
+		Object[][] np = new Object[rl - 1][cl];
+		for (int i = 0; i < rl - 1; i++) {
+			for (int j = 0; j < cl - 1; j++) {
+				np[i][j] = data[i][j];
 			}
+			np[i][cl - 1] = "0";
 		}
-
-		
+		data = np;
+	}
+	
+	public void deleteColumn(int col) {
+		int rl = data.length;
+		int cl = data[0].length - 1;
+		Object[][] np = new Object[rl-1][cl];
+		for(int i = 0; i < rl-1; i++) {
+			for(int j = 0; j < col; j++)
+				np[i][j] = data[i][j];
+			for(int k = col; k < cl; k++) {
+				np[i][k] = data[i][k+1];
+			}
+		 }
+		data = np;
 	}
 
 	public boolean isContained(String s) {

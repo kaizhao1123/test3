@@ -25,6 +25,7 @@ import Entity.LocationTable;
 
 
 
+
 public class LocationPanel extends JPanel {
 	/**
 	 * 
@@ -43,6 +44,9 @@ public class LocationPanel extends JPanel {
 		
 	JPanel panel = this;
 	GridBagConstraints gc;
+	
+	JLabel label_1;
+	JLabel label_2;
     LocationTable myTable1;
     LocationTable myTable2;   
     JTable databaseTable1;
@@ -52,18 +56,32 @@ public class LocationPanel extends JPanel {
     JTextField textLocation;
     JScrollPane scrollPane1;
     JScrollPane scrollPane2;
+    JButton buttonAdd;
+    JButton buttonDelete;
+    JButton buttonHelp;
+    JButton buttonOK;
     
     Boolean twoPeriod = false;
     String firstPeriod;
     String secondPeriod;
     
-	public LocationPanel(PanelManager pm) {
-		// get the column name of the table
-		//
-		panelManager = pm;
-		animalsList = panelManager.getDataFromAnimalPanel();
-		
-		
+    
+ 	public LocationPanel(PanelManager pm) {
+ 		panelManager = pm;
+ 		animalsList = panelManager.getDataFromAnimalPanel();
+ 		
+ 		// initial this panel
+ 		initialData();
+ 		initialElements();
+ 		initialActionLiseners();
+ 		setLayout(new GridBagLayout());
+ 		gc = new GridBagConstraints();
+ 		initialLayout(gc);
+
+ 	}
+    
+    private void initialData() {
+    	// get the column of the table
 		int size = animalsList.size() + 1;
 		String[] name = new String[size];
 		name[0] = "Location";
@@ -71,12 +89,12 @@ public class LocationPanel extends JPanel {
 			name[i] = animalsList.get(i - 1).name;
 		}
 		columnName = name;
-		
-		// initial the component of structure 
-		JLabel label_1 = new JLabel("Enter Location: ");
+    }
+    private void initialElements() {		
+		label_1 = new JLabel("Enter Location: ");
 		textLocation = new JTextField();
 		textLocation.setPreferredSize(new Dimension(130,25));
-		JLabel label_2 = new JLabel("Enter the Percent of Manure Each Animal Deposits in Each Location: ");
+		label_2 = new JLabel("Enter the Percent of Manure Each Animal Deposits in Each Location: ");
 
 		label_3 = new JLabel(" ");
 		label_4 = new JLabel(" ");
@@ -92,13 +110,14 @@ public class LocationPanel extends JPanel {
         scrollPane2 = new JScrollPane(databaseTable2);	
         scrollPane2.setPreferredSize(new Dimension(480,100));
             
-        JButton buttonAdd = new JButton("Add Location"); 
+        buttonAdd = new JButton("Add Location"); 
         buttonAdd.setPreferredSize(new Dimension(150,25));
-        JButton buttonDelete = new JButton("Delete Selected Row");
-        JButton buttonHelp = new JButton("Help");
-        JButton buttonOK = new JButton("OK");
-        
-        buttonAdd.addActionListener(new ActionListener() {
+        buttonDelete = new JButton("Delete Selected Row");
+        buttonHelp = new JButton("Help");
+        buttonOK = new JButton("OK");
+    }
+    private void initialActionLiseners() {
+    	buttonAdd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e){	
 				if(textLocation != null) {
 					String s = textLocation.getText();
@@ -121,7 +140,7 @@ public class LocationPanel extends JPanel {
 					databaseTable1.updateUI();
 					
 					myTable2.model.addRow(dataTable2);
-					data2 = myTable2.model.data;
+					data2 = myTable2.model.data;				
 					databaseTable2.updateUI();
 					
 					textLocation.setText("");
@@ -140,6 +159,13 @@ public class LocationPanel extends JPanel {
 		);
         buttonOK.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e){	
+				
+				// remember to update the data of two tables,
+				// such as lose focus, need also store the data 
+				
+				//(databaseTable2.isEditing())
+          	   //databaseTable2.getCellEditor().stopCellEditing(); 
+				// databaseTable2.repaint();
 				String dd= "";
 				System.out.print(dd);
 			
@@ -152,8 +178,10 @@ public class LocationPanel extends JPanel {
             public void mouseClicked(MouseEvent e) {              
               int r= databaseTable1.getSelectedRow();
               rowIndex = r;
-              databaseTable2.isRowSelected(rowIndex);
-              databaseTable2.changeSelection(rowIndex, 0,false, false);
+              if (databaseTable2.isEditing())
+            	  databaseTable2.getCellEditor().stopCellEditing();             
+              databaseTable2.changeSelection(rowIndex, 0,false,false);
+              databaseTable2.repaint();
             }
         }); 
 	    
@@ -161,67 +189,49 @@ public class LocationPanel extends JPanel {
             public void mouseClicked(MouseEvent e) {              
               int r= databaseTable2.getSelectedRow();              
               rowIndex = r;
-              databaseTable1.isRowSelected(rowIndex);
-              databaseTable1.changeSelection(rowIndex, 0,false, false);
+              if (databaseTable1.isEditing())
+            	  databaseTable1.getCellEditor().stopCellEditing();              
+              databaseTable1.changeSelection(rowIndex, 0,false,false);
+              databaseTable1.repaint();
             }
         });
-        
-     // setup layout
-        panel.setLayout(new GridBagLayout());
-		gc = new GridBagConstraints();		
-		gc.anchor = GridBagConstraints.NORTHWEST;
+    }
+    private void initialLayout(GridBagConstraints gc) {
+    	gc.anchor = GridBagConstraints.NORTHWEST;
         gc.insets = new Insets(0,5,5,0);
 		
         gc.gridx = 0;
-		gc.gridy = 0;
-		
-		panel.add(label_1,gc);
+		//gc.gridy = 0;		
+		add(label_1,gc);
 		gc.gridy = 1;
-		panel.add(textLocation,gc);
+		add(textLocation,gc);
 		gc.gridx = 2;
-		panel.add(buttonAdd,gc);
+		add(buttonAdd,gc);
 		gc.gridwidth = 3;
 		gc.gridx = 4;		
-		panel.add(buttonDelete,gc);
+		add(buttonDelete,gc);
 		
-		gc.gridx = 0;
-		
+		gc.gridx = 0;		
 		gc.gridy = 2;
 		gc.gridwidth = 7;
-		panel.add(label_2,gc);			
+		add(label_2,gc);			
 		gc.gridy = 3;
-		panel.add(label_3,gc);
+		add(label_3,gc);
 		gc.gridy = 4;		
-		panel.add(scrollPane1,gc);
+		add(scrollPane1,gc);
 		gc.gridy = 9;
 		gc.gridheight = 1;
-		panel.add(label_4,gc);
-		//gc.gridy = 10;
-		//gc.gridheight = 3;
-		//scrollPane2.setVisible(false);
-		//panel.add(scrollPane2,gc);
-		
+		add(label_4,gc);
 
 		gc.gridx = 5;
 		gc.gridy = 15;
 		gc.gridheight = 1;
 		gc.gridwidth = 1;
-		panel.add(buttonHelp,gc);
+		add(buttonHelp,gc);
 		gc.gridx = 6;
-		panel.add(buttonOK,gc);
-		
-        
-        //add(panel);        
-       // panel.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setVisible(true);
-        setMinimumSize(new Dimension(500,400));
-        //panel.setResizable(false);
-        
-        
-        
-        
-		
-	}
+		add(buttonOK,gc);		
+    }
+ 
 	
 	// Corresponding the first option of periodDialog
 	public void update1() {
@@ -274,7 +284,154 @@ public class LocationPanel extends JPanel {
 		}
     }
 	
-	
+    private void addTableColumn(String s) {
+    	String[] ncolumnNamess = new String[columnName.length+1];
+		for(int i = 0; i < columnName.length; i++) {
+			ncolumnNamess[i] = columnName[i];
+		}
+		ncolumnNamess[columnName.length] = s;
+		columnName = ncolumnNamess;
+		
+		myTable1.model.addColumn();
+		myTable2.model.addColumn();
+		updateTable(myTable1, myTable2);
+		/*data1 = myTable1.model.data;						
+		myTable1 = new LocationTable();	
+		databaseTable1 = myTable1.buildMyTable(columnName, data1);
+		scrollPane1.setViewportView(databaseTable1);
+		databaseTable1.addMouseListener(new MouseAdapter(){
+            public void mouseClicked(MouseEvent e) {              
+                int r= databaseTable1.getSelectedRow();
+                rowIndex = r;                           
+                if (databaseTable2.isEditing())
+              	  databaseTable2.getCellEditor().stopCellEditing();
+               
+                databaseTable2.changeSelection(rowIndex, 0,false,false);
+                databaseTable2.repaint();
+                //databaseTable2.updateUI();
+                
+              }
+          }); 
+		
+
+		myTable2.model.addColumn();
+		data2 = myTable2.model.data;						
+		myTable2 = new LocationTable();						
+		databaseTable2 = myTable2.buildMyTable(columnName, data2);	
+		scrollPane2.setViewportView(databaseTable2);
+		databaseTable2.addMouseListener(new MouseAdapter(){
+            public void mouseClicked(MouseEvent e) {              
+              int r= databaseTable2.getSelectedRow();              
+              rowIndex = r;
+              if (databaseTable1.isEditing())
+            	  databaseTable1.getCellEditor().stopCellEditing();
+              
+              databaseTable1.changeSelection(rowIndex, 0,false,false);
+              databaseTable1.repaint();
+              //databaseTable1.updateUI();
+            }
+        });*/
+	    
+    }
+    
+    private void deleteTableColumn(String s) {
+    	int col = 1;
+    	for (int i = 0; i < columnName.length; i++) {
+    		if (columnName[i] == s)
+    			col = i;
+    	}  	
+    	String[] ncolumnName = new String[columnName.length-1];
+    	for(int i = 0; i < col; i++) {
+    		ncolumnName[i] = columnName[i];
+    	}
+    	for(int i = col; i < columnName.length-1; i++) {
+    		ncolumnName[i] = columnName[i+1];
+    	}   	
+    	columnName = ncolumnName;   	
+    	
+    	myTable1.model.deleteColumn(col);
+    	myTable2.model.deleteColumn(col);
+    	updateTable(myTable1, myTable2);
+    	
+    	/*data1 = myTable1.model.data;						
+    	myTable1 = new LocationTable();	
+    	databaseTable1 = myTable1.buildMyTable(columnName, data1);
+    	scrollPane1.setViewportView(databaseTable1);
+    	databaseTable1.addMouseListener(new MouseAdapter(){
+            public void mouseClicked(MouseEvent e) {              
+                int r= databaseTable1.getSelectedRow();
+                rowIndex = r;                           
+                if (databaseTable2.isEditing())
+              	  databaseTable2.getCellEditor().stopCellEditing();
+               
+                databaseTable2.changeSelection(rowIndex, 0,false,false);
+                databaseTable2.repaint();
+                //databaseTable2.updateUI();
+                
+              }
+          }); 
+    	
+    	
+    	myTable2.model.deleteColumn(col);
+    	data2 = myTable2.model.data;						
+    	myTable2 = new LocationTable();	
+    	databaseTable2 = myTable2.buildMyTable(columnName, data1);
+    	scrollPane2.setViewportView(databaseTable2);
+    	databaseTable2.addMouseListener(new MouseAdapter(){
+            public void mouseClicked(MouseEvent e) {              
+                int r= databaseTable2.getSelectedRow();
+                rowIndex = r;                           
+                if (databaseTable1.isEditing())
+              	  databaseTable1.getCellEditor().stopCellEditing();
+               
+                databaseTable1.changeSelection(rowIndex, 0,false,false);
+                databaseTable1.repaint();
+               // databaseTable1.updateUI();                
+              }
+          }); */
+ 
+    }
+    
+    private void updateTable(LocationTable t1, LocationTable t2) {
+    	
+    	//myTable1.model.deleteColumn(col);
+    	data1 = t1.model.data;	
+    	data2 = t2.model.data;
+    	t1 = new LocationTable();	
+    	t2 = new LocationTable();
+    	databaseTable1 = t1.buildMyTable(columnName, data1);
+    	databaseTable2 = t2.buildMyTable(columnName, data2);
+    	scrollPane1.setViewportView(databaseTable1);    	
+    	scrollPane2.setViewportView(databaseTable2);
+    	
+    	databaseTable1.addMouseListener(new MouseAdapter(){
+            public void mouseClicked(MouseEvent e) {              
+                int r= databaseTable1.getSelectedRow();
+                rowIndex = r;                           
+                if (databaseTable2.isEditing())
+              	  databaseTable2.getCellEditor().stopCellEditing();
+               
+                databaseTable2.changeSelection(rowIndex, 0,false,false);
+                databaseTable2.repaint();
+                //databaseTable2.updateUI();
+                
+              }
+          }); 
+    	databaseTable2.addMouseListener(new MouseAdapter(){
+            public void mouseClicked(MouseEvent e) {              
+                int r= databaseTable2.getSelectedRow();
+                rowIndex = r;                           
+                if (databaseTable1.isEditing())
+              	  databaseTable1.getCellEditor().stopCellEditing();
+               
+                databaseTable1.changeSelection(rowIndex, 0,false,false);
+                databaseTable1.repaint();
+               // databaseTable1.updateUI();                
+              }
+          }); 
+ 
+ 
+    }
 	
 	
 	public void setParent(MainFrame frame) {
