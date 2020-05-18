@@ -12,7 +12,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 public class ClimateTable implements TableModelListener{
 	
 	public JTable ntable;
-	public TableModel model;
+	public TableModelWithTotal model;
 	
 	String[] columnName;
 	Object[][] data;
@@ -23,9 +23,8 @@ public class ClimateTable implements TableModelListener{
 		columnName = s;
 		data = o;
 		
-		model = new TableModel();
-		model.buildModel(columnName,data);
-		
+		model = new TableModelWithTotal(columnName,data);
+				
 	    model.addTableModelListener(this);
 	    model.addTotalRow(model.getEachSum());
 				

@@ -24,11 +24,11 @@ import javax.swing.JTable;
 
 import AWS.PanelManager;
 import Entity.AnimalInfo;
-import Entity.AnimalTable;
+import Entity.AnimalsTable;
 import Entity.ClimateTable;
 import Entity.OutputOfAnimalTable;
 
-public class AnimalPanel extends JPanel {
+public class AnimalsPanel extends JPanel {
 	/**
 	 * 
 	 */
@@ -36,7 +36,7 @@ public class AnimalPanel extends JPanel {
 	MainFrame parent;
 	JTabbedPane pane;
 	PanelManager panelManager;
-	LocationPanel locationPanel;
+	LocationsPanel locationPanel;
 	AddAnimalDialog modelDialog;
 
 	// declare the data structure used in the panel
@@ -63,7 +63,7 @@ public class AnimalPanel extends JPanel {
 	JScrollPane choicesScrollPane;
 	JScrollPane selectedScrollPane;
 	JScrollPane tableScrollPane;
-	AnimalTable mTable;
+	AnimalsTable mTable;
 	JTable jtable;
 	JComboBox<String> animalType;
 	JButton buttonAdd;
@@ -78,7 +78,7 @@ public class AnimalPanel extends JPanel {
 	JList<String> selectedList; // to display the selected
 	DefaultListModel<String> selectedModel;
 
-	public AnimalPanel(PanelManager pm) {
+	public AnimalsPanel(PanelManager pm) {
 		panelManager = pm;
 
 		// get animal dataset
@@ -220,7 +220,7 @@ public class AnimalPanel extends JPanel {
 		animalType.setSelectedIndex(0);
 
 		// initial table
-		mTable = new AnimalTable();
+		mTable = new AnimalsTable();
 		jtable = mTable.buildMyTable(columnNamess, dataa);
 		jtable.getTableHeader().setPreferredSize(new Dimension(10, 35));
 		tableScrollPane = new JScrollPane(jtable);
@@ -296,7 +296,7 @@ public class AnimalPanel extends JPanel {
 				if (locationPanel == null) {
 					getOutput();
 					panelManager.storeAnimalPanelOutput(animalPanelOutput);
-					locationPanel = new LocationPanel(panelManager);
+					locationPanel = new LocationsPanel(panelManager);
 					locationPanel.setParent(parent);
 					pane.add("location", locationPanel);
 

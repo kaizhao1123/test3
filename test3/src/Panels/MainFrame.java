@@ -30,7 +30,7 @@ public class MainFrame extends JFrame {
 	// the elements of tabbedPane
 	public StartPanel startPanel;
 	public ClimatePanel climatePanel;
-	public AnimalPanel animalPanel;
+	public AnimalsPanel animalPanel;
 	public AddAnimalDialog addAnimalDialog;
 
 	public MainFrame(PanelManager pm, int width, int height) throws IOException {
@@ -45,7 +45,7 @@ public class MainFrame extends JFrame {
 	}
 
 	private void createMainPane(JPanel main, JTabbedPane tab, StartPanel start, ClimatePanel climate,
-			AnimalPanel animal) {
+			AnimalsPanel animal) {
 		Container[] containers = { start, climate, animal };
 		menubar = new MenuBar(panelManager, containers);
 		main.setLayout(new BorderLayout());

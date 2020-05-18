@@ -3,7 +3,7 @@ package Entity;
 import java.text.DecimalFormat;
 import javax.swing.table.AbstractTableModel;
 
-public class TableModel extends AbstractTableModel {
+public class TableModelWithTotal extends AbstractTableModel {
 
 	/**
 	* 
@@ -13,8 +13,8 @@ public class TableModel extends AbstractTableModel {
 	public String[] columnName;
 	public Object[][] data;
 
-	public TableModel(String[] s, Object[][] o) {
-		// TODO Auto-generated constructor stub
+	public TableModelWithTotal(String[] s, Object[][] o) {
+
 		columnName = s;
 		data = o;
 	}

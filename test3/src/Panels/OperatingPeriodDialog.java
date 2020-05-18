@@ -22,7 +22,7 @@ import javax.swing.JTextField;
 public class OperatingPeriodDialog extends JDialog{
 	MainFrame parent;
 	JTabbedPane pane;
-	LocationPanel locationPanel;
+	LocationsPanel locationPanel;
 	
     Boolean firstOption = true;
 	Boolean secondOption = false;
@@ -93,7 +93,7 @@ public class OperatingPeriodDialog extends JDialog{
 					pane = parent.tabbedPane;
 					int index = pane.indexOfTab("location");  	  // it is associate with location panel.				
 					if(index >= 0) {
-						locationPanel = (LocationPanel) pane.getComponentAt(index);
+						locationPanel = (LocationsPanel) pane.getComponentAt(index);
 						locationPanel.update1();
 					}
 			    	
@@ -127,7 +127,7 @@ public class OperatingPeriodDialog extends JDialog{
 					pane = parent.tabbedPane;
 					int index = pane.indexOfTab("location");    // it is associate with location panel.
 					if(index >= 0) {
-						locationPanel = (LocationPanel) pane.getComponentAt(index);
+						locationPanel = (LocationsPanel) pane.getComponentAt(index);
 						locationPanel.update2();
 					}
 				} catch (Exception e1) {

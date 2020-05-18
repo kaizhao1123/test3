@@ -9,22 +9,22 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 
-public class AnimalTable implements TableModelListener {
+public class AnimalsTable implements TableModelListener {
 
 	public JTable ntable;
-	public TableModel model;
+	public TableModelWithTotal model;
 
-	String[] columnNamess;
-	Object[][] dataa;
+	String[] columnNames;
+	Object[][] data;
 	Color cc = Color.lightGray;
 
 	public JTable buildMyTable(String[] s, Object[][] o) {
 
-		columnNamess = s;
-		dataa = o;
+		columnNames = s;
+		data = o;
 
-		model = new TableModel();
-		model.buildModel(columnNamess, dataa);
+		model = new TableModelWithTotal(columnNames, data);
+		
 
 		model.addTableModelListener(this);
 		model.addTotalRow(model.getEachSum());

@@ -21,12 +21,13 @@ import javax.swing.JTextField;
 import AWS.PanelManager;
 import Entity.AnimalInfo;
 import Entity.ClimateTable;
-import Entity.LocationTable;
+import Entity.LocationsTable;
+import Entity.OutputOfAnimalTable;
 
 
 
 
-public class LocationPanel extends JPanel {
+public class LocationsPanel extends JPanel {
 	/**
 	 * 
 	 */
@@ -35,6 +36,7 @@ public class LocationPanel extends JPanel {
 	JTabbedPane pane;
 	PanelManager panelManager;
 	OperatingPeriodDialog periodDialog;
+	AdditionsPanel additionsPanel;
 	  
 	String[] columnName;
 	Object data1[][];   // for table1
@@ -47,8 +49,8 @@ public class LocationPanel extends JPanel {
 	
 	JLabel label_1;
 	JLabel label_2;
-    LocationTable myTable1;
-    LocationTable myTable2;   
+    LocationsTable myTable1;
+    LocationsTable myTable2;   
     JTable databaseTable1;
     JTable databaseTable2;
     JLabel label_3;
@@ -66,7 +68,7 @@ public class LocationPanel extends JPanel {
     String secondPeriod;
     
     
- 	public LocationPanel(PanelManager pm) {
+ 	public LocationsPanel(PanelManager pm) {
  		panelManager = pm;
  		animalsList = panelManager.getDataFromAnimalPanel();
  		
@@ -99,13 +101,13 @@ public class LocationPanel extends JPanel {
 		label_3 = new JLabel(" ");
 		label_4 = new JLabel(" ");
         
-        myTable1 = new LocationTable();
+        myTable1 = new LocationsTable();
         databaseTable1 = myTable1.buildMyTable(columnName, data1); 
         scrollPane1 = new JScrollPane(databaseTable1);	
         scrollPane1.setPreferredSize(new Dimension(480,100));
       
         
-        myTable2 = new LocationTable();
+        myTable2 = new LocationsTable();
         databaseTable2 = myTable2.buildMyTable(columnName, data2); 
         scrollPane2 = new JScrollPane(databaseTable2);	
         scrollPane2.setPreferredSize(new Dimension(480,100));
@@ -159,15 +161,19 @@ public class LocationPanel extends JPanel {
 		);
         buttonOK.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e){	
-				
-				// remember to update the data of two tables,
-				// such as lose focus, need also store the data 
-				
-				//(databaseTable2.isEditing())
-          	   //databaseTable2.getCellEditor().stopCellEditing(); 
-				// databaseTable2.repaint();
-				String dd= "";
-				System.out.print(dd);
+				pane = parent.tabbedPane;
+				if (additionsPanel == null) {
+					getOutput();
+					//panelManager.storeAnimalPanelOutput(animalPanelOutput);
+					additionsPanel = new AdditionsPanel(panelManager);
+					additionsPanel.setParent(parent);
+					pane.add("additions", additionsPanel);					
+
+				} else {
+					// get the location table and add column.
+					
+				}
+				pane.setSelectedIndex(pane.indexOfTab("additions"));
 			
 				
 			}							
@@ -201,7 +207,7 @@ public class LocationPanel extends JPanel {
         gc.insets = new Insets(0,5,5,0);
 		
         gc.gridx = 0;
-		//gc.gridy = 0;		
+		gc.gridy = 0;		
 		add(label_1,gc);
 		gc.gridy = 1;
 		add(textLocation,gc);
@@ -392,13 +398,13 @@ public class LocationPanel extends JPanel {
  
     }
     
-    private void updateTable(LocationTable t1, LocationTable t2) {
+    private void updateTable(LocationsTable t1, LocationsTable t2) {
     	
     	//myTable1.model.deleteColumn(col);
     	data1 = t1.model.data;	
     	data2 = t2.model.data;
-    	t1 = new LocationTable();	
-    	t2 = new LocationTable();
+    	t1 = new LocationsTable();	
+    	t2 = new LocationsTable();
     	databaseTable1 = t1.buildMyTable(columnName, data1);
     	databaseTable2 = t2.buildMyTable(columnName, data2);
     	scrollPane1.setViewportView(databaseTable1);    	
@@ -432,6 +438,17 @@ public class LocationPanel extends JPanel {
  
  
     }
+    
+	private void getOutput() {
+		/*animalPanelOutput = new ArrayList<>();
+		for(int i = 0; i < animalInTable.size(); i++) {
+			AnimalInfo ani = animalInTable.get(i);
+			String quantity = mTable.model.data[i][2].toString();
+			String weight = mTable.model.data[i][3].toString();
+			OutputOfAnimalTable ele = new OutputOfAnimalTable(ani,quantity,weight);
+			animalPanelOutput.add(ele);
+		}*/				
+	}
 	
 	
 	public void setParent(MainFrame frame) {

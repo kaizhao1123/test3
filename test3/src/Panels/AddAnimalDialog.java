@@ -21,7 +21,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 
 import Entity.AnimalInfo;
-import Entity.AnimalTable;
+import Entity.AnimalsTable;
 import Entity.ClimateTable;
 
 public class AddAnimalDialog extends JDialog{
@@ -29,14 +29,14 @@ public class AddAnimalDialog extends JDialog{
 	MainFrame parent;
 	JTabbedPane pane;
 	
-	AnimalTable myTable;
+	AnimalsTable myTable;
     JTable jTable;
     String source;
     String station;
     
     //AnimalInfo newAnimal;
     
-	public AddAnimalDialog(AnimalTable mt, JTable jt, String sour, String sta){
+	public AddAnimalDialog(AnimalsTable mt, JTable jt, String sour, String sta){
 		 
 		myTable = mt;
 		jTable = jt;
@@ -148,7 +148,7 @@ public class AddAnimalDialog extends JDialog{
 					}
 					pane = parent.tabbedPane;
 					int index = pane.indexOfTab("animal");
-			    	AnimalPanel ap = (AnimalPanel) pane.getComponentAt(index);
+			    	AnimalsPanel ap = (AnimalsPanel) pane.getComponentAt(index);
 			    	ap.newAnimalInfo = ele;
 			    	ap.animalInTable.add(ap.newAnimalInfo);					
 					jTable.updateUI();

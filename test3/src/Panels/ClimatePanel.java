@@ -43,7 +43,7 @@ public class ClimatePanel extends JPanel {
 	MainFrame parent;
 	JTabbedPane pane;
 	PanelManager panelManager;
-	AnimalPanel animalPanel = null;
+	AnimalsPanel animalPanel = null;
 
 	// declare the data structure
 	ArrayList<ClimateInfo> climateDataByState;
@@ -565,7 +565,7 @@ public class ClimatePanel extends JPanel {
 					// int index = pane.indexOfTab("animal");
 					if (animalPanel == null) {
 						panelManager.storeClimatePanelOutput(climatePanelOutput);
-						animalPanel = new AnimalPanel(panelManager);
+						animalPanel = new AnimalsPanel(panelManager);
 						animalPanel.setParent(parent);
 						pane.add("animal", animalPanel);
 					}
