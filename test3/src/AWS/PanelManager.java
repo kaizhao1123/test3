@@ -12,7 +12,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import Entity.AnimalInfo;
 import Entity.ClimateInfo;
-import Entity.OutputOfAnimalTable;
+import Entity.OutputOfAnimalPanel;
 
 
 public class PanelManager {
@@ -24,7 +24,7 @@ public class PanelManager {
 	
 	public String[] startPanelOutput = new String[2];
 	public ArrayList<String> climatePanelOutout;
-	public ArrayList<OutputOfAnimalTable> animalPanelOutput;
+	public ArrayList<OutputOfAnimalPanel> animalPanelOutput;
 	
 	public PanelManager(String path) throws IOException {
 		InputStream fis = new FileInputStream(path);		
@@ -139,7 +139,7 @@ public class PanelManager {
 	}
 	
 	// store output data
-	public void storeAnimalPanelOutput(ArrayList<OutputOfAnimalTable> o) {
+	public void storeAnimalPanelOutput(ArrayList<OutputOfAnimalPanel> o) {
 		animalPanelOutput = o;
 	}
 
@@ -149,7 +149,7 @@ public class PanelManager {
 	 ***/
 	public ArrayList<AnimalInfo> getDataFromAnimalPanel(){
 		ArrayList<AnimalInfo> list = new ArrayList<>();
-		for(OutputOfAnimalTable ele : animalPanelOutput) {
+		for(OutputOfAnimalPanel ele : animalPanelOutput) {
 			list.add(ele.aniInfo);
 		}				
 		return list;

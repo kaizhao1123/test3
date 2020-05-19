@@ -154,9 +154,21 @@ public class TableModelWithTotal extends AbstractTableModel {
 
 	@Override
 	public boolean isCellEditable(int rowIndex, int columnIndex) {
-		String s = "<html>Animal <br> (type) </html>";
 		String colName = columnName[columnIndex].toString();
-		if (columnIndex == 0 || s == colName)
+		// set uneditable column of animalsTable
+		String s1 = "<html>Animal <br> (type) </html>";
+		String s2 = "<html> Manure <br> (cu.ft/day) </html>";
+		String s3 = "<html> VS <br> (lbs/day) </html>";
+		String s4 = "<html> TS <br> (lbs/day) </html>";
+		String s5 = "<html>Manure <br> (lbs/day) </html>";
+		
+		
+		if (columnIndex == 0 || rowIndex == data.length -1 
+				|| colName == s1
+				|| colName == s2
+				|| colName == s3
+				|| colName == s4
+				|| colName == s5)
 			return false;
 		else
 			return true;

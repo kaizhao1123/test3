@@ -1,5 +1,6 @@
 package Panels;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -22,7 +23,7 @@ import AWS.PanelManager;
 import Entity.AnimalInfo;
 import Entity.ClimateTable;
 import Entity.LocationsTable;
-import Entity.OutputOfAnimalTable;
+import Entity.OutputOfAnimalPanel;
 
 
 
@@ -146,6 +147,13 @@ public class LocationsPanel extends JPanel {
 					databaseTable2.updateUI();
 					
 					textLocation.setText("");
+					
+					// update color
+					int r = databaseTable1.getRowCount();
+					int c = databaseTable1.getColumnCount();					
+					myTable1.setColor(r-1,r-1,1,c-1,Color.cyan);
+					myTable2.setColor(r-1,r-1,1,c-1,Color.cyan);
+					
 				}
 			}							
 		}
@@ -284,7 +292,14 @@ public class LocationsPanel extends JPanel {
 			for(int i = 1; i < myTable1.model.getColumnCount(); i++) {
 				myTable1.model.mySetValueAt(myTable1.model.getNewSum(i), myTable1.model.getRowCount()-1, i);
 				myTable2.model.mySetValueAt(myTable2.model.getNewSum(i), myTable2.model.getRowCount()-1, i);
-			}						
+			}
+			
+			// update color
+			int r = databaseTable1.getRowCount();
+			int c = databaseTable1.getColumnCount();			
+			myTable1.setColor(r-1,r-1,1,c-1,Color.cyan);
+			myTable2.setColor(r-1,r-1,1,c-1,Color.cyan);
+			
 			databaseTable1.updateUI();
 			databaseTable2.updateUI();
 		}

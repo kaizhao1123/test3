@@ -28,12 +28,10 @@ public class LocationsTable implements TableModelListener {
 
 		model.addTableModelListener(this);
 		model.addTotalRow(model.getEachSum());
-
 		ntable = new JTable(model);
-
-		// int rowcount = ntable.getRowCount();
-		// int colcount = ntable.getColumnCount();
-		// setColor(rowcount-1,rowcount-1,1,colcount,Color.cyan);
+		int rowcount = ntable.getRowCount();
+		int colcount = ntable.getColumnCount();
+		setColor(rowcount-1,rowcount-1,1,colcount,Color.cyan);
 
 		ntable.setVisible(true);
 		;
@@ -46,18 +44,13 @@ public class LocationsTable implements TableModelListener {
 				public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
 						boolean hasFocus, int row, int column) {
 					Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-					if (row == row_start && column == col_start) {
-						c.setBackground(ncolor);
-					}
 
 					if (row >= row_start && row <= row_end && column >= col_start && column <= col_end) {
 						setBackground(ncolor);
-						// cc = ncolor;
 					} else if (column == 0) {
 						setBackground(null);
 					} else
 						setBackground(cc);
-
 					return c;
 				}
 			};

@@ -14,14 +14,16 @@ import javax.swing.JTable;
 import Entity.AdditionsTable;
 import Entity.WashWaterTable;
 
-public class WashWaterDialog extends JDialog{
+public class FlushWaterDialog extends JDialog{
 	
 	JPanel panel;
-	String[] columnName = {  "Hoses", "Amount", "Units", "Minutes/Day","total(gal/day)" };   
-	Object data[][] = { 	{"Hose 1", "0.00", "gal/minute", "0.00",  "0.00"},
-							{"Hose 2", "0.00", "gal/minute", "0.00",  "0.00"}, 
-							{"Hose 3", "0.00", "gal/minute", "0.00",  "0.00"},
-							{"Hose 4", "0.00", "gal/minute", "0.00",  "0.00"},};
+	String[] columnName = { "<html> Animal  <br> ---Units --->  </html>", 
+							"<html> Quantity  <br>   </html>", 
+							"<html>Sug. Flush Volume  <br> (gal/head) </html>", 
+							"<html>Flush Volume  <br>  (gal/head) </html>",
+							"<html>Daily Flush  <br> (gallons) </html>"};    
+	Object data[][] = { {"Cow", "10", "500", "0.00",  "0.00"},
+						{"Feeder Calf", "20", "0.00", "0.00",  "0.00"}};
 	WashWaterTable myTable;
 	JTable databaseTable;
 	JScrollPane scrollPane;
@@ -33,7 +35,7 @@ public class WashWaterDialog extends JDialog{
 	String streamName = null;
 	String result = null;
 	
-	public WashWaterDialog(AdditionsTable mt, JTable jTable) {
+	public FlushWaterDialog(AdditionsTable mt, JTable jTable) {
 		
 		JDialog dialog = this;		
 		panel = new JPanel();
@@ -47,18 +49,16 @@ public class WashWaterDialog extends JDialog{
 		buttonHelp = new JButton ("Help");
 		buttonCancel = new JButton("Cancel");
 		buttonOK = new JButton("OK");
-		
-		
-		
+			
 		buttonOK.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				result = myTable.model.data[4][4].toString();
+				int rowCount = myTable.model.data.length;
+				result = myTable.model.data[rowCount-1][4].toString();
 				//int row = jTable.getSelectedRow();
 				int col = jTable.getSelectedColumn();
 				mt.model.data[row][col] = result;
 				jTable.updateUI();
 				dialog.dispose();
-				
 			}
 		});
 		
@@ -71,7 +71,7 @@ public class WashWaterDialog extends JDialog{
 		Container container = getContentPane();		
 		container.add(panel);   	
     	container.setVisible(true);  
-    	setTitle("Wash Water Calculator for " + streamName);
+    	setTitle("Flush Water Calculator for " + streamName);
     	setSize(new Dimension(420,440));
     	setVisible(true);
 	}

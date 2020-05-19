@@ -1,5 +1,6 @@
 package Panels;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -26,7 +27,7 @@ import AWS.PanelManager;
 import Entity.AnimalInfo;
 import Entity.AnimalsTable;
 import Entity.ClimateTable;
-import Entity.OutputOfAnimalTable;
+import Entity.OutputOfAnimalPanel;
 
 public class AnimalsPanel extends JPanel {
 	/**
@@ -47,7 +48,7 @@ public class AnimalsPanel extends JPanel {
 	AnimalInfo newAnimalInfo; // to build new animal info
 	ArrayList<AnimalInfo> animalInTable; // the animals showed in the table, including all selected and new build
 										 // animals, used to generate report
-	ArrayList<OutputOfAnimalTable> animalPanelOutput;  // store the output of panel: the name, the quantity and the weight of each animal
+	ArrayList<OutputOfAnimalPanel> animalPanelOutput;  // store the output of panel: the name, the quantity and the weight of each animal
 	
 	String[]  columnNamess = { "<html> Animal  </html>", // the header of table
 			"<html>Animal <br> (type) </html>", "<html>Quantity </html>", "<html>Weight <br> (lbs) </html>",
@@ -64,7 +65,7 @@ public class AnimalsPanel extends JPanel {
 	JScrollPane selectedScrollPane;
 	JScrollPane tableScrollPane;
 	AnimalsTable mTable;
-	JTable jtable;
+	JTable jTable;
 	JComboBox<String> animalType;
 	JButton buttonAdd;
 	JButton buttonRemove;
@@ -221,9 +222,9 @@ public class AnimalsPanel extends JPanel {
 
 		// initial table
 		mTable = new AnimalsTable();
-		jtable = mTable.buildMyTable(columnNamess, dataa);
-		jtable.getTableHeader().setPreferredSize(new Dimension(10, 35));
-		tableScrollPane = new JScrollPane(jtable);
+		jTable = mTable.buildMyTable(columnNamess, dataa);
+		jTable.getTableHeader().setPreferredSize(new Dimension(10, 35));
+		tableScrollPane = new JScrollPane(jTable);
 		tableScrollPane.setPreferredSize(new Dimension(800, 120));
 	}
 
@@ -240,7 +241,7 @@ public class AnimalsPanel extends JPanel {
 		// add listeners of each button
 		buttonAdd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				addToSelectedList();
+				addToSelectedList();				
 			}
 		});
 		buttonRemove.addActionListener(new ActionListener() {
@@ -262,13 +263,13 @@ public class AnimalsPanel extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				String source = panelManager.startPanelOutput[0];
 				String station = panelManager.startPanelOutput[1];
-				modelDialog = new AddAnimalDialog(mTable, jtable, source, station);
+				modelDialog = new AddAnimalDialog(mTable, jTable, source, station);
 				modelDialog.setParent(parent);
 			}
 		});
 		buttonDeleteRow.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				int row = jtable.getSelectedRow();
+				int row = jTable.getSelectedRow();
 				if (row != -1) {
 					String item = mTable.model.data[row][0].toString();
 					DefaultListModel<String> model = (DefaultListModel<String>) selectedList.getModel();
@@ -382,7 +383,7 @@ public class AnimalsPanel extends JPanel {
 			AnimalInfo ani = animalInTable.get(i);
 			String quantity = mTable.model.data[i][2].toString();
 			String weight = mTable.model.data[i][3].toString();
-			OutputOfAnimalTable ele = new OutputOfAnimalTable(ani,quantity,weight);
+			OutputOfAnimalPanel ele = new OutputOfAnimalPanel(ani,quantity,weight);
 			animalPanelOutput.add(ele);
 		}				
 	}
@@ -397,6 +398,7 @@ public class AnimalsPanel extends JPanel {
 			selectedModel.addElement(item);
 			selectedMap.put(item, choicesList);
 			addTableRow(item);
+			
 		}
 	}
 
@@ -427,6 +429,7 @@ public class AnimalsPanel extends JPanel {
 				selectedMap.put(item, choicesList);
 				addTableRow(item);
 				size--;
+				
 			}
 		}
 	}
@@ -463,7 +466,8 @@ public class AnimalsPanel extends JPanel {
 				} else
 					mTable.model.mySetValueAt(mTable.model.getNewSum(i), mTable.model.getRowCount() - 1, i);
 			}
-			jtable.updateUI();
+			mTable.setColor(0,jTable.getRowCount()-2,2,6,Color.lightGray);
+			jTable.updateUI();
 			AnimalInfo a = getInfoByName(item, animalInTable);
 			animalInTable.remove(a);
 		}
@@ -499,7 +503,8 @@ public class AnimalsPanel extends JPanel {
 			rowData[10] = df.format(mDou * qDou * wDou * 60 / 1000);
 			// rowData[10] = Double.toString(mDou * qDou * wDou * 60 / 1000);
 			mTable.model.addRow(rowData);
-
+			mTable.setColor(0,jTable.getRowCount()-2,2,6,Color.lightGray);
+			
 			for (int i = 2; i < rowData.length; i++) {
 				if (i == 3 || i == 4 || i == 5 || i == 6) {
 					mTable.model.mySetValueAt("N/A", mTable.model.getRowCount() - 1, i);
@@ -507,7 +512,7 @@ public class AnimalsPanel extends JPanel {
 				} else
 					mTable.model.mySetValueAt(mTable.model.getNewSum(i), mTable.model.getRowCount() - 1, i);
 			}
-			jtable.updateUI();
+			jTable.updateUI();
 			animalInTable.add(ele);
 		}
 
