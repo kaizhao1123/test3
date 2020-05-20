@@ -106,6 +106,8 @@ public class ClimatePanel extends JPanel {
 		BorderLayout border = new BorderLayout();
 		initialLayout(border);
 		initialActionLiseners();
+		
+		
 		// build actionlisterner for button to show whether the action works or not
 
 		/*

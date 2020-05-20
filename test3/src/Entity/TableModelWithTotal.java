@@ -161,14 +161,16 @@ public class TableModelWithTotal extends AbstractTableModel {
 		String s3 = "<html> VS <br> (lbs/day) </html>";
 		String s4 = "<html> TS <br> (lbs/day) </html>";
 		String s5 = "<html>Manure <br> (lbs/day) </html>";
-		
+		// set uneditable column of runoffTable
+		String s6 = "Monthly Totals";
 		
 		if (columnIndex == 0 || rowIndex == data.length -1 
 				|| colName == s1
 				|| colName == s2
 				|| colName == s3
 				|| colName == s4
-				|| colName == s5)
+				|| colName == s5
+				|| colName == s6)
 			return false;
 		else
 			return true;
@@ -186,14 +188,14 @@ public class TableModelWithTotal extends AbstractTableModel {
 
 	public double getSum(int column) {
 		if (data == null)
-			return Double.parseDouble(new DecimalFormat("0.00").format(0.0));
+			return Double.parseDouble(new DecimalFormat("0.00").format(0.00));
 		else {
-			double sum1 = 0.0;
+			double sum1 = 0.00;
 			for (int i = 0; i < getRowCount(); i++) {
 				String ddd = (String) getValueAt(i, column);
 				for (int j = 0; j < ddd.length(); j++) {
 					if (!Character.isDigit(ddd.charAt(j)) && ddd.charAt(j) != '.') {
-						return 0.0;
+						return 0.00;
 					}
 				}
 				Double val = Double.parseDouble(ddd);
@@ -206,10 +208,10 @@ public class TableModelWithTotal extends AbstractTableModel {
 
 	public double getNewSum(int column) {
 		if (data == null)
-			return 0.0;
+			return 0.00;
 		else {
 
-			double sum1 = 0.0;
+			double sum1 = 0.00;
 			for (int i = 0; i < getRowCount() - 1; i++) {
 				String ddd = (String) getValueAt(i, column);
 				Double val = Double.parseDouble(ddd);
@@ -225,7 +227,7 @@ public class TableModelWithTotal extends AbstractTableModel {
 		eachSum[0] = "Total";
 		for (int i = 1; i < getColumnCount(); i++) {
 			double num = getSum(i);
-			if (num == 0.0) {
+			if (num == 0.00) {
 				eachSum[i] = "N/A";
 			} else
 				eachSum[i] = Double.toString(getSum(i));
