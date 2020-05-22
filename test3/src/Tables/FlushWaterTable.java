@@ -1,4 +1,4 @@
-package Entity;
+package Tables;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -11,7 +11,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 
-public class WashWaterTable implements TableModelListener {
+public class FlushWaterTable implements TableModelListener {
 
 	JTable ntable;
 	public TableModelWithTotal model;
@@ -31,9 +31,10 @@ public class WashWaterTable implements TableModelListener {
 
 		ntable = new JTable(model);
 
-		//int rowcount = ntable.getRowCount();
+		int rowcount = ntable.getRowCount();
 		//int colcount = ntable.getColumnCount();
-		setColor(0,3,1,3,Color.lightGray);
+		setColor(0,rowcount-1,3,3,Color.lightGray);
+		
 		//FitTableColumns(ntable);
 		//model.mySetValueAt("Wash Water Total", model.getRowCount()-1, 0);
 		FitTableColumns(ntable);
@@ -48,14 +49,10 @@ public class WashWaterTable implements TableModelListener {
 				public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
 						boolean hasFocus, int row, int column) {
 					Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-					if (row == row_start && column == col_start) {
-						c.setBackground(ncolor);
-					}
-
 					if (row >= row_start && row <= row_end && column >= col_start && column <= col_end) {
 						setBackground(ncolor);
 						// cc = ncolor;
-					} else if (column == 0) {
+					} else if (column == 0 || column == 1 || column == 2) {
 						setBackground(null);
 					} else
 						setBackground(cc);
@@ -123,30 +120,15 @@ public class WashWaterTable implements TableModelListener {
 	
 	@Override
 	public void tableChanged(TableModelEvent e) {
-		// int col = e.getColumn();
-		int col = ntable.getSelectedColumn();
-		//int col = ntable.getColumnCount();
-		//String colName = ntable.getColumnName(col);
 
-
-		
-		
 		int row = ntable.getSelectedRow();
 		String amount = model.data[row][1].toString();
 		String number = model.data[row][3].toString();
 		Double aDou = Double.parseDouble(amount);
-		Double nDou = Double.parseDouble(number);
-		
+		Double nDou = Double.parseDouble(number);		
 		String totalPerRow = Double.toString(aDou * nDou);
 		model.mySetValueAt(totalPerRow, row, 4);
-
-		
 		model.mySetValueAt(model.getNewSum(4), model.getRowCount() - 1, 4);
-		
-		
-		
-
-
 		ntable.repaint();
 	}
 }

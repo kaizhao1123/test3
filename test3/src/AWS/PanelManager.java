@@ -11,20 +11,27 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import Entity.AnimalInfo;
+import Entity.BeddingInfo;
 import Entity.ClimateInfo;
 import Entity.OutputOfAnimalPanel;
 
 
 public class PanelManager {
 	
-
-	public Workbook workbook = null;	
+	public Workbook workbook = null;
+	
+	// for input data
 	public ArrayList<ClimateInfo> allClimateData = new ArrayList<>();
 	public ArrayList<AnimalInfo> allAnimalData = new ArrayList<>();
+	public ArrayList<BeddingInfo> allBeddingData = new ArrayList<>();
 	
+	
+	// for output of each panel
 	public String[] startPanelOutput = new String[2];
 	public ArrayList<String> climatePanelOutout;
 	public ArrayList<OutputOfAnimalPanel> animalPanelOutput;
+	public ArrayList<String> locationPanelOutput;
+	
 	
 	public PanelManager(String path) throws IOException {
 		InputStream fis = new FileInputStream(path);		
@@ -35,9 +42,10 @@ public class PanelManager {
         }
 		readClimateDataset("Climate");
 		readAnimalDataset("Animal");
+		readBeddingDataset("Bedding");
 	}
 	
-	
+	// reading data from climate
 	public void readClimateDataset(String sheetName) {
 		try {    		
     	    Sheet sheet = workbook.getSheet(sheetName);	     
@@ -60,6 +68,7 @@ public class PanelManager {
     	}  			
 	}	
 	
+	// reading data from animal
 	public void readAnimalDataset(String sheetName){
 		try {    		
     	    Sheet sheet = workbook.getSheet(sheetName);	     
@@ -82,6 +91,26 @@ public class PanelManager {
     	}  		
 	}
 	
+	// reading data from bedding
+	public void readBeddingDataset(String sheetName){
+		try {    		
+    	    Sheet sheet = workbook.getSheet(sheetName);	     
+    	    Row row;   	      	     
+    	    for(int i = 1; i < sheet.getLastRowNum(); i++ ) {
+    	    	row = sheet.getRow(i); 	
+    	    	BeddingInfo element;
+    	    	String name = row.getCell(0).toString();
+	    		String density = row.getCell(1).toString();
+	    		String eff_Density = row.getCell(2).toString();
+	    		String state = row.getCell(3).toString();
+    	    	
+    	    	element = new BeddingInfo(name, density, eff_Density, state);
+    	    	allBeddingData.add(element);   	    	 
+    	     }	    	        	    
+    	}catch(Exception e) {
+    		 e.printStackTrace();
+    	}  		
+	}
 	
 	/***
 	 * Manage start panel
@@ -154,7 +183,25 @@ public class PanelManager {
 		}				
 		return list;
 	}
+
+	// store output data
+	public void storeLocationPanelOutput(ArrayList<String> o) {
+		locationPanelOutput = o;
+	}
+	/***
+	 * manage Addition panel
+	 ***/
 	
+	
+	
+	/***
+	 * manage runoff panel
+	 ***/
+	
+	
+	/***
+	 * manage management panel
+	 */
 	
 	
 }

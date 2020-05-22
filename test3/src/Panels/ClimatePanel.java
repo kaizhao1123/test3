@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -32,7 +33,7 @@ import javax.swing.JTextField;
 
 import AWS.PanelManager;
 import Entity.ClimateInfo;
-import Entity.ClimateTable;
+import Tables.ClimateTable;
 
 public class ClimatePanel extends JPanel {
 	/**
@@ -68,7 +69,7 @@ public class ClimatePanel extends JPanel {
 	
 	// declare the elements in the panel
 	JRadioButton r1, r2, r3, r4, r5;
-	ButtonGroup bg1, bg2;
+	//ButtonGroup bg1, bg2;
 	JLabel labelCounty, labelStation, labelEnterCounty,labelEnterStation, labelInches, labelPrecipitation, labelRate, labelKval, labelOcv, labelLrv,
 			labelAlr;
 	JLabel jl1, jl2, jl3;
@@ -188,20 +189,25 @@ public class ClimatePanel extends JPanel {
 
 	private void initialElements() {
 		r1 = new JRadioButton("Use AWM Database");
+		r1.setFont(new Font(r1.getFont().getName(),Font.PLAIN,12));
 		r1.setSelected(true);
 		r2 = new JRadioButton("Enter custom climate data for this job   ");
-		bg1 = new ButtonGroup();
-		bg1.add(r1);
-		bg1.add(r2);
+		r2.setFont(new Font(r2.getFont().getName(),Font.PLAIN,12));
+		//bg1 = new ButtonGroup();
+		//bg1.add(r1);
+		//bg1.add(r2);
 
 		r3 = new JRadioButton("If prec - evap < 0 then set net value to 0              ");
 		r3.setSelected(true);
+		r3.setFont(new Font(r3.getFont().getName(),Font.PLAIN,12));
 		r4 = new JRadioButton("Always set net value to prec-evap");
+		r4.setFont(new Font(r4.getFont().getName(),Font.PLAIN,12));
 		r5 = new JRadioButton("Ignore evap value, and use prec. only");
-		bg2 = new ButtonGroup();
-		bg2.add(r3);
-		bg2.add(r4);
-		bg2.add(r5);
+		r5.setFont(new Font(r5.getFont().getName(),Font.PLAIN,12));
+		//bg2 = new ButtonGroup();
+		//bg2.add(r3);
+		//bg2.add(r4);
+		//bg2.add(r5);
 
 		labelCounty = new JLabel("Select County:");
 		bCounty = new JComboBox<>(listOfCounty);

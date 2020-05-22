@@ -1,4 +1,4 @@
-package Entity;
+package Tables;
 
 import java.awt.Color;
 import java.awt.Component;

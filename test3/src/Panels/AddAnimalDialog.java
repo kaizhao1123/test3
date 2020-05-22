@@ -21,8 +21,8 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 
 import Entity.AnimalInfo;
-import Entity.AnimalsTable;
-import Entity.ClimateTable;
+import Tables.AnimalsTable;
+import Tables.ClimateTable;
 
 public class AddAnimalDialog extends JDialog{
 

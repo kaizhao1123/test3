@@ -2,10 +2,13 @@ package Panels;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -21,7 +24,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import AWS.PanelManager;
-import Entity.RunoffTable;
+import Tables.RunoffTable;
 
 
 public class RunoffPanel extends JPanel{
@@ -34,7 +37,7 @@ public class RunoffPanel extends JPanel{
 String[] columnName = {" ", "Pervious","Impervious","Monthly Totals"};
 	
     // the data from the database
-	Object[][] tableData1 = { 	{ "January", "0.00", "0.00" , "0.00"}, 
+	Object[][] tableData1 = { 	{ "January", "1.00", "0.00" , "0.00"}, 
 		{ "February", "0.00", "0.00" , "0.00" },
 		{ "March", "0.00", "0.00" , "0.00"}, 
 		{ "April", "0.00", "0.00" , "0.00"}, 
@@ -106,7 +109,9 @@ String[] columnName = {" ", "Pervious","Impervious","Monthly Totals"};
     private void initialElements() {
     	labelMethods = new JLabel("Methods for determining monthly runoff volumes:");
     	label_1 = new JLabel("1.) Calculate volumes from climate and watershed data.");
+    	label_1.setFont(new Font(label_1.getFont().getName(),Font.PLAIN,12));
     	label_2 = new JLabel("2.) Enter runoff volumes directly in the table on the right.");
+    	label_2.setFont(new Font(label_2.getFont().getName(),Font.PLAIN,12));
     	childPanel_1 = buildPanel_1();
     	childPanel_2 = buildPanel_2();
     	labelRV = new JLabel("Runoff Volumes (1000 cu.ft)");
@@ -181,7 +186,7 @@ String[] columnName = {" ", "Pervious","Impervious","Monthly Totals"};
     	p.setLayout(new GridBagLayout());
 		GridBagConstraints gc1 = new GridBagConstraints();
 		gc1.anchor = GridBagConstraints.NORTHWEST;
-		gc1.insets = new Insets(5, 5, 0, 5);
+		gc1.insets = new Insets(5, 2, 0, 2);
 		
 		// first row
 		gc1.gridx = 0;
@@ -215,10 +220,47 @@ String[] columnName = {" ", "Pervious","Impervious","Monthly Totals"};
 		gc1.gridx = 4;
 		p.add(label_4, gc1);
 		
+		p.setPreferredSize(new Dimension(300, 140));
     	return p;
     }
     
     private void initialActionLiseners() {
+    	
+    	r1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					r1.setSelected(true);
+					r2.setSelected(false);
+					scrollPane.setViewportView(databaseTable);
+					gc.gridx = 0;
+					gc.gridy = 4;
+					gc.gridheight = 1;
+					add(childPanel_2, gc);				
+					updateUI();
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
+		r2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					r2.setSelected(true);
+					r1.setSelected(false);
+					scrollPane.setViewportView(customerTable);
+					System.out.print(getComponentZOrder(childPanel_2));
+					remove(childPanel_2);
+
+					updateUI();
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
+    	
+    	
     	text_1.getDocument().addDocumentListener(new DocumentListener(){   	  
 			@Override
 			public void insertUpdate(DocumentEvent e) {
@@ -294,6 +336,7 @@ String[] columnName = {" ", "Pervious","Impervious","Monthly Totals"};
 		add(labelWarning, gbc);
 		
 		// second column
+		gbc.anchor = GridBagConstraints.CENTER;
 		gbc.gridx = 3;
 		gbc.gridy = 0;
 		gbc.gridheight = 1;
@@ -304,7 +347,7 @@ String[] columnName = {" ", "Pervious","Impervious","Monthly Totals"};
 		gbc.gridwidth = 5;
 		add(scrollPane, gbc);
 		
-		gbc.anchor = GridBagConstraints.CENTER;
+		//gbc.anchor = GridBagConstraints.CENTER;
 		gbc.gridx = 0;
 		gbc.gridy = 5;
 		gbc.gridheight = 1;

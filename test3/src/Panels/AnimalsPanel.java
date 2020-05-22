@@ -25,9 +25,9 @@ import javax.swing.JTable;
 
 import AWS.PanelManager;
 import Entity.AnimalInfo;
-import Entity.AnimalsTable;
-import Entity.ClimateTable;
 import Entity.OutputOfAnimalPanel;
+import Tables.AnimalsTable;
+import Tables.ClimateTable;
 
 public class AnimalsPanel extends JPanel {
 	/**
@@ -41,14 +41,18 @@ public class AnimalsPanel extends JPanel {
 	AddAnimalDialog modelDialog;
 
 	// declare the data structure used in the panel
-	ArrayList<AnimalInfo> animalData; // store the input data filtered by source
-	HashMap<String, JList<String>> choicesMap; // K is the name of animal type, V is the original JList respond the name
-	HashMap<String, JList<String>> selectedMap; // K is the name of animal, V is the JList where the animal come from.
-	String[] animalTypes; // store the types of the animal
-	AnimalInfo newAnimalInfo; // to build new animal info
-	ArrayList<AnimalInfo> animalInTable; // the animals showed in the table, including all selected and new build
-										 // animals, used to generate report
-	ArrayList<OutputOfAnimalPanel> animalPanelOutput;  // store the output of panel: the name, the quantity and the weight of each animal
+	ArrayList<AnimalInfo> animalData; 				// store the input data filtered by source
+	HashMap<String, JList<String>> choicesMap; 		// K is the name of animal type, V is the original JList respond the name
+	HashMap<String, JList<String>> selectedMap;		// K is the name of animal, V is the JList where the animal come from.
+	String[] animalTypes; 							// store the types of the animal
+	AnimalInfo newAnimalInfo; 						// to build new animal info
+	
+	// the animals showed in the table, including all selected and new build animals, used to generate report
+	ArrayList<AnimalInfo> animalInTable; 			
+	
+	// store the output of panel: the name, the quantity and the weight of each animal
+	ArrayList<OutputOfAnimalPanel> animalPanelOutput;  
+	
 	
 	String[]  columnNamess = { "<html> Animal  </html>", // the header of table
 			"<html>Animal <br> (type) </html>", "<html>Quantity </html>", "<html>Weight <br> (lbs) </html>",

@@ -1,4 +1,4 @@
-package Entity;
+package Tables;
 
 import java.text.DecimalFormat;
 import javax.swing.table.AbstractTableModel;

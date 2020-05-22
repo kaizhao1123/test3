@@ -21,9 +21,9 @@ import javax.swing.JTextField;
 
 import AWS.PanelManager;
 import Entity.AnimalInfo;
-import Entity.ClimateTable;
-import Entity.LocationsTable;
 import Entity.OutputOfAnimalPanel;
+import Tables.ClimateTable;
+import Tables.LocationsTable;
 
 
 
@@ -42,7 +42,7 @@ public class LocationsPanel extends JPanel {
 	String[] columnName;
 	Object data1[][];   // for table1
 	Object data2[][];	// for table2
-	ArrayList<AnimalInfo> animalsList;
+	ArrayList<AnimalInfo> animalsList;	// get output of animalPanel, to generate the column names;
 	int rowIndex;  //  the row index of selected to delete
 		
 	JPanel panel = this;
@@ -68,11 +68,12 @@ public class LocationsPanel extends JPanel {
     String firstPeriod;
     String secondPeriod;
     
+    // to store the output
+    ArrayList<String> locationPanelOutput;
     
  	public LocationsPanel(PanelManager pm) {
  		panelManager = pm;
- 		animalsList = panelManager.getDataFromAnimalPanel();
- 		
+ 				
  		// initial this panel
  		initialData();
  		initialElements();
@@ -84,6 +85,9 @@ public class LocationsPanel extends JPanel {
  	}
     
     private void initialData() {
+    	
+    	animalsList = panelManager.getDataFromAnimalPanel();
+    	
     	// get the column of the table
 		int size = animalsList.size() + 1;
 		String[] name = new String[size];
@@ -172,7 +176,7 @@ public class LocationsPanel extends JPanel {
 				pane = parent.tabbedPane;
 				if (additionsPanel == null) {
 					getOutput();
-					//panelManager.storeAnimalPanelOutput(animalPanelOutput);
+					panelManager.storeLocationPanelOutput(locationPanelOutput);
 					additionsPanel = new AdditionsPanel(panelManager);
 					additionsPanel.setParent(parent);
 					pane.add("additions", additionsPanel);					
@@ -247,6 +251,14 @@ public class LocationsPanel extends JPanel {
     }
  
 	
+	
+	private void getOutput() {
+		locationPanelOutput = new ArrayList<>();
+		for(int i = 0; i < myTable1.model.data.length-1; i++) {
+			locationPanelOutput.add(myTable1.model.data[i][0].toString());
+		}
+	}
+    
 	// Corresponding the first option of periodDialog
 	public void update1() {
     	label_3.setText(" ");
@@ -256,6 +268,8 @@ public class LocationsPanel extends JPanel {
     	panel.setSize(new Dimension(500,400));
     	panel.updateUI();
     }
+	
+	
 	// Corresponding the second option of periodDialog
     public void update2() {
     	
@@ -454,17 +468,6 @@ public class LocationsPanel extends JPanel {
  
     }
     
-	private void getOutput() {
-		/*animalPanelOutput = new ArrayList<>();
-		for(int i = 0; i < animalInTable.size(); i++) {
-			AnimalInfo ani = animalInTable.get(i);
-			String quantity = mTable.model.data[i][2].toString();
-			String weight = mTable.model.data[i][3].toString();
-			OutputOfAnimalTable ele = new OutputOfAnimalTable(ani,quantity,weight);
-			animalPanelOutput.add(ele);
-		}*/				
-	}
-	
 	
 	public void setParent(MainFrame frame) {
 		this.parent = frame;

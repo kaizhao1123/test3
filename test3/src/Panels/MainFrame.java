@@ -2,6 +2,7 @@ package Panels;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -145,6 +146,7 @@ public class MainFrame extends JFrame {
 		startPanel = new StartPanel(panelManager);
 		startPanel.setParent(this);
 
+		pane.setPreferredSize(new Dimension(width,height));
 		pane.addTab("Introduction", introPanel);
 		pane.addTab("Start", startPanel);
 	}

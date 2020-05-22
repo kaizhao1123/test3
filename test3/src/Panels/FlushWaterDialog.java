@@ -11,8 +11,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
-import Entity.AdditionsTable;
-import Entity.WashWaterTable;
+import Tables.AdditionsTable;
+import Tables.WashWaterTable;
 
 public class FlushWaterDialog extends JDialog{
 	

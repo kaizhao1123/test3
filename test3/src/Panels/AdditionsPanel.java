@@ -23,7 +23,8 @@ import javax.swing.JTextField;
 import javax.swing.table.TableColumn;
 
 import AWS.PanelManager;
-import Entity.AdditionsTable;
+import Entity.BeddingInfo;
+import Tables.AdditionsTable;
 
 public class AdditionsPanel extends JPanel {
 
@@ -40,13 +41,15 @@ public class AdditionsPanel extends JPanel {
 	JTable databaseTable;
 	JScrollPane scrollPane;
 
+	// the header of table
 	String[] columnName = { "<html> Waste Streams  <br> ---Units --->  </html>", // the header of table
 			"<html>Wash Water  <br> (gal/day) </html>", "<html>Flush Water  <br> (gal/day) </html>",
 			"<html>Bedding Type  <br>   </html>", "<html>Eff  <br> (Density) </html>",
 			"<html> Amout <br> (lbs/day) </html>", "<html> LV Amt <br> (cu.ft/day) </html>",
 			"<html> Cv Amt <br> (cu.ft/day) </html>" };
-	Object data[][] = { { "dd", "0.00", "0.00", " 0.00", "0.00", "0.00", "0.00", "0.00" },
-			{ "ss", "0.00", "0.00", " 0.00", "0.00", "0.00", "0.00", "0.00" } };
+	Object data[][];
+		//{ { "dd", "0.00", "0.00", " 0.00", "0.00", "0.00", "0.00", "0.00" },
+		//	{ "ss", "0.00", "0.00", " 0.00", "0.00", "0.00", "0.00", "0.00" } };
 
 	JButton buttonAdd;
 	JButton buttonReset;
@@ -54,8 +57,11 @@ public class AdditionsPanel extends JPanel {
 	JButton buttonOK;
 	JPanel panel;
 	GridBagConstraints gc;
-	JComboBox comboboxType;
-	ArrayList<String> beddingType = new ArrayList();
+	JComboBox<String> comboboxType;
+	
+	ArrayList<String> streamName;
+	ArrayList<BeddingInfo> dataset;
+	ArrayList<String> beddingType;
 
 	public AdditionsPanel(PanelManager pm) {
 
@@ -70,9 +76,28 @@ public class AdditionsPanel extends JPanel {
 
 	private void initialData() {
 		panel = this;
-		beddingType.add("abc");
-		beddingType.add("bcd");
-		beddingType.add("cde");
+		// get the database data		
+		dataset = panelManager.allBeddingData;
+		beddingType = new ArrayList<>();
+		for(int i = 0; i < dataset.size(); i++) {
+			beddingType.add(dataset.get(i).name);
+		}
+	
+		// get the first column data
+		streamName = panelManager.locationPanelOutput;
+		
+		// initial the table data
+		data = new Object[streamName.size()][8];		
+		for(int i = 0; i < streamName.size(); i ++) {
+			data[i][0] = streamName.get(i);
+			for(int j = 1; j < 8; j++) {
+				if (j == 3)
+					data[i][j] = "";
+				else
+					data[i][j] = "0.00";				
+			}			
+		}
+
 	}
 
 	private void initalElements() {
@@ -83,7 +108,8 @@ public class AdditionsPanel extends JPanel {
 		textAdd = new JTextField();
 		textAdd.setPreferredSize(new Dimension(130, 25));
 
-		comboboxType = new JComboBox();
+		comboboxType = new JComboBox<String>();
+		comboboxType.addItem(" ");
 		for (int i = 0; i < beddingType.size(); i++) {
 			comboboxType.addItem(beddingType.get(i));
 		}
@@ -92,10 +118,12 @@ public class AdditionsPanel extends JPanel {
 		buttonReset = new JButton("Reset Effective Densities");
 		buttonHelp = new JButton("Help");
 		buttonOK = new JButton("OK");
-		myTable = new AdditionsTable();
-		databaseTable = myTable.buildMyTable(columnName, data);
+		myTable = new AdditionsTable();		
+		databaseTable = myTable.buildMyTable(columnName, data, dataset);
+    	//TableColumn column = databaseTable.getColumnModel().getColumn(3);
+       // column.setPreferredWidth(120);
 		scrollPane = new JScrollPane(databaseTable);
-		scrollPane.setPreferredSize(new Dimension(600, 100));
+		scrollPane.setPreferredSize(new Dimension(660, 100));
 
 		TableColumn sportColumn = databaseTable.getColumnModel().getColumn(3);
 		sportColumn.setCellEditor(new DefaultCellEditor(comboboxType));
@@ -200,15 +228,15 @@ public class AdditionsPanel extends JPanel {
 		gc.gridheight = 6;
 		add(scrollPane, gc);
 
-		gc.anchor = GridBagConstraints.EAST;
+		gc.anchor = GridBagConstraints.CENTER;
 		gc.gridx = 4;
 		gc.gridy = 9;
-		gc.gridwidth = 1;
+		gc.gridwidth = 3;
 		gc.gridheight = 1;
 		add(buttonHelp, gc);
 		gc.anchor = GridBagConstraints.EAST;
-		gc.gridx = 5;
-		gc.gridwidth = 1;
+		//gc.gridx = 4;
+		gc.gridwidth = 2;
 		add(buttonOK, gc);
 
 	}

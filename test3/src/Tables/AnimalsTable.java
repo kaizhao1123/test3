@@ -1,4 +1,4 @@
-package Entity;
+package Tables;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -81,11 +81,11 @@ public class AnimalsTable implements TableModelListener {
 		int row = ntable.getSelectedRow();
 		Object[] ele = model.data[row];
 		DecimalFormat df = new DecimalFormat("0.00");
-		double qDou = Double.parseDouble(ele[2].toString());
-		double wDou = Double.parseDouble(ele[3].toString());
-		double mDou = Double.parseDouble(ele[4].toString());
-		double tsDou = Double.parseDouble(ele[6].toString());
-		double vsDou = Double.parseDouble(ele[5].toString());
+		Double qDou = Double.parseDouble(ele[2].toString());
+		Double wDou = Double.parseDouble(ele[3].toString());
+		Double mDou = Double.parseDouble(ele[4].toString());
+		Double tsDou = Double.parseDouble(ele[6].toString());
+		Double vsDou = Double.parseDouble(ele[5].toString());
 
 		ele[7] = df.format(mDou * qDou * wDou / 1000);
 		ele[8] = df.format(vsDou * qDou * wDou / 1000);

@@ -1,7 +1,9 @@
-package Entity;
+package Tables;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Enumeration;
 
 import javax.swing.JTable;
@@ -10,6 +12,8 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
+
+import Entity.BeddingInfo;
 
 
 public class AdditionsTable implements TableModelListener {
@@ -20,11 +24,16 @@ public class AdditionsTable implements TableModelListener {
 	String[] columnNamess;
 	Object[][] dataa;
 	Color cc = Color.lightGray;
+	
+	ArrayList<BeddingInfo> beddingDataset;
+	BeddingInfo bed = null;
 
-	public JTable buildMyTable(String[] s, Object[][] o) {
+	public JTable buildMyTable(String[] s, Object[][] o, ArrayList<BeddingInfo> list) {
 		
 		columnNamess = s;
 		dataa = o;
+		beddingDataset = list;
+		
 		
 		model = new TableModel(columnNamess, dataa);
 		model.addTableModelListener(this);
@@ -34,6 +43,9 @@ public class AdditionsTable implements TableModelListener {
 		int colcount = ntable.getColumnCount();
 		setColor(0,rowcount-1,6,colcount,Color.cyan);
 		FitTableColumns(ntable);
+		TableColumn column = ntable.getColumnModel().getColumn(3);
+        column.setWidth(160);
+		
 		ntable.setVisible(true);
 	
 		return ntable;
@@ -117,11 +129,25 @@ public class AdditionsTable implements TableModelListener {
 	public void tableChanged(TableModelEvent e) {
 		// int col = e.getColumn();
 		int col = ntable.getSelectedColumn();
-		String colName = ntable.getColumnName(col);
+		//String colName = ntable.getColumnName(col);
+		int row = ntable.getSelectedRow();
+		Object[] ele = model.data[row];
+		String s = ntable.getValueAt(row, col).toString();		
 		
+		for(int i = 0; i < beddingDataset.size(); i++) {
+			if(beddingDataset.get(i).name.equals(s)) {
+				bed = beddingDataset.get(i);
+				ele[4] = bed.eff_Density;
+			}				
+		}
+	
+		DecimalFormat df = new DecimalFormat("0.00");
+		Double aDou = Double.parseDouble(ele[5].toString());
+		Double dDou = Double.parseDouble(bed.density);
+		Double edDou = Double.parseDouble(ele[4].toString());
 		
-		// setup the relationship between each column
-		
+		ele[6] = df.format(aDou / dDou);
+		ele[7] = df.format(aDou / edDou);		
 		
 		ntable.repaint();
 	}

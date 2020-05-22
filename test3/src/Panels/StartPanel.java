@@ -52,11 +52,6 @@ public class StartPanel extends JPanel {
 	public StartPanel(PanelManager pm) {
 		panelManager = pm;
 
-		// get climate dataset
-		
-		climateDataSet = panelManager.allClimateData;
-
-		// initial this panel
 		initialData();
 		initialElements();
 		initialActionLiseners();
@@ -66,7 +61,12 @@ public class StartPanel extends JPanel {
 	}
 
 	private void initialData() {
-		allStateNames = getSet(climateDataSet); // get all state names
+		
+		// get climate dataset		
+		climateDataSet = panelManager.allClimateData;
+		
+		// get all state names
+		allStateNames = getSet(climateDataSet); 
 		output = new String[2];
 	}
 
