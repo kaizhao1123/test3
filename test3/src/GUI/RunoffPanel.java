@@ -38,7 +38,7 @@ public class RunoffPanel extends JPanel {
 	String[] perData = {"5.40","5.23","6.65","5.24","3.86","3.99","5.27","3.91","3.88","2.82","3.98","5.37"};
 	String[] imperData = {"0.00", "0.00","0.00", "0.00", "0.00", "0.00","0.00","0.00","0.00", "0.00","0.00","0.00"};
 	
-	int curveNum_30;
+	int curveNum_30 = 77;
 	
 	
 	// the data from the database
@@ -278,14 +278,15 @@ public class RunoffPanel extends JPanel {
 				try {
 					r1.setSelected(true);
 					r2.setSelected(false);
+					text_1.setEditable(false);
+					text_2.setEditable(false);
 					scrollPane.setViewportView(databaseTable);
 					gc.gridx = 0;
 					gc.gridy = 4;
 					gc.gridheight = 1;
-					add(childPanel_2, gc);
+					add(childPanel_2, gc);				
 					updateUI();
 				} catch (Exception e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 			}
@@ -295,13 +296,13 @@ public class RunoffPanel extends JPanel {
 				try {
 					r2.setSelected(true);
 					r1.setSelected(false);
+					text_1.setEditable(true);
+					text_2.setEditable(true);
 					scrollPane.setViewportView(customerTable);
 					System.out.print(getComponentZOrder(childPanel_2));
 					remove(childPanel_2);
-
 					updateUI();
 				} catch (Exception e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 			}
@@ -310,18 +311,12 @@ public class RunoffPanel extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					r3.setSelected(true);
-					r4.setSelected(false);
-					
+					r4.setSelected(false);					
 					int num = Integer.parseInt(textPCN2.getText());	
 					getCurveNum_30(num);
 					double area = Double.parseDouble(textPWA.getText());
-					updateTablePerv(curveNum_30, area, perData);
-					//scrollPane.setViewportView(databaseTable);
-					//updateUI();	
-					System.out.print(curveNum_30);
-					
+					updateTablePerv(curveNum_30, area, perData);					
 				} catch (Exception e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 			}
@@ -332,101 +327,173 @@ public class RunoffPanel extends JPanel {
 				try {
 					r4.setSelected(true);
 					r3.setSelected(false);
-					//scrollPane.setViewportView(databaseTable);
 					int num = Integer.parseInt(textPCN2.getText());						
 					curveNum_30 = num;
 					double area = Double.parseDouble(textPWA.getText());
 					updateTablePerv(curveNum_30, area, perData);
-					
-					
-					System.out.print(curveNum_30);
-					//scrollPane.setViewportView(databaseTable);
-					//updateUI();
-				} catch (Exception e1) {
-					// TODO Auto-generated catch block
+				} catch (Exception e1) {	
 					e1.printStackTrace();
 				}
 			}
 		});
     	
-
-		text_1.getDocument().addDocumentListener(new DocumentListener() {
+    	textPWA.getDocument().addDocumentListener(new DocumentListener(){   	  
 			@Override
 			public void insertUpdate(DocumentEvent e) {
-				// TODO Auto-generated method stub
-				double v1 = Double.parseDouble(text_1.getText().toString());
-				double v2 = Double.parseDouble(text_2.getText().toString());
-
-				String s = Double.toString(v1 + v2);
-				text_3.setText(s);
+				double v = Double.parseDouble(textPWA.getText().toString());
+    	    	updateTablePerv(curveNum_30, v, perData);   	    	
 			}
 
 			@Override
 			public void removeUpdate(DocumentEvent e) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void changedUpdate(DocumentEvent e) {
-				// TODO Auto-generated method stub
-
-			}
-		});
-
-		text_2.getDocument().addDocumentListener(new DocumentListener() {
-			@Override
-			public void insertUpdate(DocumentEvent e) {
-				// TODO Auto-generated method stub
-				double v1 = Double.parseDouble(text_1.getText().toString());
-				double v2 = Double.parseDouble(text_2.getText().toString());
-
-				String s = Double.toString(v1 + v2);
-				text_3.setText(s);
-			}
-
-			@Override
-			public void removeUpdate(DocumentEvent e) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void changedUpdate(DocumentEvent e) {
-				// TODO Auto-generated method stub
-
-			}
-		});
-		
-		buttonOK.addActionListener(new ActionListener() 
-		{
-			public void actionPerformed(ActionEvent e) {
-
-				pane = parent.tabbedPane;
-
-				try {
-					if (mgmtTrainPanel == null) {
-						//panelManager.storeClimatePanelOutput(Output);
-						mgmtTrainPanel = new MgmtTrainPanel(panelManager);
-						mgmtTrainPanel.setParent(parent);
-						pane.add("Mgmt Train", mgmtTrainPanel);
-					}
-					/*
-					 * else { pane.remove(index);
-					 * 
-					 * //System.out.print(index);
-					 * 
-					 * animal = new AnimalPanel(pane,animalData,source); animal.setParent(parent);
-					 * pane.insertTab("animal", null, animal, null, index); }
-					 */
-					pane.setSelectedIndex(pane.indexOfTab("Mgmt Train"));
-				} catch (Exception e1) {
-					e1.printStackTrace();
+				double v;
+				try {									
+					v = Double.parseDouble(textPWA.getText().toString());	  
+				}catch(Exception f){
+					v = 0.00;				
 				}
-
+				updateTablePerv(curveNum_30, v, perData);   	    	
 			}
-		});
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+				
+			}
+    	});
+    	
+    	textPCN1.getDocument().addDocumentListener(new DocumentListener(){   	  
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				// TODO Auto-generated method stub
+				//double v = Double.parseDouble(textPWA.getText().toString());
+    	    	//updateTablePerv(curveNum_30, v, perData);   	    	
+			}
 
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				// TODO Auto-generated method stub
+				//double v;
+				//try {									
+				//	v = Double.parseDouble(textPWA.getText().toString());	  
+				//}catch(Exception f){
+				//	v = 0.00;				
+				//}
+				//updateTablePerv(curveNum_30, v, perData);   	    	
+			}
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+    	});
+    	
+    	textPCN2.getDocument().addDocumentListener(new DocumentListener(){   	  
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				// TODO Auto-generated method stub				
+				int v = Integer.parseInt(textPCN2.getText().toString());
+				if(r3.isSelected())
+					getCurveNum_30(v);
+				else
+					curveNum_30 = v;
+				double area = Double.parseDouble(textPWA.getText().toString());
+    	    	updateTablePerv(curveNum_30, area, perData);   	    	
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				// TODO Auto-generated method stub
+				int v;
+				try {					
+					v = Integer.parseInt(textPCN2.getText().toString());
+					if(r3.isSelected())
+						getCurveNum_30(v);
+					else
+						curveNum_30 = v;
+					
+					double area = Double.parseDouble(textPWA.getText().toString());
+	    	    	updateTablePerv(curveNum_30, area, perData);	
+				}catch(Exception f){
+					
+				}
+						   	    	
+			}
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+    	});
+    	
+    	textIA.getDocument().addDocumentListener(new DocumentListener(){   	  
+    		@Override
+			public void insertUpdate(DocumentEvent e) {
+				double v = Double.parseDouble(textIA.getText().toString());
+    	    	updateTableImperv(95, v, perData);   	    	
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				double v;
+				try {									
+					v = Double.parseDouble(textIA.getText().toString());	  
+				}catch(Exception f){
+					v = 0.00;				
+				}
+				updateTableImperv(95, v, perData);   	    	
+			}
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+				
+			}
+    	});
+    	
+    	text_1.getDocument().addDocumentListener(new DocumentListener(){   	  
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				double v1 = Double.parseDouble(text_1.getText().toString());
+    	    	double v2 = Double.parseDouble(text_2.getText().toString());
+    	    	String s = Double.toString(v1 + v2);
+    	    	text_3.setText(s);
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				double v1 = Double.parseDouble(text_1.getText().toString());
+    	    	double v2 = Double.parseDouble(text_2.getText().toString());
+    	    	String s = Double.toString(v1 + v2);
+    	    	text_3.setText(s);
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+				
+			}
+    	});
+    	
+    	text_2.getDocument().addDocumentListener(new DocumentListener(){   	  
+			@Override
+			public void insertUpdate(DocumentEvent e) {		
+				double v1 = Double.parseDouble(text_1.getText().toString());
+    	    	double v2 = Double.parseDouble(text_2.getText().toString());
+    	    	String s = Double.toString(v1 + v2);
+    	    	text_3.setText(s);
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				double v1 = Double.parseDouble(text_1.getText().toString());
+    	    	double v2 = Double.parseDouble(text_2.getText().toString());
+    	    	String s = Double.toString(v1 + v2);
+    	    	text_3.setText(s);
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+    	});
+    	
 	}
 
 	private void initialLayout(GridBagConstraints gbc) {
@@ -499,26 +566,52 @@ public class RunoffPanel extends JPanel {
     	curveNum_30 = (int) res;    	
     }
     
-	public void updateTablePerv(int num, double area, String[] data) {
+    public void updateTablePerv(int num, double area, String[] data) {
+    	DecimalFormat df = new DecimalFormat("0.00");
+    	if(num > 0) {
+    		double s = 1000.00/num - 10;
+        	s = Double.parseDouble(df.format(s));    	
+       	
+        	for(int i = 0; i < 12; i++) {
+            	double ele = Double.parseDouble(data[i].toString());    		
+        		double p =  Double.parseDouble(df.format(ele));
+        		double q = (p - 0.2*s) * (p - 0.2*s) / (p + 0.8*s);
+        		q = Double.parseDouble(df.format(q)); 
+        		double perv = Double.parseDouble(df.format(q * area *3.63));  		
+        		myTable1.model.data[i][1] = Double.toString(perv);  
+        		double imperv = Double.parseDouble(myTable1.model.data[i][2].toString());
+        		double total = Double.parseDouble(df.format(perv + imperv));
+        		myTable1.model.data[i][3] = Double.toString(total);
+        	}
+        	
+        	myTable1.model.mySetValueAt(myTable1.model.getNewSum(1), 12, 1);
+        	myTable1.model.mySetValueAt(myTable1.model.getNewSum(3), 12, 3);
+        	databaseTable.updateUI();    	    	
+    	}
+    	
+    }
+    
+    public void updateTableImperv(int num, double area, String[] data) {
     	DecimalFormat df = new DecimalFormat("0.00");
     	double s = 1000.00/num - 10;
-    	s = Double.parseDouble(df.format(s));
-    	//df.format(s);
-    	double total = 0.00;
+    	s = Double.parseDouble(df.format(s));    	
+   	
     	for(int i = 0; i < 12; i++) {
         	double ele = Double.parseDouble(data[i].toString());    		
     		double p =  Double.parseDouble(df.format(ele));
     		double q = (p - 0.2*s) * (p - 0.2*s) / (p + 0.8*s);
     		q = Double.parseDouble(df.format(q)); 
-    		double nele = Double.parseDouble(df.format(q * area *3.63)); 
-    		total += nele;
-    		myTable1.model.data[i][1] = Double.toString(nele);    		    		    		
+    		double imperv = Double.parseDouble(df.format(q * area *3.63 / 43559));  		
+    		myTable1.model.data[i][2] = Double.toString(imperv);  
+    		double perv = Double.parseDouble(myTable1.model.data[i][1].toString());
+    		double total = Double.parseDouble(df.format(perv + imperv));
+    		myTable1.model.data[i][3] = Double.toString(total);
     	}
-    	myTable1.model.data[12][1] =  df.format(total); 
-    	databaseTable.updateUI();
-    	    	
+    	
+    	myTable1.model.mySetValueAt(myTable1.model.getNewSum(2), 12, 2);
+    	myTable1.model.mySetValueAt(myTable1.model.getNewSum(3), 12, 3);
+    	databaseTable.updateUI();    	    	
     }
-    
 	public void setParent(MainFrame frame) {
 		this.parent = frame;
 	}
