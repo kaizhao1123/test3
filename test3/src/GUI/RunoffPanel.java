@@ -35,12 +35,16 @@ public class RunoffPanel extends JPanel {
 	PanelManager panelManager;
 
 	String[] columnName = { " ", "Pervious", "Impervious", "Monthly Totals" };
-	String[] perData = {"5.40","5.23","6.65","5.24","3.86","3.99","5.27","3.91","3.88","2.82","3.98","5.37"};
-	String[] imperData = {"0.00", "0.00","0.00", "0.00", "0.00", "0.00","0.00","0.00","0.00", "0.00","0.00","0.00"};
-	
+	String[] perData = { "5.40", "5.23", "6.65", "5.24", "3.86", "3.99", "5.27", "3.91", "3.88", "2.82", "3.98",
+			"5.37" };
+	String[] imperData = { "0.00", "0.00", "0.00", "0.00", "0.00", "0.00", "0.00", "0.00", "0.00", "0.00", "0.00",
+			"0.00" };
+
 	int curveNum_30 = 77;
-	
-	
+	double pervious25Yr = 5.40;
+	double valuePWA, valuePCN1, valuePCN2, valueIA, valueT1, valueT2;
+	DecimalFormat df;
+
 	// the data from the database
 	Object[][] tableData1 = { { "January", "0.00", "0.00", "0.00" }, { "February", "0.00", "0.00", "0.00" },
 			{ "March", "0.00", "0.00", "0.00" }, { "April", "0.00", "0.00", "0.00" }, { "May", "0.00", "0.00", "0.00" },
@@ -79,7 +83,7 @@ public class RunoffPanel extends JPanel {
 	JButton buttonHelp;
 	JButton buttonOK;
 
-	//JPanel panel;
+	JPanel panel;
 	JPanel childPanel_1, childPanel_2;
 	GridBagConstraints gc;
 
@@ -95,31 +99,28 @@ public class RunoffPanel extends JPanel {
 	}
 
 	private void initialData() {
-		DecimalFormat df = new DecimalFormat("0.00");
-    	double s = 1000.00/77 - 10;
-    	s = Double.parseDouble(df.format(s));
-
-    	for(int i = 0; i < 12; i++) {
-    		//tableData1[i][1] = perData[i];
-    		double ele = Double.parseDouble(perData[i]);    		
-    		double p =  Double.parseDouble(df.format(ele));
-    		double q = (p - 0.2*s) * (p - 0.2*s) / (p + 0.8*s);
-    		q = Double.parseDouble(df.format(q));
-    		
-    		tableData1[i][1] = Double.toString(Double.parseDouble(df.format(q * 1 *3.63)));
-    		
-    		
-    		tableData1[i][2] = imperData[i];
-    		    		
-    		String pervious = tableData1[i][1].toString();    		   		
-    		String impervious = tableData1[i][2].toString();
-    		Double pDou = Double.parseDouble(pervious);
-    		Double iDou = Double.parseDouble(impervious);
-    		String totalPerRow = Double.toString(Double.parseDouble(new DecimalFormat("0.00").format(pDou +  iDou)));    		   		
-    		tableData1[i][3] = totalPerRow;
-    	}
+		df = new DecimalFormat("0.00");
+		/*
+		 * double s = 1000.00/77 - 10; s = Double.parseDouble(df.format(s));
+		 * 
+		 * for(int i = 0; i < 12; i++) { //tableData1[i][1] = perData[i]; double ele =
+		 * Double.parseDouble(perData[i]); double p =
+		 * Double.parseDouble(df.format(ele)); double q = (p - 0.2*s) * (p - 0.2*s) / (p
+		 * + 0.8*s); q = Double.parseDouble(df.format(q));
+		 * 
+		 * tableData1[i][1] = Double.toString(Double.parseDouble(df.format(q * 1
+		 * *3.63)));
+		 * 
+		 * 
+		 * tableData1[i][2] = imperData[i];
+		 * 
+		 * String pervious = tableData1[i][1].toString(); String impervious =
+		 * tableData1[i][2].toString(); Double pDou = Double.parseDouble(pervious);
+		 * Double iDou = Double.parseDouble(impervious); String totalPerRow =
+		 * Double.toString(Double.parseDouble(new DecimalFormat("0.00").format(pDou +
+		 * iDou))); tableData1[i][3] = totalPerRow; }
+		 */
 	}
-
 
 	private void initialElements() {
 		labelMethods = new JLabel("Methods for determining monthly runoff volumes:");
@@ -127,14 +128,15 @@ public class RunoffPanel extends JPanel {
 		label_1.setFont(new Font(label_1.getFont().getName(), Font.PLAIN, 12));
 		label_2 = new JLabel("2.) Enter runoff volumes directly in the table on the right.");
 		label_2.setFont(new Font(label_2.getFont().getName(), Font.PLAIN, 12));
-		buildPanel_1();		
+		buildPanel_1();
 		buildPanel_2();
 		labelRV = new JLabel("Runoff Volumes (1000 cu.ft)");
-		labelRV.setFont(new Font(labelRV.getFont().getName(),Font.BOLD,14));
+		labelRV.setFont(new Font(labelRV.getFont().getName(), Font.BOLD, 14));
 
 		myTable1 = new RunoffTable();
 		databaseTable = myTable1.buildMyTable(columnName, tableData1);
 		databaseTable.setRowHeight(20);
+		databaseTable.enable(false);
 		myTable2 = new RunoffTable();
 		customerTable = myTable2.buildMyTable(columnName, tableData2);
 		customerTable.setRowHeight(20);
@@ -143,11 +145,15 @@ public class RunoffPanel extends JPanel {
 
 		label_5 = new JLabel("25-Yr 24-Hr Storm Runoff:");
 		text_1 = new JTextField("0.00");
+		text_1.setName("text_1");
 		text_1.setPreferredSize(new Dimension(63, 25));
 		text_1.setBackground(Color.lightGray);
+		text_1.setEditable(false);
 		text_2 = new JTextField("0.00");
+		text_2.setName("text_2");
 		text_2.setPreferredSize(new Dimension(73, 25));
 		text_2.setBackground(Color.lightGray);
+		text_2.setEditable(false);
 		text_3 = new JTextField("0.00");
 		text_3.setPreferredSize(new Dimension(102, 25));
 		text_3.setBackground(Color.cyan);
@@ -158,6 +164,7 @@ public class RunoffPanel extends JPanel {
 						+ "The user is encouraged to use a method outside of the program to compute runoff <br>"
 						+ "volumes for larger watersheds and where precision is vital. Methods for computing <br>"
 						+ "monthly runoff volumes include the NEH-4 stream gauge procedure and SPAW. </html>");
+		labelWarning.setForeground(Color.red);
 		buttonHelp = new JButton("Help");
 		buttonHelp.setPreferredSize(new Dimension(60, 25));
 		buttonOK = new JButton("OK");
@@ -166,54 +173,77 @@ public class RunoffPanel extends JPanel {
 
 	private void buildPanel_1() {
 		childPanel_1 = new JPanel();
-    	r1 = new JRadioButton("Calculate Monthly Runoff Volumes");
-    	r1.setSelected(true);
-    	r2 = new JRadioButton("Enter Monthly Runoff Volumes");
-    	//bg = new ButtonGroup();
-		//bg.add(r1);
-		//bg.add(r2);
-		
-    	childPanel_1.setLayout(new GridLayout(2, 1));
-    	childPanel_1.add(r1);
-    	childPanel_1.add(r2);
-    	childPanel_1.setBorder(
+		r1 = new JRadioButton("Calculate Monthly Runoff Volumes");
+		r1.setSelected(true);
+		r2 = new JRadioButton("Enter Monthly Runoff Volumes");
+		// bg = new ButtonGroup();
+		// bg.add(r1);
+		// bg.add(r2);
+
+		childPanel_1.setLayout(new GridLayout(2, 1));
+		childPanel_1.add(r1);
+		childPanel_1.add(r2);
+		childPanel_1.setBorder(
 				BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Runoff Volume Method"));
-    	childPanel_1.setPreferredSize(new Dimension(310, 80));
+		childPanel_1.setPreferredSize(new Dimension(310, 80));
 	}
 
 	private void buildPanel_2() {
 		childPanel_2 = new JPanel();
-    	labelPWA = new JLabel("Pervious Watershed Area: ");
-    	labelPCN1 = new JLabel("<html> Pervious Curve Number (1-day) <br>"
-    			+ "for 25-Yr 24-Hr Storm Runoff: </html>");
-    	labelPCN2 = new JLabel("<html> Pervious Curve Number  <br>"
-    			+ "for Monthly Runoff: </html>");
-    	labelIA = new JLabel("Impervious Area (roofs, slabs, etc): ");
-    	label_3 = new JLabel("acres");
-    	label_4 = new JLabel("sq.ft.");
-    	
-    	r3 = new JRadioButton("(1-day)");
-    	r3.setFont(new Font(r3.getFont().getName(),Font.PLAIN,11));
-    	r3.setPreferredSize(new Dimension(70,16));
-    	r3.setSelected(true);
-    	r4 = new JRadioButton("(30-day)");
-    	r4.setFont(new Font(r4.getFont().getName(),Font.PLAIN,11));
-    	r4.setPreferredSize(new Dimension(70,16));
-    	
-    	textPWA = new JTextField("1");
-    	textPWA.setPreferredSize(new Dimension(50,25));
-    	textPCN1 = new JTextField("90");
-    	textPCN1.setPreferredSize(new Dimension(50,25));
-    	textPCN2 = new JTextField("90");
-    	textPCN2.setPreferredSize(new Dimension(50,25));
-    	textIA = new JTextField("0");
-    	textIA.setPreferredSize(new Dimension(50,25));
-    	
-    	childPanel_2.setLayout(new GridBagLayout());
+		labelPWA = new JLabel("Pervious Watershed Area: ");
+		labelPCN1 = new JLabel("<html> Pervious Curve Number (1-day) <br>" + "for 25-Yr 24-Hr Storm Runoff: </html>");
+		labelPCN2 = new JLabel("<html> Pervious Curve Number  <br>" + "for Monthly Runoff: </html>");
+		labelIA = new JLabel("Impervious Area (roofs, slabs, etc): ");
+		label_3 = new JLabel("acres");
+		label_4 = new JLabel("sq.ft.");
+
+		r3 = new JRadioButton("(1-day)");
+		r3.setFont(new Font(r3.getFont().getName(), Font.PLAIN, 11));
+		r3.setPreferredSize(new Dimension(70, 16));
+		r3.setSelected(true);
+		r4 = new JRadioButton("(30-day)");
+		r4.setFont(new Font(r4.getFont().getName(), Font.PLAIN, 11));
+		r4.setPreferredSize(new Dimension(70, 16));
+
+		textPWA = new JTextField("0");
+		textPWA.setName("textPWA");
+		textPWA.setPreferredSize(new Dimension(50, 25));
+		textPCN1 = new JTextField("90");
+		textPCN1.setName("textPCN1");
+		textPCN1.setPreferredSize(new Dimension(50, 25));
+		textPCN2 = new JTextField("90");
+		textPCN2.setName("textPCN2");
+		textPCN2.setPreferredSize(new Dimension(50, 25));
+		textIA = new JTextField("0");
+		textIA.setName("textIA");
+		textIA.setPreferredSize(new Dimension(50, 25));
+
+		try {
+			valuePWA = Double.parseDouble(textPWA.getText().toString());
+		} catch (Exception e) {
+			valuePWA = 0;
+		}
+		try {
+			valuePCN1 = Double.parseDouble(textPCN1.getText().toString());
+		} catch (Exception e) {
+			valuePCN1 = 0;
+		}
+		try {
+			valuePCN2 = Double.parseDouble(textPCN2.getText().toString());
+		} catch (Exception e) {
+			valuePCN2 = 0;
+		}
+		try {
+			valueIA = Double.parseDouble(textIA.getText().toString());
+		} catch (Exception e) {
+			valueIA = 0;
+		}
+
+		childPanel_2.setLayout(new GridBagLayout());
 		GridBagConstraints gc1 = new GridBagConstraints();
-		gc1.anchor = GridBagConstraints.NORTHWEST;		
+		gc1.anchor = GridBagConstraints.NORTHWEST;
 		gc1.insets = new Insets(3, 2, 2, 2);
-		
+
 		// first row
 		gc1.gridx = 0;
 		gc1.gridy = 0;
@@ -224,7 +254,7 @@ public class RunoffPanel extends JPanel {
 		childPanel_2.add(textPWA, gc1);
 		gc1.gridx = 4;
 		childPanel_2.add(label_3, gc1);
-		
+
 		// second row
 		gc1.gridx = 0;
 		gc1.gridy = 1;
@@ -234,28 +264,27 @@ public class RunoffPanel extends JPanel {
 		gc1.gridx = 2;
 		gc1.gridwidth = 1;
 		childPanel_2.add(textPCN1, gc1);
-		
+
 		// third row
-		//gc1.anchor = GridBagConstraints.CENTER;
+		// gc1.anchor = GridBagConstraints.CENTER;
 		gc1.gridx = 0;
-		gc1.gridy = 2;	
+		gc1.gridy = 2;
 		gc1.gridheight = 2;
 		childPanel_2.add(labelPCN2, gc1);
 		gc1.anchor = GridBagConstraints.NORTHWEST;
 		gc1.gridx = 1;
 		gc1.gridheight = 1;
-		childPanel_2.add(r3,gc1);
+		childPanel_2.add(r3, gc1);
 		gc1.insets = new Insets(0, 2, 0, 2);
 		gc1.gridy = 3;
-		childPanel_2.add(r4,gc1);
+		childPanel_2.add(r4, gc1);
 		gc1.anchor = GridBagConstraints.CENTER;
 		gc1.insets = new Insets(3, 2, 2, 2);
 		gc1.gridx = 2;
 		gc1.gridy = 2;
 		gc1.gridheight = 2;
 		childPanel_2.add(textPCN2, gc1);
-		
-    	
+
 		// fourth row
 		gc1.anchor = GridBagConstraints.NORTHWEST;
 		gc1.gridx = 0;
@@ -267,7 +296,7 @@ public class RunoffPanel extends JPanel {
 		childPanel_2.add(textIA, gc1);
 		gc1.gridx = 4;
 		childPanel_2.add(label_4, gc1);
-		
+
 		childPanel_2.setPreferredSize(new Dimension(310, 140));
 	}
 
@@ -278,13 +307,19 @@ public class RunoffPanel extends JPanel {
 				try {
 					r1.setSelected(true);
 					r2.setSelected(false);
+					if (customerTable.isEditing())
+		            	  customerTable.getCellEditor().stopCellEditing(); 
+					updateTablePerv(curveNum_30, valuePWA, perData);
+					updateTableImperv(curveNum_30, valueIA, perData);
+					updateRunoff(valuePCN1, valuePWA, valueIA);
+					databaseTable.setEnabled(false);
 					text_1.setEditable(false);
 					text_2.setEditable(false);
 					scrollPane.setViewportView(databaseTable);
 					gc.gridx = 0;
 					gc.gridy = 4;
 					gc.gridheight = 1;
-					add(childPanel_2, gc);				
+					add(childPanel_2, gc);
 					updateUI();
 				} catch (Exception e1) {
 					e1.printStackTrace();
@@ -298,8 +333,9 @@ public class RunoffPanel extends JPanel {
 					r1.setSelected(false);
 					text_1.setEditable(true);
 					text_2.setEditable(true);
+					customerTable = databaseTable;
+					customerTable.enable(true);
 					scrollPane.setViewportView(customerTable);
-					System.out.print(getComponentZOrder(childPanel_2));
 					remove(childPanel_2);
 					updateUI();
 				} catch (Exception e1) {
@@ -309,191 +345,178 @@ public class RunoffPanel extends JPanel {
 		});
 		r3.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				
+				r3.setSelected(true);
+				r4.setSelected(false);
+				int num;
 				try {
-					r3.setSelected(true);
-					r4.setSelected(false);					
-					int num = Integer.parseInt(textPCN2.getText());	
-					getCurveNum_30(num);
-					double area = Double.parseDouble(textPWA.getText());
-					updateTablePerv(curveNum_30, area, perData);					
+					String ns = textPCN2.getText();
+					if (onlyContainDigit(ns))
+						valuePCN2 = Double.parseDouble(ns);
+					else
+						valuePCN2 = 0;
+					num = (int)valuePCN2;
+					
 				} catch (Exception e1) {
-					e1.printStackTrace();
+					num = 0;					
+				}
+				
+				curveNum_30 = num;
+				if(num >= 90 && num <= 97) {
+					//updateTablePerv(curveNum_30, valuePWA, perData);
+					updateTextField(textPCN2);
+					textPCN2.setBackground(null);
+				}
+				else {
+					//updateTablePerv(curveNum_30, 0, perData);
+					updateTextField(textPCN2);
+					textPCN2.setBackground(Color.red);
 				}
 			}
 		});
-		
+
 		r4.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				
+				r4.setSelected(true);
+				r3.setSelected(false);
+				
+				int num;
 				try {
-					r4.setSelected(true);
-					r3.setSelected(false);
-					int num = Integer.parseInt(textPCN2.getText());						
-					curveNum_30 = num;
-					double area = Double.parseDouble(textPWA.getText());
-					updateTablePerv(curveNum_30, area, perData);
-				} catch (Exception e1) {	
-					e1.printStackTrace();
+
+					String ns = textPCN2.getText();
+					if (onlyContainDigit(ns))
+						valuePCN2 = Double.parseDouble(ns);
+					else
+						valuePCN2 = 0;
+					num = (int)valuePCN2;
+					
+				} catch (Exception e1) {
+					num = 0;					
 				}
+				
+				curveNum_30 = num;
+				if(num >= 90 && num <= 97) {
+					//updateTablePerv(curveNum_30, valuePWA, perData);
+					updateTextField(textPCN2);
+					textPCN2.setBackground(null);
+				}
+				else {
+					//updateTablePerv(curveNum_30, 0, perData);
+					updateTextField(textPCN2);
+					textPCN2.setBackground(Color.red);
+				}
+				
+				
 			}
 		});
-    	
-    	textPWA.getDocument().addDocumentListener(new DocumentListener(){   	  
+
+		textPWA.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
 			public void insertUpdate(DocumentEvent e) {
-				double v = Double.parseDouble(textPWA.getText().toString());
-    	    	updateTablePerv(curveNum_30, v, perData);   	    	
+				updateTextField(textPWA);
 			}
 
 			@Override
 			public void removeUpdate(DocumentEvent e) {
-				double v;
-				try {									
-					v = Double.parseDouble(textPWA.getText().toString());	  
-				}catch(Exception f){
-					v = 0.00;				
-				}
-				updateTablePerv(curveNum_30, v, perData);   	    	
+				updateTextField(textPWA);
 			}
+
 			@Override
 			public void changedUpdate(DocumentEvent e) {
-				
+
 			}
-    	});
-    	
-    	textPCN1.getDocument().addDocumentListener(new DocumentListener(){   	  
+		});
+
+		textPCN1.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
 			public void insertUpdate(DocumentEvent e) {
-				// TODO Auto-generated method stub
-				//double v = Double.parseDouble(textPWA.getText().toString());
-    	    	//updateTablePerv(curveNum_30, v, perData);   	    	
+				updateTextField(textPCN1);
 			}
 
 			@Override
 			public void removeUpdate(DocumentEvent e) {
-				// TODO Auto-generated method stub
-				//double v;
-				//try {									
-				//	v = Double.parseDouble(textPWA.getText().toString());	  
-				//}catch(Exception f){
-				//	v = 0.00;				
-				//}
-				//updateTablePerv(curveNum_30, v, perData);   	    	
+				updateTextField(textPCN1);
 			}
+
 			@Override
 			public void changedUpdate(DocumentEvent e) {
 				// TODO Auto-generated method stub
-				
+
 			}
-    	});
-    	
-    	textPCN2.getDocument().addDocumentListener(new DocumentListener(){   	  
+		});
+
+		textPCN2.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
 			public void insertUpdate(DocumentEvent e) {
-				// TODO Auto-generated method stub				
-				int v = Integer.parseInt(textPCN2.getText().toString());
-				if(r3.isSelected())
-					getCurveNum_30(v);
-				else
-					curveNum_30 = v;
-				double area = Double.parseDouble(textPWA.getText().toString());
-    	    	updateTablePerv(curveNum_30, area, perData);   	    	
+				updateTextField(textPCN2);
 			}
 
 			@Override
 			public void removeUpdate(DocumentEvent e) {
-				// TODO Auto-generated method stub
-				int v;
-				try {					
-					v = Integer.parseInt(textPCN2.getText().toString());
-					if(r3.isSelected())
-						getCurveNum_30(v);
-					else
-						curveNum_30 = v;
-					
-					double area = Double.parseDouble(textPWA.getText().toString());
-	    	    	updateTablePerv(curveNum_30, area, perData);	
-				}catch(Exception f){
-					
-				}
-						   	    	
-			}
-			@Override
-			public void changedUpdate(DocumentEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-    	});
-    	
-    	textIA.getDocument().addDocumentListener(new DocumentListener(){   	  
-    		@Override
-			public void insertUpdate(DocumentEvent e) {
-				double v = Double.parseDouble(textIA.getText().toString());
-    	    	updateTableImperv(95, v, perData);   	    	
+				updateTextField(textPCN2);
+
 			}
 
 			@Override
-			public void removeUpdate(DocumentEvent e) {
-				double v;
-				try {									
-					v = Double.parseDouble(textIA.getText().toString());	  
-				}catch(Exception f){
-					v = 0.00;				
-				}
-				updateTableImperv(95, v, perData);   	    	
-			}
-			@Override
 			public void changedUpdate(DocumentEvent e) {
-				
+				// TODO Auto-generated method stub
+
 			}
-    	});
-    	
-    	text_1.getDocument().addDocumentListener(new DocumentListener(){   	  
+		});
+
+		textIA.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
 			public void insertUpdate(DocumentEvent e) {
-				double v1 = Double.parseDouble(text_1.getText().toString());
-    	    	double v2 = Double.parseDouble(text_2.getText().toString());
-    	    	String s = Double.toString(v1 + v2);
-    	    	text_3.setText(s);
+				updateTextField(textIA);
 			}
 
 			@Override
 			public void removeUpdate(DocumentEvent e) {
-				double v1 = Double.parseDouble(text_1.getText().toString());
-    	    	double v2 = Double.parseDouble(text_2.getText().toString());
-    	    	String s = Double.toString(v1 + v2);
-    	    	text_3.setText(s);
+				updateTextField(textIA);
 			}
 
 			@Override
 			public void changedUpdate(DocumentEvent e) {
-				
+
 			}
-    	});
-    	
-    	text_2.getDocument().addDocumentListener(new DocumentListener(){   	  
+		});
+
+		text_1.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
-			public void insertUpdate(DocumentEvent e) {		
-				double v1 = Double.parseDouble(text_1.getText().toString());
-    	    	double v2 = Double.parseDouble(text_2.getText().toString());
-    	    	String s = Double.toString(v1 + v2);
-    	    	text_3.setText(s);
+			public void insertUpdate(DocumentEvent e) {
+				updateTextField(text_1);
 			}
 
 			@Override
 			public void removeUpdate(DocumentEvent e) {
-				double v1 = Double.parseDouble(text_1.getText().toString());
-    	    	double v2 = Double.parseDouble(text_2.getText().toString());
-    	    	String s = Double.toString(v1 + v2);
-    	    	text_3.setText(s);
+				updateTextField(text_1);
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+
+			}
+		});
+
+		text_2.getDocument().addDocumentListener(new DocumentListener() {
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				updateTextField(text_2);
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				updateTextField(text_2);
 			}
 
 			@Override
 			public void changedUpdate(DocumentEvent e) {
 				// TODO Auto-generated method stub
-				
+
 			}
-    	});
-    	
+		});
+
 	}
 
 	private void initialLayout(GridBagConstraints gbc) {
@@ -559,59 +582,223 @@ public class RunoffPanel extends JPanel {
 
 	}
 
-    private void getCurveNum_30(int num) {
-    	double res = Math.pow(num, 2.365) / 631.79;    	   	
-    	res = (num - res - 15) * Math.log10(30);    	
-    	res = num - res;    	
-    	curveNum_30 = (int) res;    	
-    }
-    
-    public void updateTablePerv(int num, double area, String[] data) {
-    	DecimalFormat df = new DecimalFormat("0.00");
-    	if(num > 0) {
-    		double s = 1000.00/num - 10;
-        	s = Double.parseDouble(df.format(s));    	
-       	
-        	for(int i = 0; i < 12; i++) {
-            	double ele = Double.parseDouble(data[i].toString());    		
-        		double p =  Double.parseDouble(df.format(ele));
-        		double q = (p - 0.2*s) * (p - 0.2*s) / (p + 0.8*s);
-        		q = Double.parseDouble(df.format(q)); 
-        		double perv = Double.parseDouble(df.format(q * area *3.63));  		
-        		myTable1.model.data[i][1] = Double.toString(perv);  
-        		double imperv = Double.parseDouble(myTable1.model.data[i][2].toString());
-        		double total = Double.parseDouble(df.format(perv + imperv));
-        		myTable1.model.data[i][3] = Double.toString(total);
-        	}
-        	
-        	myTable1.model.mySetValueAt(myTable1.model.getNewSum(1), 12, 1);
-        	myTable1.model.mySetValueAt(myTable1.model.getNewSum(3), 12, 3);
-        	databaseTable.updateUI();    	    	
-    	}
-    	
-    }
-    
-    public void updateTableImperv(int num, double area, String[] data) {
-    	DecimalFormat df = new DecimalFormat("0.00");
-    	double s = 1000.00/num - 10;
-    	s = Double.parseDouble(df.format(s));    	
-   	
-    	for(int i = 0; i < 12; i++) {
-        	double ele = Double.parseDouble(data[i].toString());    		
-    		double p =  Double.parseDouble(df.format(ele));
-    		double q = (p - 0.2*s) * (p - 0.2*s) / (p + 0.8*s);
-    		q = Double.parseDouble(df.format(q)); 
-    		double imperv = Double.parseDouble(df.format(q * area *3.63 / 43559));  		
-    		myTable1.model.data[i][2] = Double.toString(imperv);  
-    		double perv = Double.parseDouble(myTable1.model.data[i][1].toString());
-    		double total = Double.parseDouble(df.format(perv + imperv));
-    		myTable1.model.data[i][3] = Double.toString(total);
-    	}
-    	
-    	myTable1.model.mySetValueAt(myTable1.model.getNewSum(2), 12, 2);
-    	myTable1.model.mySetValueAt(myTable1.model.getNewSum(3), 12, 3);
-    	databaseTable.updateUI();    	    	
-    }
+	private void getCurveNum_30(int num) {
+		double res = Math.pow(num, 2.365) / 631.79;
+		res = (num - res - 15) * Math.log10(30);
+		res = num - res;
+		curveNum_30 = (int) res;
+	}
+
+	public void updateTablePerv(int num, double area, String[] data) {
+		// DecimalFormat df = new DecimalFormat("0.00");
+		// if(num > 0) {
+		double s = 1000.00 / num - 10;
+		s = Double.parseDouble(df.format(s));
+
+		for (int i = 0; i < 12; i++) {
+			double ele = Double.parseDouble(data[i].toString());
+			double p = Double.parseDouble(df.format(ele));
+			double q = (p - 0.2 * s) * (p - 0.2 * s) / (p + 0.8 * s);
+			q = Double.parseDouble(df.format(q));
+			double perv = Double.parseDouble(df.format(q * area * 3.63));
+			myTable1.model.data[i][1] = Double.toString(perv);
+			double imperv = Double.parseDouble(myTable1.model.data[i][2].toString());
+			double total = Double.parseDouble(df.format(perv + imperv));
+			myTable1.model.data[i][3] = Double.toString(total);
+		}
+
+		myTable1.model.mySetValueAt(myTable1.model.getNewSum(1), 12, 1);
+		myTable1.model.mySetValueAt(myTable1.model.getNewSum(3), 12, 3);
+		databaseTable.updateUI();
+		// }
+
+	}
+
+	public void updateTableImperv(int num, double area, String[] data) {
+		// DecimalFormat df = new DecimalFormat("0.00");
+		double s = 1000.00 / num - 10;
+		s = Double.parseDouble(df.format(s));
+
+		for (int i = 0; i < 12; i++) {
+			double ele = Double.parseDouble(data[i].toString());
+			double p = Double.parseDouble(df.format(ele));
+			double q = (p - 0.2 * s) * (p - 0.2 * s) / (p + 0.8 * s);
+			q = Double.parseDouble(df.format(q));
+			double imperv = Double.parseDouble(df.format(q * area * 3.63 / 43559));
+			myTable1.model.data[i][2] = Double.toString(imperv);
+			double perv = Double.parseDouble(myTable1.model.data[i][1].toString());
+			double total = Double.parseDouble(df.format(perv + imperv));
+			myTable1.model.data[i][3] = Double.toString(total);
+		}
+
+		myTable1.model.mySetValueAt(myTable1.model.getNewSum(2), 12, 2);
+		myTable1.model.mySetValueAt(myTable1.model.getNewSum(3), 12, 3);
+		databaseTable.updateUI();
+	}
+
+	public void updateRunoff(double numCN, double areaPWA, double areaIPWA) {
+		// if (numCN > 0) {
+		// DecimalFormat df = new DecimalFormat("0.00");
+		double s = 1000.00 / numCN - 10;
+		s = Double.parseDouble(df.format(s));
+		double q = (pervious25Yr - 0.2 * s) * (pervious25Yr - 0.2 * s) / (pervious25Yr + 0.8 * s);
+		q = Double.parseDouble(df.format(q));
+
+		double s1 = 1000.00 / 98 - 10;
+		s1 = Double.parseDouble(df.format(s1));
+		double q1 = (pervious25Yr - 0.2 * s1) * (pervious25Yr - 0.2 * s1) / (pervious25Yr + 0.8 * s1);
+		q1 = Double.parseDouble(df.format(q1));
+
+		double perv = Double.parseDouble(df.format(q * areaPWA * 3.63));
+		double imperv = Double.parseDouble(df.format(q1 * areaIPWA * 3.63 / 43559));
+
+		text_1.setText(Double.toString(perv));
+		text_2.setText(Double.toString(imperv));
+		text_3.setText(Double.toString(Double.parseDouble(df.format(perv + imperv))));
+		// }
+	}
+
+	public void updateTextField(JTextField textField) {
+
+		switch (textField.getName()) {
+		case "textPWA":
+			try {
+				String s = textPWA.getText().toString();
+				if (onlyContainDigit(s))
+					valuePWA = Double.parseDouble(s);
+				else
+					valuePWA = 0;
+			} catch (Exception f) {
+				valuePWA = 0;
+			}
+
+			if (curveNum_30 > 0 && valuePCN1 > 0 && valuePCN2 > 0) {
+				updateTablePerv(curveNum_30, valuePWA, perData);
+				updateRunoff(valuePCN1, valuePWA, valueIA);
+			}
+
+			break;
+		case "textPCN1":
+			try {
+				String s = textPCN1.getText().toString();
+				if (onlyContainDigit(s))
+					valuePCN1 = Double.parseDouble(s);
+				else
+					valuePCN1 = 0;
+			} catch (Exception f) {
+				valuePCN1 = 0;
+			}
+			int val = (int) valuePCN1;
+			if (val >= 60 && val <= 92) {
+				updateRunoff(val, valuePWA, valueIA);
+				textPCN1.setBackground(null);
+			} else {
+				updateRunoff(-1, 0, valueIA);
+				textPCN1.setBackground(Color.red);
+			}
+
+			break;
+		case "textPCN2":
+			int v;
+			try {
+				String s = textPCN2.getText().toString();
+				if (onlyContainDigit(s)) {
+					valuePCN2 = Double.parseDouble(s);
+				} else {
+					valuePCN2 = 0;
+				}
+			} catch (Exception f) {
+				valuePCN2 = 0;
+			}
+			v = (int) valuePCN2;
+			if (r3.isSelected())
+				getCurveNum_30(v);
+			else if (r4.isSelected())
+				curveNum_30 = v;
+
+			// set the bounder of the valuePCN2
+			if (v >= 90 && v <= 97) {
+				updateTablePerv(curveNum_30, valuePWA, perData);
+				updateTableImperv(95, valueIA, perData);
+				textPCN2.setBackground(null);
+			} else {
+				updateTablePerv(-1, 0, perData);
+				updateTableImperv(95, valueIA, perData);
+				textPCN2.setBackground(Color.red);
+			}
+			break;
+		case "textIA":
+			try {
+				String s = textIA.getText().toString();
+				if (onlyContainDigit(s))
+					valueIA = Double.parseDouble(s);
+				else
+					valueIA = 0;
+			} catch (Exception f) {
+				valueIA = 0;
+			}
+			updateTableImperv(95, valueIA, perData);
+			updateRunoff(valuePCN1, valuePWA, valueIA);
+			break;
+		case "text_1":
+			try {
+				String s = text_1.getText().toString();
+				if (onlyContainDigit(s))
+					valueT1 = Double.parseDouble(s);
+				else
+					valueT1 = 0;
+			} catch (Exception f) {
+				valueT1 = 0;
+			}
+			try {
+				String s = text_2.getText().toString();
+				if (onlyContainDigit(s))
+					valueT2 = Double.parseDouble(s);
+				else
+					valueT2 = 0;
+			} catch (Exception f) {
+				valueT2 = 0;
+			}
+			double total = Double.parseDouble(df.format(valueT1 + valueT2));
+			String s = Double.toString(total);
+			text_3.setText(s);
+			break;
+		case "text_2":
+			try {
+				String ns = text_1.getText().toString();
+				if (onlyContainDigit(ns))
+					valueT1 = Double.parseDouble(ns);
+				else
+					valueT1 = 0;
+			} catch (Exception f) {
+				valueT1 = 0;
+			}
+			try {
+				String ns = text_2.getText().toString();
+				if (onlyContainDigit(ns))
+					valueT2 = Double.parseDouble(ns);
+				else
+					valueT2 = 0;
+			} catch (Exception f) {
+				valueT2 = 0;
+			}
+			double valueT3 = Double.parseDouble(df.format(valueT1 + valueT2));
+			String ns = Double.toString(valueT3);
+			text_3.setText(ns);
+			break;
+		}
+
+	}
+
+	private boolean onlyContainDigit(String s) {
+
+		for (int i = 0; i < s.length(); i++) {
+			if (!Character.isDigit(s.charAt(i)) && (s.charAt(i) != '.'))
+				return false;
+		}
+		return true;
+	}
+
 	public void setParent(MainFrame frame) {
 		this.parent = frame;
 	}
