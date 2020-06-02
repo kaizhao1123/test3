@@ -33,19 +33,42 @@ public class RunoffPanel extends JPanel {
 	JTabbedPane pane;
 	MgmtTrainPanel mgmtTrainPanel;
 	PanelManager panelManager;
-
-	String[] columnName = { " ", "Pervious", "Impervious", "Monthly Totals" };
-	//String[] perData = { "5.40", "5.23", "6.65", "5.24", "3.86", "3.99", "5.27", "3.91", "3.88", "2.82", "3.98",
-	//		"5.37" };
+	
+	// the data will be used in this panel
 	String[] perData;
-	//String[] imperData = { "0.00", "0.00", "0.00", "0.00", "0.00", "0.00", "0.00", "0.00", "0.00", "0.00", "0.00",
-	//		"0.00" };
-
 	int curveNum_30;
 	double pervious25Yr;
 	double valuePWA, valuePCN1, valuePCN2, valueIA, valueT1, valueT2;
 	DecimalFormat df;
 
+	// declare the elements of this panel
+	JPanel childPanel_1, childPanel_2;
+	GridBagConstraints gc;
+	JLabel labelMethods;
+	JLabel label_1, label_2;
+	JRadioButton r1, r2, r3, r4;
+	ButtonGroup bg;
+	JLabel labelPWA, labelPCN1, labelPCN2, labelIA;
+	JLabel label_3;
+	JLabel label_4;
+	JLabel labelRV;
+	JLabel label_5;
+	JLabel labelWarning;
+
+	JTextField textPWA, textPCN1, textPCN2, textIA;
+	JTextField text_1, text_2, text_3;
+
+	JButton buttonHelp;
+	JButton buttonOK;
+	
+	RunoffTable myTable1;
+	JTable databaseTable;
+	RunoffTable myTable2;
+	JTable customerTable;
+	JScrollPane scrollPane;
+
+	// the column of the table
+	String[] columnName = { " ", "Pervious", "Impervious", "Monthly Totals" };
 	// the data from the database
 	Object[][] tableData1 = { { "January", "0.00", "0.00", "0.00" }, { "February", "0.00", "0.00", "0.00" },
 			{ "March", "0.00", "0.00", "0.00" }, { "April", "0.00", "0.00", "0.00" }, { "May", "0.00", "0.00", "0.00" },
@@ -61,35 +84,8 @@ public class RunoffPanel extends JPanel {
 			{ "October", "0.00", "0.00", "0.00" }, { "November", "0.00", "0.00", "0.00" },
 			{ "December", "0.00", "0.00", "0.00" } };
 
-	JLabel labelMethods;
-	JLabel label_1, label_2;
-	JRadioButton r1, r2, r3, r4;
-	ButtonGroup bg;
-	JLabel labelPWA, labelPCN1, labelPCN2, labelIA;
-	JLabel label_3;
-	JLabel label_4;
-	JLabel labelRV;
-	JLabel label_5;
-	JLabel labelWarning;
-
-	JTextField textPWA, textPCN1, textPCN2, textIA;
-	JTextField text_1, text_2, text_3;
-
-	RunoffTable myTable1;
-	JTable databaseTable;
-	RunoffTable myTable2;
-	JTable customerTable;
-	JScrollPane scrollPane;
-
-	JButton buttonHelp;
-	JButton buttonOK;
-
-	JPanel panel;
-	JPanel childPanel_1, childPanel_2;
-	GridBagConstraints gc;
 
 	public RunoffPanel(PanelManager pm) {
-
 		panelManager = pm;
 		initialData();
 		initialElements();
@@ -104,31 +100,12 @@ public class RunoffPanel extends JPanel {
 		perData = panelManager.getPrecData(panelManager.climatePanelOutout);
 		curveNum_30 = 77;
 		pervious25Yr = panelManager.getPrecipitation25Yr(panelManager.climatePanelOutout);
-		
-		for(int i = 0; i < 12; i++) {
-			System.out.print(perData[i]);
-		}
-		
-		/*
-		 * double s = 1000.00/77 - 10; s = Double.parseDouble(df.format(s));
-		 * 
-		 * for(int i = 0; i < 12; i++) { //tableData1[i][1] = perData[i]; double ele =
-		 * Double.parseDouble(perData[i]); double p =
-		 * Double.parseDouble(df.format(ele)); double q = (p - 0.2*s) * (p - 0.2*s) / (p
-		 * + 0.8*s); q = Double.parseDouble(df.format(q));
-		 * 
-		 * tableData1[i][1] = Double.toString(Double.parseDouble(df.format(q * 1
-		 * *3.63)));
-		 * 
-		 * 
-		 * tableData1[i][2] = imperData[i];
-		 * 
-		 * String pervious = tableData1[i][1].toString(); String impervious =
-		 * tableData1[i][2].toString(); Double pDou = Double.parseDouble(pervious);
-		 * Double iDou = Double.parseDouble(impervious); String totalPerRow =
-		 * Double.toString(Double.parseDouble(new DecimalFormat("0.00").format(pDou +
-		 * iDou))); tableData1[i][3] = totalPerRow; }
-		 */
+		valuePWA = 0;
+		valuePCN1 = 0;
+		valuePCN2 = 0;
+		valueIA = 0;
+		valueT1 = 0;
+		valueT2 = 0;
 	}
 
 	private void initialElements() {
@@ -137,8 +114,8 @@ public class RunoffPanel extends JPanel {
 		label_1.setFont(new Font(label_1.getFont().getName(), Font.PLAIN, 12));
 		label_2 = new JLabel("2.) Enter runoff volumes directly in the table on the right.");
 		label_2.setFont(new Font(label_2.getFont().getName(), Font.PLAIN, 12));
-		buildPanel_1();
-		buildPanel_2();
+		initialPanel_1();
+		initialPanel_2();
 		labelRV = new JLabel("Runoff Volumes (1000 cu.ft)");
 		labelRV.setFont(new Font(labelRV.getFont().getName(), Font.BOLD, 14));
 
@@ -178,135 +155,6 @@ public class RunoffPanel extends JPanel {
 		buttonHelp.setPreferredSize(new Dimension(60, 25));
 		buttonOK = new JButton("OK");
 		buttonOK.setPreferredSize(new Dimension(60, 25));
-	}
-
-	private void buildPanel_1() {
-		childPanel_1 = new JPanel();
-		r1 = new JRadioButton("Calculate Monthly Runoff Volumes");
-		r1.setSelected(true);
-		r2 = new JRadioButton("Enter Monthly Runoff Volumes");
-		// bg = new ButtonGroup();
-		// bg.add(r1);
-		// bg.add(r2);
-
-		childPanel_1.setLayout(new GridLayout(2, 1));
-		childPanel_1.add(r1);
-		childPanel_1.add(r2);
-		childPanel_1.setBorder(
-				BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Runoff Volume Method"));
-		childPanel_1.setPreferredSize(new Dimension(310, 80));
-	}
-
-	private void buildPanel_2() {
-		childPanel_2 = new JPanel();
-		labelPWA = new JLabel("Pervious Watershed Area: ");
-		labelPCN1 = new JLabel("<html> Pervious Curve Number (1-day) <br>" + "for 25-Yr 24-Hr Storm Runoff: </html>");
-		labelPCN2 = new JLabel("<html> Pervious Curve Number  <br>" + "for Monthly Runoff: </html>");
-		labelIA = new JLabel("Impervious Area (roofs, slabs, etc): ");
-		label_3 = new JLabel("acres");
-		label_4 = new JLabel("sq.ft.");
-
-		r3 = new JRadioButton("(1-day)");
-		r3.setFont(new Font(r3.getFont().getName(), Font.PLAIN, 11));
-		r3.setPreferredSize(new Dimension(70, 16));
-		r3.setSelected(true);
-		r4 = new JRadioButton("(30-day)");
-		r4.setFont(new Font(r4.getFont().getName(), Font.PLAIN, 11));
-		r4.setPreferredSize(new Dimension(70, 16));
-
-		textPWA = new JTextField("0");
-		textPWA.setName("textPWA");
-		textPWA.setPreferredSize(new Dimension(50, 25));
-		textPCN1 = new JTextField("90");
-		textPCN1.setName("textPCN1");
-		textPCN1.setPreferredSize(new Dimension(50, 25));
-		textPCN2 = new JTextField("90");
-		textPCN2.setName("textPCN2");
-		textPCN2.setPreferredSize(new Dimension(50, 25));
-		textIA = new JTextField("0");
-		textIA.setName("textIA");
-		textIA.setPreferredSize(new Dimension(50, 25));
-
-		try {
-			valuePWA = Double.parseDouble(textPWA.getText().toString());
-		} catch (Exception e) {
-			valuePWA = 0;
-		}
-		try {
-			valuePCN1 = Double.parseDouble(textPCN1.getText().toString());
-		} catch (Exception e) {
-			valuePCN1 = 0;
-		}
-		try {
-			valuePCN2 = Double.parseDouble(textPCN2.getText().toString());
-		} catch (Exception e) {
-			valuePCN2 = 0;
-		}
-		try {
-			valueIA = Double.parseDouble(textIA.getText().toString());
-		} catch (Exception e) {
-			valueIA = 0;
-		}
-
-		childPanel_2.setLayout(new GridBagLayout());
-		GridBagConstraints gc1 = new GridBagConstraints();
-		gc1.anchor = GridBagConstraints.NORTHWEST;
-		gc1.insets = new Insets(3, 2, 2, 2);
-
-		// first row
-		gc1.gridx = 0;
-		gc1.gridy = 0;
-		gc1.gridwidth = 2;
-		childPanel_2.add(labelPWA, gc1);
-		gc1.gridwidth = 1;
-		gc1.gridx = 2;
-		childPanel_2.add(textPWA, gc1);
-		gc1.gridx = 4;
-		childPanel_2.add(label_3, gc1);
-
-		// second row
-		gc1.gridx = 0;
-		gc1.gridy = 1;
-		gc1.gridwidth = 2;
-		childPanel_2.add(labelPCN1, gc1);
-		gc1.anchor = GridBagConstraints.CENTER;
-		gc1.gridx = 2;
-		gc1.gridwidth = 1;
-		childPanel_2.add(textPCN1, gc1);
-
-		// third row
-		// gc1.anchor = GridBagConstraints.CENTER;
-		gc1.gridx = 0;
-		gc1.gridy = 2;
-		gc1.gridheight = 2;
-		childPanel_2.add(labelPCN2, gc1);
-		gc1.anchor = GridBagConstraints.NORTHWEST;
-		gc1.gridx = 1;
-		gc1.gridheight = 1;
-		childPanel_2.add(r3, gc1);
-		gc1.insets = new Insets(0, 2, 0, 2);
-		gc1.gridy = 3;
-		childPanel_2.add(r4, gc1);
-		gc1.anchor = GridBagConstraints.CENTER;
-		gc1.insets = new Insets(3, 2, 2, 2);
-		gc1.gridx = 2;
-		gc1.gridy = 2;
-		gc1.gridheight = 2;
-		childPanel_2.add(textPCN2, gc1);
-
-		// fourth row
-		gc1.anchor = GridBagConstraints.NORTHWEST;
-		gc1.gridx = 0;
-		gc1.gridy = 4;
-		gc1.gridwidth = 2;
-		childPanel_2.add(labelIA, gc1);
-		gc1.gridx = 2;
-		gc1.gridwidth = 1;
-		childPanel_2.add(textIA, gc1);
-		gc1.gridx = 4;
-		childPanel_2.add(label_4, gc1);
-
-		childPanel_2.setPreferredSize(new Dimension(310, 140));
 	}
 
 	private void initialActionLiseners() {
@@ -353,70 +201,18 @@ public class RunoffPanel extends JPanel {
 			}
 		});
 		r3.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				
+			public void actionPerformed(ActionEvent e) {			
 				r3.setSelected(true);
 				r4.setSelected(false);
-				int num;
-				try {
-					String ns = textPCN2.getText();
-					if (onlyContainDigit(ns))
-						valuePCN2 = Double.parseDouble(ns);
-					else
-						valuePCN2 = 0;
-					num = (int)valuePCN2;
-					
-				} catch (Exception e1) {
-					num = 0;					
-				}
-				
-				curveNum_30 = num;
-				if(num >= 90 && num <= 97) {
-					//updateTablePerv(curveNum_30, valuePWA, perData);
-					updateTextField(textPCN2);
-					textPCN2.setBackground(null);
-				}
-				else {
-					//updateTablePerv(curveNum_30, 0, perData);
-					updateTextField(textPCN2);
-					textPCN2.setBackground(Color.red);
-				}
+				updateTextField(textPCN2);
 			}
 		});
 
 		r4.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				
+			public void actionPerformed(ActionEvent e) {				
 				r4.setSelected(true);
-				r3.setSelected(false);
-				
-				int num;
-				try {
-
-					String ns = textPCN2.getText();
-					if (onlyContainDigit(ns))
-						valuePCN2 = Double.parseDouble(ns);
-					else
-						valuePCN2 = 0;
-					num = (int)valuePCN2;
-					
-				} catch (Exception e1) {
-					num = 0;					
-				}
-				
-				curveNum_30 = num;
-				if(num >= 90 && num <= 97) {
-					//updateTablePerv(curveNum_30, valuePWA, perData);
-					updateTextField(textPCN2);
-					textPCN2.setBackground(null);
-				}
-				else {
-					//updateTablePerv(curveNum_30, 0, perData);
-					updateTextField(textPCN2);
-					textPCN2.setBackground(Color.red);
-				}
-				
-				
+				r3.setSelected(false);								
+				updateTextField(textPCN2);
 			}
 		});
 
@@ -525,7 +321,6 @@ public class RunoffPanel extends JPanel {
 
 			}
 		});
-
 	}
 
 	private void initialLayout(GridBagConstraints gbc) {
@@ -588,8 +383,135 @@ public class RunoffPanel extends JPanel {
 		add(buttonHelp, gbc);
 		gbc.gridy = 7;
 		add(buttonOK, gbc);
-
 	}
+	
+	private void initialPanel_1() {
+		childPanel_1 = new JPanel();
+		r1 = new JRadioButton("Calculate Monthly Runoff Volumes");
+		r1.setSelected(true);
+		r2 = new JRadioButton("Enter Monthly Runoff Volumes");
+
+		childPanel_1.setLayout(new GridLayout(2, 1));
+		childPanel_1.add(r1);
+		childPanel_1.add(r2);
+		childPanel_1.setBorder(
+				BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Runoff Volume Method"));
+		childPanel_1.setPreferredSize(new Dimension(310, 80));
+	}
+
+	private void initialPanel_2() {
+		childPanel_2 = new JPanel();
+		labelPWA = new JLabel("Pervious Watershed Area: ");
+		labelPCN1 = new JLabel("<html> Pervious Curve Number (1-day) <br>" + "for 25-Yr 24-Hr Storm Runoff: </html>");
+		labelPCN2 = new JLabel("<html> Pervious Curve Number  <br>" + "for Monthly Runoff: </html>");
+		labelIA = new JLabel("Impervious Area (roofs, slabs, etc): ");
+		label_3 = new JLabel("acres");
+		label_4 = new JLabel("sq.ft.");
+
+		r3 = new JRadioButton("(1-day)");
+		r3.setFont(new Font(r3.getFont().getName(), Font.PLAIN, 11));
+		r3.setPreferredSize(new Dimension(70, 16));
+		r3.setSelected(true);
+		r4 = new JRadioButton("(30-day)");
+		r4.setFont(new Font(r4.getFont().getName(), Font.PLAIN, 11));
+		r4.setPreferredSize(new Dimension(70, 16));
+
+		textPWA = new JTextField("0");
+		textPWA.setName("textPWA");
+		textPWA.setPreferredSize(new Dimension(50, 25));
+		textPCN1 = new JTextField("90");
+		textPCN1.setName("textPCN1");
+		textPCN1.setPreferredSize(new Dimension(50, 25));
+		textPCN2 = new JTextField("90");
+		textPCN2.setName("textPCN2");
+		textPCN2.setPreferredSize(new Dimension(50, 25));
+		textIA = new JTextField("0");
+		textIA.setName("textIA");
+		textIA.setPreferredSize(new Dimension(50, 25));
+
+		try {
+			valuePWA = Double.parseDouble(textPWA.getText().toString());
+		} catch (Exception e) {
+			//valuePWA = 0;
+		}
+		try {
+			valuePCN1 = Double.parseDouble(textPCN1.getText().toString());
+		} catch (Exception e) {
+			//valuePCN1 = 0;
+		}
+		try {
+			valuePCN2 = Double.parseDouble(textPCN2.getText().toString());
+		} catch (Exception e) {
+			//valuePCN2 = 0;
+		}
+		try {
+			valueIA = Double.parseDouble(textIA.getText().toString());
+		} catch (Exception e) {
+			//valueIA = 0;
+		}
+
+		childPanel_2.setLayout(new GridBagLayout());
+		GridBagConstraints gc1 = new GridBagConstraints();
+		gc1.anchor = GridBagConstraints.NORTHWEST;
+		gc1.insets = new Insets(3, 2, 2, 2);
+
+		// first row
+		gc1.gridx = 0;
+		gc1.gridy = 0;
+		gc1.gridwidth = 2;
+		childPanel_2.add(labelPWA, gc1);
+		gc1.gridwidth = 1;
+		gc1.gridx = 2;
+		childPanel_2.add(textPWA, gc1);
+		gc1.gridx = 4;
+		childPanel_2.add(label_3, gc1);
+
+		// second row
+		gc1.gridx = 0;
+		gc1.gridy = 1;
+		gc1.gridwidth = 2;
+		childPanel_2.add(labelPCN1, gc1);
+		gc1.anchor = GridBagConstraints.CENTER;
+		gc1.gridx = 2;
+		gc1.gridwidth = 1;
+		childPanel_2.add(textPCN1, gc1);
+
+		// third row
+		// gc1.anchor = GridBagConstraints.CENTER;
+		gc1.gridx = 0;
+		gc1.gridy = 2;
+		gc1.gridheight = 2;
+		childPanel_2.add(labelPCN2, gc1);
+		gc1.anchor = GridBagConstraints.NORTHWEST;
+		gc1.gridx = 1;
+		gc1.gridheight = 1;
+		childPanel_2.add(r3, gc1);
+		gc1.insets = new Insets(0, 2, 0, 2);
+		gc1.gridy = 3;
+		childPanel_2.add(r4, gc1);
+		gc1.anchor = GridBagConstraints.CENTER;
+		gc1.insets = new Insets(3, 2, 2, 2);
+		gc1.gridx = 2;
+		gc1.gridy = 2;
+		gc1.gridheight = 2;
+		childPanel_2.add(textPCN2, gc1);
+
+		// fourth row
+		gc1.anchor = GridBagConstraints.NORTHWEST;
+		gc1.gridx = 0;
+		gc1.gridy = 4;
+		gc1.gridwidth = 2;
+		childPanel_2.add(labelIA, gc1);
+		gc1.gridx = 2;
+		gc1.gridwidth = 1;
+		childPanel_2.add(textIA, gc1);
+		gc1.gridx = 4;
+		childPanel_2.add(label_4, gc1);
+
+		childPanel_2.setPreferredSize(new Dimension(310, 140));
+	}
+
+	
 
 	private void getCurveNum_30(int num) {
 		double res = Math.pow(num, 2.365) / 631.79;
@@ -599,8 +521,7 @@ public class RunoffPanel extends JPanel {
 	}
 
 	public void updateTablePerv(int num, double area, String[] data) {
-		// DecimalFormat df = new DecimalFormat("0.00");
-		// if(num > 0) {
+
 		double s = 1000.00 / num - 10;
 		s = Double.parseDouble(df.format(s));
 
@@ -619,12 +540,11 @@ public class RunoffPanel extends JPanel {
 		myTable1.model.mySetValueAt(myTable1.model.getNewSum(1), 12, 1);
 		myTable1.model.mySetValueAt(myTable1.model.getNewSum(3), 12, 3);
 		databaseTable.updateUI();
-		// }
 
 	}
 
 	public void updateTableImperv(int num, double area, String[] data) {
-		// DecimalFormat df = new DecimalFormat("0.00");
+		
 		double s = 1000.00 / num - 10;
 		s = Double.parseDouble(df.format(s));
 
@@ -646,8 +566,7 @@ public class RunoffPanel extends JPanel {
 	}
 
 	public void updateRunoff(double numCN, double areaPWA, double areaIPWA) {
-		// if (numCN > 0) {
-		// DecimalFormat df = new DecimalFormat("0.00");
+
 		double s = 1000.00 / numCN - 10;
 		s = Double.parseDouble(df.format(s));
 		double q = (pervious25Yr - 0.2 * s) * (pervious25Yr - 0.2 * s) / (pervious25Yr + 0.8 * s);
@@ -665,10 +584,6 @@ public class RunoffPanel extends JPanel {
 		text_2.setText(Double.toString(imperv));
 		text_3.setText(Double.toString(Double.parseDouble(df.format(perv + imperv))));
 		
-		text_1.updateUI();
-		text_2.updateUI();
-		text_3.updateUI();
-		// }
 	}
 
 	public void updateTextField(JTextField textField) {
@@ -685,7 +600,7 @@ public class RunoffPanel extends JPanel {
 				valuePWA = 0;
 			}
 
-			if (curveNum_30 > 0 && valuePCN1 > 0 && valuePCN2 > 0) {
+			if (curveNum_30 > 0 && valuePCN1 >= 60 && valuePCN1 <= 92 && valuePCN2 >= 90 && valuePCN2 <= 97) {
 				updateTablePerv(curveNum_30, valuePWA, perData);
 				updateRunoff(valuePCN1, valuePWA, valueIA);
 			}
@@ -708,6 +623,7 @@ public class RunoffPanel extends JPanel {
 			} else {
 				updateRunoff(-1, 0, valueIA);
 				textPCN1.setBackground(Color.red);
+				textPCN1.setToolTipText("Range: 60-92");				
 			}
 
 			break;
@@ -736,9 +652,11 @@ public class RunoffPanel extends JPanel {
 				textPCN2.setBackground(null);
 			} else {
 				updateTablePerv(-1, 0, perData);
-				updateTableImperv(95, valueIA, perData);
+				updateTableImperv(95, 0, perData);
 				textPCN2.setBackground(Color.red);
+				textPCN2.setToolTipText("Range: 90-97");
 			}
+			r3.setToolTipText("=" + curveNum_30 + "(30 day)");
 			break;
 		case "textIA":
 			try {
@@ -750,27 +668,29 @@ public class RunoffPanel extends JPanel {
 			} catch (Exception f) {
 				valueIA = 0;
 			}
-			updateTableImperv(95, valueIA, perData);
-			updateRunoff(valuePCN1, valuePWA, valueIA);
+			if(curveNum_30 > 0 && valuePCN1 >= 60 && valuePCN1 <= 92 && valuePCN2 >= 90 && valuePCN2 <= 97) {
+				updateTableImperv(95, valueIA, perData);
+				updateRunoff(valuePCN1, valuePWA, valueIA);
+			}
 			break;
 		case "text_1":
 			try {
 				String s = text_1.getText().toString();
 				if (onlyContainDigit(s))
 					valueT1 = Double.parseDouble(s);
-				else
-					valueT1 = 0;
+				//else
+					//valueT1 = 0;
 			} catch (Exception f) {
-				valueT1 = 0;
+				//valueT1 = 0;
 			}
 			try {
 				String s = text_2.getText().toString();
 				if (onlyContainDigit(s))
 					valueT2 = Double.parseDouble(s);
-				else
-					valueT2 = 0;
+				//else
+					//valueT2 = 0;
 			} catch (Exception f) {
-				valueT2 = 0;
+				//valueT2 = 0;
 			}
 			double total = Double.parseDouble(df.format(valueT1 + valueT2));
 			String s = Double.toString(total);
@@ -781,19 +701,19 @@ public class RunoffPanel extends JPanel {
 				String ns = text_1.getText().toString();
 				if (onlyContainDigit(ns))
 					valueT1 = Double.parseDouble(ns);
-				else
-					valueT1 = 0;
+				//else
+					//valueT1 = 0;
 			} catch (Exception f) {
-				valueT1 = 0;
+				//valueT1 = 0;
 			}
 			try {
 				String ns = text_2.getText().toString();
 				if (onlyContainDigit(ns))
 					valueT2 = Double.parseDouble(ns);
-				else
-					valueT2 = 0;
+				//else
+					//valueT2 = 0;
 			} catch (Exception f) {
-				valueT2 = 0;
+				//valueT2 = 0;
 			}
 			double valueT3 = Double.parseDouble(df.format(valueT1 + valueT2));
 			String ns = Double.toString(valueT3);

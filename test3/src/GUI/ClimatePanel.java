@@ -56,30 +56,14 @@ public class ClimatePanel extends JPanel {
 	HashMap<String, ArrayList<String>> countyStationMap; // store the county and its stations
 	String[] listOfCounty; // list all county
 	String[] listOfStation; // list all station per county
+	double valuePre, valueKVAL, valueOCV, valueLRV, valueAna;
 	ArrayList<String> climatePanelOutput;
-
-	// data for table
-	String[] months = { "January", "February", "March", "April", "May", "June", "July", "August", "September",
-			"October", "November", "December" };
-	String[] tableColumnName = { " ", "Prec(in)", "Evap(in)" };
-	Object[][] tableData1; // the data from the database
-	Object[][] tableData2 = { { "January", "0.00", "0.00" }, { "February", "0.00", "0.00" },
-			{ "March", "0.00", "0.00" }, { "April", "0.00", "0.00" }, { "May", "0.00", "0.00" },
-			{ "June", "0.00", "0.00" }, { "July", "0.00", "0.00" }, { "August", "0.00", "0.00" },
-			{ "September", "0.00", "0.00" }, { "October", "0.00", "0.00" }, { "November", "0.00", "0.00" },
-			{ "December", "0.00", "0.00" }, };
-
 	
 	// declare the elements in the panel
 	JRadioButton r1, r2, r3, r4, r5;
-	//ButtonGroup bg1, bg2;
 	JLabel labelCounty, labelStation, labelEnterCounty,labelEnterStation, labelInches, labelPrecipitation, labelRate, labelKval, labelOcv, labelLrv,
 			labelAlr;
 	JLabel jl1, jl2, jl3;
-	ClimateTable mt1 = new ClimateTable(); // used for download the existing AWM data
-	JTable databaseTable;
-	ClimateTable mt2 = new ClimateTable(); // used for input data by the customer
-	JTable customTable;
 	JScrollPane scrollPane; // used for table
 	JPanel secondLeft;
 	JPanel databasePlacePanel; // the panel of county and station, used to get the data from the database
@@ -93,120 +77,36 @@ public class ClimatePanel extends JPanel {
 	JComboBox bStation = new JComboBox(); // to display the station
 	JTextField textEnterCounty;
 	JTextField textEnterStation;
-
 	JButton buttonHelp, buttonOK;
 	
+	ClimateTable mt1 = new ClimateTable(); // used for download the existing AWM data
+	JTable databaseTable;
+	ClimateTable mt2 = new ClimateTable(); // used for input data by the customer
+	JTable customTable;
+	
+	// data for table
+	String[] months = { "January", "February", "March", "April", "May", "June", "July", "August", "September",
+			"October", "November", "December" };
+	String[] tableColumnName = { " ", "Prec(in)", "Evap(in)" };
+	Object[][] tableData1; // the data from the database
+	Object[][] tableData2 = { { "January", "0.00", "0.00" }, { "February", "0.00", "0.00" },
+			{ "March", "0.00", "0.00" }, { "April", "0.00", "0.00" }, { "May", "0.00", "0.00" },
+			{ "June", "0.00", "0.00" }, { "July", "0.00", "0.00" }, { "August", "0.00", "0.00" },
+			{ "September", "0.00", "0.00" }, { "October", "0.00", "0.00" }, { "November", "0.00", "0.00" },
+			{ "December", "0.00", "0.00" }, };
+	
 	public ClimatePanel(PanelManager pm) {
-
 		panelManager = pm;
-		// get input data
-		climateDataByState = panelManager.filterByState(panelManager.startPanelOutput[1],
-				panelManager.allClimateData);
-
-		// initial this panel
 		initialData();
 		initialElements();
-		// setLayout(new BorderLayout());
-		BorderLayout border = new BorderLayout();
-		initialLayout(border);
 		initialActionLiseners();
-		
-		
-		// build actionlisterner for button to show whether the action works or not
-
-		/*
-		 * ActionListener sliceActionListener = new ActionListener() { public void
-		 * actionPerformed(ActionEvent actionEvent) { AbstractButton aButton =
-		 * (AbstractButton) actionEvent.getSource(); System.out.println("Selected: " +
-		 * aButton.getText()); /// show whether the action works or not } };
-		 */
-
-
-
+		BorderLayout border = new BorderLayout();
+		initialLayout(border);		
 	}
 	
-	private void getOutput() {
-		climatePanelOutput = new ArrayList<>();
-		if(r1.isSelected()) {
-			if(bCounty.getSelectedIndex() < 0)
-			{
-				climatePanelOutput.add(bCounty.getItemAt(0).toString());
-			}
-			else				
-				climatePanelOutput.add(bCounty.getSelectedItem().toString());	
-			if(bStation.getSelectedIndex() < 0)
-			{
-				climatePanelOutput.add(bStation.getItemAt(0).toString());
-			}
-			else				
-				climatePanelOutput.add(bStation.getSelectedItem().toString());
-		}
-		else {
-			climatePanelOutput.add(textEnterCounty.getText());
-			climatePanelOutput.add(textEnterStation.getText());
-		}
-		
-		climatePanelOutput.add(textPre.getText());
-		climatePanelOutput.add(textKVAL.getText());
-		climatePanelOutput.add(textOCV.getText());
-		climatePanelOutput.add(textLRV.getText());
-		climatePanelOutput.add(textAna.getText());
-		
-		if(r1.isSelected()) {
-			if(r3.isSelected()) {
-				for(int i = 0; i < 12; i++) {
-					double v1 = Double.parseDouble(mt1.model.data[i][1].toString());
-					double v2 = Double.parseDouble(mt1.model.data[i][2].toString());
-					double sub = v1 - v2;
-					if(sub < 0)
-						climatePanelOutput.add("0.00");
-					else
-						climatePanelOutput.add(Double.toString(sub));
-				}
-			}
-			else if(r4.isSelected()) {
-				for(int i = 0; i < 12; i++) {
-					double v1 = Double.parseDouble(mt1.model.data[i][1].toString());
-					double v2 = Double.parseDouble(mt1.model.data[i][2].toString());
-					double sub = v1 - v2;
-					climatePanelOutput.add(Double.toString(sub));
-				}
-			}			
-			else if(r5.isSelected()) {
-				for(int i = 0; i < 12; i++) {				
-					climatePanelOutput.add(mt1.model.data[i][1].toString());
-				}
-			}									
-		}
-		else {
-			if(r3.isSelected()) {
-				for(int i = 0; i < 12; i++) {
-					double v1 = Double.parseDouble(mt1.model.data[i][1].toString());
-					double v2 = Double.parseDouble(mt1.model.data[i][2].toString());
-					double sub = v1 - v2;
-					if(sub < 0)
-						climatePanelOutput.add("0.00");
-					else
-						climatePanelOutput.add(Double.toString(sub));
-				}
-			}
-			else if(r4.isSelected()) {
-				for(int i = 0; i < 12; i++) {
-					double v1 = Double.parseDouble(mt1.model.data[i][1].toString());
-					double v2 = Double.parseDouble(mt1.model.data[i][2].toString());
-					double sub = v1 - v2;
-					climatePanelOutput.add(Double.toString(sub));
-				}
-			}			
-			else if(r5.isSelected()) {
-				for(int i = 0; i < 12; i++) {				
-					climatePanelOutput.add(mt2.model.data[i][1].toString());
-				}
-			}										
-		}
-
-	}
 	private void initialData() {
+		climateDataByState = panelManager.filterByState(panelManager.startPanelOutput[1],
+				panelManager.allClimateData);
 		currentElement = climateDataByState.get(0);
 		climateDataByCounty = panelManager.filterByCounty(currentElement.county, climateDataByState);
 		countyStationMap = getMap(climateDataByState);
@@ -224,7 +124,12 @@ public class ClimatePanel extends JPanel {
 		listOfStation = convertToStringList(firstCounty);
 
 		tableData1 = getTableData(currentElement);
-
+		
+		valuePre = 0;
+		valueKVAL = 0;
+		valueOCV = 0;
+		valueLRV = 0;
+		valueAna = 0;
 	}
 
 	private void initialElements() {
@@ -233,9 +138,6 @@ public class ClimatePanel extends JPanel {
 		r1.setSelected(true);
 		r2 = new JRadioButton("Enter custom climate data for this job   ");
 		r2.setFont(new Font(r2.getFont().getName(),Font.PLAIN,12));
-		//bg1 = new ButtonGroup();
-		//bg1.add(r1);
-		//bg1.add(r2);
 
 		r3 = new JRadioButton("If prec - evap < 0 then set net value to 0              ");
 		r3.setSelected(true);
@@ -244,10 +146,6 @@ public class ClimatePanel extends JPanel {
 		r4.setFont(new Font(r4.getFont().getName(),Font.PLAIN,12));
 		r5 = new JRadioButton("Ignore evap value, and use prec. only");
 		r5.setFont(new Font(r5.getFont().getName(),Font.PLAIN,12));
-		//bg2 = new ButtonGroup();
-		//bg2.add(r3);
-		//bg2.add(r4);
-		//bg2.add(r5);
 
 		labelCounty = new JLabel("Select County:");
 		bCounty = new JComboBox<>(listOfCounty);
@@ -274,16 +172,27 @@ public class ClimatePanel extends JPanel {
 		labelAlr = new JLabel("Anaerobic Load Rate:");
 
 		textPre = new JTextField(currentElement.data[0]);
+		textPre.setName("textPre");
 		textPre.setPreferredSize(new Dimension(60, 25));
 		textKVAL = new JTextField(currentElement.data[25]);
+		textKVAL.setName("textKVAL");
 		textKVAL.setPreferredSize(new Dimension(65, 25));
 		textOCV = new JTextField(currentElement.data[27]);
+		textOCV.setName("textOCV");
 		textOCV.setPreferredSize(new Dimension(65, 25));
 		textLRV = new JTextField(currentElement.data[28]);
+		textLRV.setName("textLRV");
 		textLRV.setPreferredSize(new Dimension(65, 25));
 		textAna = new JTextField(currentElement.data[26]);
+		textAna.setName("textAna");
 		textAna.setPreferredSize(new Dimension(65, 25));
 
+		updateTextField(textPre);
+		updateTextField(textKVAL);
+		updateTextField(textOCV);
+		updateTextField(textLRV);
+		updateTextField(textAna);
+			
 		jl1 = new JLabel("lbx VS/cu. ft/day");
 		jl2 = new JLabel("lbx VS/cu. ft/day");
 		jl3 = new JLabel("lbs VS/1000 cu.ft/day");
@@ -292,7 +201,319 @@ public class ClimatePanel extends JPanel {
 		buttonOK = new JButton("OK");
 	}
 
+
 	
+	private void initialActionLiseners() {
+				
+		// it is associate with runoff panel.
+		textPre.getDocument().addDocumentListener(new DocumentListener() {						
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				try {
+					updateTextField(textPre);
+					int index = pane.indexOfTab("runoff");    
+					if(index >= 0) {
+						runoffPanel = (RunoffPanel) pane.getComponentAt(index);																	
+						runoffPanel.pervious25Yr = valuePre;
+						int num = (int)(runoffPanel.valuePCN1);
+						double a1 = runoffPanel.valuePWA;
+						double a2 = runoffPanel.valueIA;					
+						runoffPanel.updateRunoff(num, a1, a2);
+						
+					}										
+				}catch(Exception e1) {
+					
+				}
+			}
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				try {
+					updateTextField(textPre);
+					int index = pane.indexOfTab("runoff");    
+					if(index >= 0) {
+						runoffPanel = (RunoffPanel) pane.getComponentAt(index);						
+						if(valuePre <= 12 && valuePre >= 1.5) {
+							textPre.setBackground(null);
+						}
+						else {
+							textPre.setBackground(Color.red);
+							textPre.setToolTipText("Range: 1.5-12");
+						}					
+						runoffPanel.pervious25Yr = valuePre;
+						int num = (int)(runoffPanel.valuePCN1);
+						double a1 = runoffPanel.valuePWA;
+						double a2 = runoffPanel.valueIA;					
+						runoffPanel.updateRunoff(num, a1, a2);
+						
+					}	
+				}catch(Exception e1) {
+					
+				}			
+			}
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+					
+			}
+		});
+				
+		textKVAL.getDocument().addDocumentListener(new DocumentListener() {						
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				try {					
+					updateTextField(textKVAL);															
+				}catch(Exception e1) {
+					
+				}
+			}
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				try {
+					updateTextField(textKVAL);						
+				}catch(Exception e1) {
+					
+				}				
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+
+			}
+		});
+		
+		textOCV.getDocument().addDocumentListener(new DocumentListener() {						
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				try {					
+					updateTextField(textOCV);															
+				}catch(Exception e1) {
+					
+				}
+			}
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				try {
+					updateTextField(textOCV);						
+				}catch(Exception e1) {
+					
+				}				
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+
+			}
+		});
+		
+		textLRV.getDocument().addDocumentListener(new DocumentListener() {						
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				try {					
+					updateTextField(textLRV);									
+				}catch(Exception e1) {
+					
+				}
+			}
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				try {
+					updateTextField(textLRV);	
+				}catch(Exception e1) {
+					
+				}				
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+
+			}
+		});
+		
+		textAna.getDocument().addDocumentListener(new DocumentListener() {						
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				try {					
+					updateTextField(textAna);											
+				}catch(Exception e1) {
+					
+				}
+			}
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				try {
+					updateTextField(textAna);			
+				}catch(Exception e1) {
+					
+				}				
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+
+			}
+		});
+		r1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent f) {
+				try {
+					r1.setSelected(true);
+					r2.setSelected(false);
+					textPre.setText(currentElement.data[0]);
+					textKVAL.setText(currentElement.data[25]);
+					textOCV.setText(currentElement.data[27]);
+					textLRV.setText(currentElement.data[28]);
+					textAna.setText(currentElement.data[26]);
+					
+					updateTextField(textPre);
+					updateTextField(textKVAL);
+					updateTextField(textOCV);
+					updateTextField(textLRV);
+					updateTextField(textAna);
+					
+					scrollPane.setViewportView(databaseTable);
+					secondLeft.remove(customerPlacePanel);
+					secondLeft.add(databasePlacePanel, 0);
+					secondLeft.updateUI();
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
+		r2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					r2.setSelected(true);
+					r1.setSelected(false);
+					textPre.setText("0.0");
+					textKVAL.setText("0.0");
+					textOCV.setText("0.0");
+					textLRV.setText("0.0");
+					textAna.setText("0.0");
+					
+					updateTextField(textPre);
+					updateTextField(textKVAL);
+					updateTextField(textOCV);
+					updateTextField(textLRV);
+					updateTextField(textAna);
+					
+					scrollPane.setViewportView(customTable);
+					secondLeft.remove(databasePlacePanel);
+					secondLeft.add(buildCustomerPlacePanel(), 0);
+					secondLeft.updateUI();
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
+		
+		r3.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					r3.setSelected(true);
+					r4.setSelected(false);
+					r5.setSelected(false);
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
+		
+		r4.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					r4.setSelected(true);
+					r3.setSelected(false);
+					r5.setSelected(false);
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
+		
+		r5.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					r5.setSelected(true);
+					r3.setSelected(false);
+					r4.setSelected(false);
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
+
+		// state listener: select different state name to get corresponding data.
+		bCounty.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					int index = bCounty.getSelectedIndex();
+					String countyName = listOfCounty[index];
+					climateDataByCounty = panelManager.filterByCounty(countyName, climateDataByState);
+					/*
+					 * climateDataByCounty = new ArrayList<>(); for(ClimateInfo ele :
+					 * climateDataByState) { if(ele.county.equals(countyName)) {
+					 * climateDataByCounty.add(ele); } }
+					 */
+					ArrayList<String> countyValue = countyStationMap.get(countyName);
+					String[] staList = convertToStringList(countyValue);
+					DefaultComboBoxModel stationModel = new DefaultComboBoxModel(staList);
+					bStation.setModel(stationModel);
+					if (climateDataByCounty.size() == 1) {
+						refreshData(0);
+					}
+
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
+
+		// state listener: select different state name to getcorresponding data.
+		bStation.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					int index = bStation.getSelectedIndex();
+					String stationName = listOfStation[index];
+					refreshData(index);
+
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
+
+		buttonOK.addActionListener(new ActionListener() // After selected the data source, open the climate frame with
+														// data;
+		{
+			public void actionPerformed(ActionEvent e) {
+				// select the first or second data source
+				pane = parent.tabbedPane;
+
+				try {
+					// int index = pane.indexOfTab("animal");
+					if (animalPanel == null) {
+						getOutput();
+						panelManager.storeClimatePanelOutput(climatePanelOutput);
+						animalPanel = new AnimalsPanel(panelManager);
+						animalPanel.setParent(parent);
+						pane.add("animal", animalPanel);
+					}
+					/*
+					 * else { pane.remove(index);
+					 * 
+					 * //System.out.print(index);
+					 * 
+					 * animal = new AnimalPanel(pane,animalData,source); animal.setParent(parent);
+					 * pane.insertTab("animal", null, animal, null, index); }
+					 */
+					pane.setSelectedIndex(pane.indexOfTab("animal"));
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+
+			}
+		});
+	}
 
 	private void initialLayout(BorderLayout border) {
 		add(buildChildPanel_1(), border.NORTH);
@@ -518,202 +739,164 @@ public class ClimatePanel extends JPanel {
 
 	}
 
-
-	private void initialActionLiseners() {
+	private void updateTextField(JTextField text) {
+		switch (text.getName()) {
+		case "textPre":
+			try {
+				valuePre = Double.parseDouble(textPre.getText().toString());				
+			} catch (Exception e) {
+				valuePre = 0;
+			}
+			if(valuePre <= 12 && valuePre >= 1.5) {
+				textPre.setBackground(null);
+			}
+			else {
+				textPre.setBackground(Color.red);
+				textPre.setToolTipText("Range: 1.5-12");
+			}
+			break;
+		case "textKVAL":
+			try {
+				valueKVAL = Double.parseDouble(textKVAL.getText().toString());			
+			} catch (Exception e) {
+				valueKVAL = 0;
+			}
+			if(valueKVAL <= 1.2 && valueKVAL >= 0.4) {
+				textKVAL.setBackground(null);
+			}
+			else {
+				textKVAL.setBackground(Color.red);
+				textKVAL.setToolTipText("Range: 0.4-1.2");
+			}
+			break;
+		case "textOCV":
+			try {
+				valueOCV = Double.parseDouble(textOCV.getText().toString());
+			} catch (Exception e) {
+				valueOCV = 0;
+			}
+			if(valueOCV <= 0.00381 && valueOCV >= 0.00256) {
+				textOCV.setBackground(null);
+			}
+			else {
+				textOCV.setBackground(Color.red);
+				textOCV.setToolTipText("Range: 0.00256-0.00381");
+			}
+			break;
+		case "textLRV":
+			try {
+				valueLRV = Double.parseDouble(textLRV.getText().toString());
+			} catch (Exception e) {
+				valueLRV = 0;
+			}
+			if(valueLRV <= 0.0106 && valueLRV >= 0.00625) {
+				textLRV.setBackground(null);
+			}
+			else {
+				textLRV.setBackground(Color.red);
+				textLRV.setToolTipText("Range: 0.00625-0.0106");
+			}
+			break;
+		case "textAna":
+			try {
+				valueAna = Double.parseDouble(textAna.getText().toString());	
+			} catch (Exception e) {
+				valueAna = 0;
+			}
+			if(valueAna <= 12 && valueAna >= 3) {
+				textAna.setBackground(null);
+			}
+			else {
+				textAna.setBackground(Color.red);
+				textAna.setToolTipText("Range: 3-12");
+			}			
+			break;
+			
+		}
+	}
+	
+	private void getOutput() {
+		climatePanelOutput = new ArrayList<>();
+		if(r1.isSelected()) {
+			if(bCounty.getSelectedIndex() < 0)
+			{
+				climatePanelOutput.add(bCounty.getItemAt(0).toString());
+			}
+			else				
+				climatePanelOutput.add(bCounty.getSelectedItem().toString());	
+			if(bStation.getSelectedIndex() < 0)
+			{
+				climatePanelOutput.add(bStation.getItemAt(0).toString());
+			}
+			else				
+				climatePanelOutput.add(bStation.getSelectedItem().toString());
+		}
+		else {
+			climatePanelOutput.add(textEnterCounty.getText());
+			climatePanelOutput.add(textEnterStation.getText());
+		}
 		
+		climatePanelOutput.add(textPre.getText());
+		climatePanelOutput.add(textKVAL.getText());
+		climatePanelOutput.add(textOCV.getText());
+		climatePanelOutput.add(textLRV.getText());
+		climatePanelOutput.add(textAna.getText());
 		
-		
-		textPre.getDocument().addDocumentListener(new DocumentListener() {			
-			//pane = parent.tabbedPane;
-			@Override
-			public void insertUpdate(DocumentEvent e) {
-				try {
-					int index = pane.indexOfTab("runoff");    // it is associate with location panel.
-					if(index >= 0) {
-						runoffPanel = (RunoffPanel) pane.getComponentAt(index);
-						runoffPanel.pervious25Yr = Double.parseDouble(textPre.getText().toString());
-						int num = Integer.parseInt(runoffPanel.textPCN1.getText().toString());
-						double a1 = Double.parseDouble(runoffPanel.textPWA.getText().toString());
-						double a2 = Double.parseDouble(runoffPanel.textIA.getText().toString());					
-						runoffPanel.updateRunoff(num, a1, a2);
-					}
-				}catch(Exception e1) {
-					
+		if(r1.isSelected()) {
+			if(r3.isSelected()) {
+				for(int i = 0; i < 12; i++) {
+					double v1 = Double.parseDouble(mt1.model.data[i][1].toString());
+					double v2 = Double.parseDouble(mt1.model.data[i][2].toString());
+					double sub = v1 - v2;
+					if(sub < 0)
+						climatePanelOutput.add("0.00");
+					else
+						climatePanelOutput.add(Double.toString(sub));
 				}
 			}
-
-			@Override
-			public void removeUpdate(DocumentEvent e) {
-				try {
-					int index = pane.indexOfTab("runoff");    // it is associate with location panel.
-					if(index >= 0) {
-						runoffPanel = (RunoffPanel) pane.getComponentAt(index);
-						runoffPanel.pervious25Yr = Double.parseDouble(textPre.getText().toString());
-						int num = Integer.parseInt(runoffPanel.textPCN1.getText().toString());
-						double a1 = Double.parseDouble(runoffPanel.textPWA.getText().toString());
-						double a2 = Double.parseDouble(runoffPanel.textIA.getText().toString());					
-						runoffPanel.updateRunoff(num, a1, a2);
-					}
-				}catch(Exception e1) {
-					
+			else if(r4.isSelected()) {
+				for(int i = 0; i < 12; i++) {
+					double v1 = Double.parseDouble(mt1.model.data[i][1].toString());
+					double v2 = Double.parseDouble(mt1.model.data[i][2].toString());
+					double sub = v1 - v2;
+					climatePanelOutput.add(Double.toString(sub));
 				}
-				
-			}
-
-			@Override
-			public void changedUpdate(DocumentEvent e) {
-
-			}
-		});
-		
-		r1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				try {
-					r1.setSelected(true);
-					textPre.setText(currentElement.data[0]);
-					textKVAL.setText(currentElement.data[25]);
-					textOCV.setText(currentElement.data[27]);
-					textLRV.setText(currentElement.data[28]);
-					textAna.setText(currentElement.data[26]);
-					scrollPane.setViewportView(databaseTable);
-					secondLeft.remove(customerPlacePanel);
-					secondLeft.add(databasePlacePanel, 0);
-					secondLeft.updateUI();
-				} catch (Exception e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+			}			
+			else if(r5.isSelected()) {
+				for(int i = 0; i < 12; i++) {				
+					climatePanelOutput.add(mt1.model.data[i][1].toString());
+				}
+			}									
+		}
+		else {
+			if(r3.isSelected()) {
+				for(int i = 0; i < 12; i++) {
+					double v1 = Double.parseDouble(mt1.model.data[i][1].toString());
+					double v2 = Double.parseDouble(mt1.model.data[i][2].toString());
+					double sub = v1 - v2;
+					if(sub < 0)
+						climatePanelOutput.add("0.00");
+					else
+						climatePanelOutput.add(Double.toString(sub));
 				}
 			}
-		});
-		r2.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				try {
-					r2.setSelected(true);
-					textPre.setText("0");
-					textKVAL.setText("0");
-					textOCV.setText("0");
-					textLRV.setText("0");
-					textAna.setText("0");
-					scrollPane.setViewportView(customTable);
-					secondLeft.remove(databasePlacePanel);
-					secondLeft.add(buildCustomerPlacePanel(), 0);
-					secondLeft.updateUI();
-				} catch (Exception e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+			else if(r4.isSelected()) {
+				for(int i = 0; i < 12; i++) {
+					double v1 = Double.parseDouble(mt1.model.data[i][1].toString());
+					double v2 = Double.parseDouble(mt1.model.data[i][2].toString());
+					double sub = v1 - v2;
+					climatePanelOutput.add(Double.toString(sub));
 				}
-			}
-		});
-		
-		r3.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				try {
-					r3.setSelected(true);
-					r4.setSelected(false);
-					r5.setSelected(false);
-				} catch (Exception e1) {
-					e1.printStackTrace();
+			}			
+			else if(r5.isSelected()) {
+				for(int i = 0; i < 12; i++) {				
+					climatePanelOutput.add(mt2.model.data[i][1].toString());
 				}
-			}
-		});
-		
-		r4.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				try {
-					r4.setSelected(true);
-					r3.setSelected(false);
-					r5.setSelected(false);
-				} catch (Exception e1) {
-					e1.printStackTrace();
-				}
-			}
-		});
-		
-		r5.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				try {
-					r5.setSelected(true);
-					r3.setSelected(false);
-					r4.setSelected(false);
-				} catch (Exception e1) {
-					e1.printStackTrace();
-				}
-			}
-		});
-
-		// state listener: select different state name to get corresponding data.
-		bCounty.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				try {
-					int index = bCounty.getSelectedIndex();
-					String countyName = listOfCounty[index];
-					climateDataByCounty = panelManager.filterByCounty(countyName, climateDataByState);
-					/*
-					 * climateDataByCounty = new ArrayList<>(); for(ClimateInfo ele :
-					 * climateDataByState) { if(ele.county.equals(countyName)) {
-					 * climateDataByCounty.add(ele); } }
-					 */
-					ArrayList<String> countyValue = countyStationMap.get(countyName);
-					String[] staList = convertToStringList(countyValue);
-					DefaultComboBoxModel stationModel = new DefaultComboBoxModel(staList);
-					bStation.setModel(stationModel);
-					if (climateDataByCounty.size() == 1) {
-						refreshData(0);
-					}
-
-				} catch (Exception e1) {
-					e1.printStackTrace();
-				}
-			}
-		});
-
-		// state listener: select different state name to getcorresponding data.
-		bStation.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				try {
-					int index = bStation.getSelectedIndex();
-					String stationName = listOfStation[index];
-					refreshData(index);
-
-				} catch (Exception e1) {
-					e1.printStackTrace();
-				}
-			}
-		});
-
-		buttonOK.addActionListener(new ActionListener() // After selected the data source, open the climate frame with
-														// data;
-		{
-			public void actionPerformed(ActionEvent e) {
-				// select the first or second data source
-				pane = parent.tabbedPane;
-
-				try {
-					// int index = pane.indexOfTab("animal");
-					if (animalPanel == null) {
-						getOutput();
-						panelManager.storeClimatePanelOutput(climatePanelOutput);
-						animalPanel = new AnimalsPanel(panelManager);
-						animalPanel.setParent(parent);
-						pane.add("animal", animalPanel);
-					}
-					/*
-					 * else { pane.remove(index);
-					 * 
-					 * //System.out.print(index);
-					 * 
-					 * animal = new AnimalPanel(pane,animalData,source); animal.setParent(parent);
-					 * pane.insertTab("animal", null, animal, null, index); }
-					 */
-					pane.setSelectedIndex(pane.indexOfTab("animal"));
-				} catch (Exception e1) {
-					e1.printStackTrace();
-				}
-
-			}
-		});
+			}										
+		}
 
 	}
+
 
 	public Object[][] getTableData(ClimateInfo s) {
 		Object[][] res = new Object[12][3];
