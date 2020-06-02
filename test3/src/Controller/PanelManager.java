@@ -31,6 +31,7 @@ public class PanelManager {
 	public ArrayList<String> climatePanelOutout;
 	public ArrayList<OutputOfAnimalPanel> animalPanelOutput;
 	public ArrayList<String> locationPanelOutput;
+	public ArrayList<String> runoffPanelOutput;
 	
 	
 	public PanelManager(String path) throws IOException {
@@ -45,7 +46,7 @@ public class PanelManager {
 		readBeddingDataset("Bedding");
 	}
 	
-	// reading data from climate
+	// reading data from climate sheet
 	public void readClimateDataset(String sheetName) {
 		try {    		
     	    Sheet sheet = workbook.getSheet(sheetName);	     
@@ -68,7 +69,7 @@ public class PanelManager {
     	}  			
 	}	
 	
-	// reading data from animal
+	// reading data from animal sheet
 	public void readAnimalDataset(String sheetName){
 		try {    		
     	    Sheet sheet = workbook.getSheet(sheetName);	     
@@ -91,7 +92,7 @@ public class PanelManager {
     	}  		
 	}
 	
-	// reading data from bedding
+	// reading data from bedding sheet
 	public void readBeddingDataset(String sheetName){
 		try {    		
     	    Sheet sheet = workbook.getSheet(sheetName);	     
@@ -135,7 +136,7 @@ public class PanelManager {
 	
 	
 	/***
-	 * manage climate panel
+	 * Manage climate panel
 	 ***/
 	public ArrayList<ClimateInfo> filterByCounty(String name, ArrayList<ClimateInfo> upperLevelData) {
 		ArrayList<ClimateInfo> list = new ArrayList<>();
@@ -154,7 +155,7 @@ public class PanelManager {
 	
 	
 	/***
-	 * manage animal panel
+	 * Manage animal panel
 	 ***/
 	
 	public ArrayList<AnimalInfo> filterByDataSource(String ds, ArrayList<AnimalInfo> data) {
@@ -174,7 +175,7 @@ public class PanelManager {
 
 	
 	/***
-	 * manage location panel
+	 * Manage location panel
 	 ***/
 	public ArrayList<AnimalInfo> getDataFromAnimalPanel(){
 		ArrayList<AnimalInfo> list = new ArrayList<>();
@@ -188,19 +189,37 @@ public class PanelManager {
 	public void storeLocationPanelOutput(ArrayList<String> o) {
 		locationPanelOutput = o;
 	}
+	
+	
+	
 	/***
-	 * manage Addition panel
+	 * Manage Addition panel
 	 ***/
 	
 	
 	
+	
 	/***
-	 * manage runoff panel
+	 * Manage runoff panel
 	 ***/
+	public double getPrecipitation25Yr(ArrayList<String> list) {
+		String s = list.get(2);
+		double res = Double.parseDouble(s);
+		return res;
+	}
+	
+	public String[] getPrecData(ArrayList<String> list) {
+		String[] res = new String[12];
+		for(int i = 0; i < 12; i++) {
+			res[i] = list.get(i + 7);			
+		}
+		return res;
+	}
+	
 	
 	
 	/***
-	 * manage management panel
+	 * Manage management panel
 	 */
 	
 	

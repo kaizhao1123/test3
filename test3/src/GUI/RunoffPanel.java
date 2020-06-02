@@ -35,13 +35,14 @@ public class RunoffPanel extends JPanel {
 	PanelManager panelManager;
 
 	String[] columnName = { " ", "Pervious", "Impervious", "Monthly Totals" };
-	String[] perData = { "5.40", "5.23", "6.65", "5.24", "3.86", "3.99", "5.27", "3.91", "3.88", "2.82", "3.98",
-			"5.37" };
-	String[] imperData = { "0.00", "0.00", "0.00", "0.00", "0.00", "0.00", "0.00", "0.00", "0.00", "0.00", "0.00",
-			"0.00" };
+	//String[] perData = { "5.40", "5.23", "6.65", "5.24", "3.86", "3.99", "5.27", "3.91", "3.88", "2.82", "3.98",
+	//		"5.37" };
+	String[] perData;
+	//String[] imperData = { "0.00", "0.00", "0.00", "0.00", "0.00", "0.00", "0.00", "0.00", "0.00", "0.00", "0.00",
+	//		"0.00" };
 
-	int curveNum_30 = 77;
-	double pervious25Yr = 5.40;
+	int curveNum_30;
+	double pervious25Yr;
 	double valuePWA, valuePCN1, valuePCN2, valueIA, valueT1, valueT2;
 	DecimalFormat df;
 
@@ -100,6 +101,14 @@ public class RunoffPanel extends JPanel {
 
 	private void initialData() {
 		df = new DecimalFormat("0.00");
+		perData = panelManager.getPrecData(panelManager.climatePanelOutout);
+		curveNum_30 = 77;
+		pervious25Yr = panelManager.getPrecipitation25Yr(panelManager.climatePanelOutout);
+		
+		for(int i = 0; i < 12; i++) {
+			System.out.print(perData[i]);
+		}
+		
 		/*
 		 * double s = 1000.00/77 - 10; s = Double.parseDouble(df.format(s));
 		 * 
@@ -655,6 +664,10 @@ public class RunoffPanel extends JPanel {
 		text_1.setText(Double.toString(perv));
 		text_2.setText(Double.toString(imperv));
 		text_3.setText(Double.toString(Double.parseDouble(df.format(perv + imperv))));
+		
+		text_1.updateUI();
+		text_2.updateUI();
+		text_3.updateUI();
 		// }
 	}
 

@@ -30,6 +30,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import Controller.PanelManager;
 import Model_Entity.ClimateInfo;
@@ -44,6 +46,7 @@ public class ClimatePanel extends JPanel {
 	MainFrame parent;
 	JTabbedPane pane;
 	PanelManager panelManager;
+	RunoffPanel runoffPanel;
 	AnimalsPanel animalPanel = null;
 
 	// declare the data structure
@@ -81,11 +84,11 @@ public class ClimatePanel extends JPanel {
 	JPanel secondLeft;
 	JPanel databasePlacePanel; // the panel of county and station, used to get the data from the database
 	JPanel customerPlacePanel; // the panel of county and station, used to input the data by the customer
-	JTextField valueOfPre;
-	JTextField valueOfKVAL;
-	JTextField valueOfOCV;
-	JTextField valueOfLRV;
-	JTextField valueOfAna;
+	JTextField textPre;
+	JTextField textKVAL;
+	JTextField textOCV;
+	JTextField textLRV;
+	JTextField textAna;
 	JComboBox bCounty; // to display the county
 	JComboBox bStation = new JComboBox(); // to display the station
 	JTextField textEnterCounty;
@@ -143,33 +146,65 @@ public class ClimatePanel extends JPanel {
 			climatePanelOutput.add(textEnterStation.getText());
 		}
 		
-		climatePanelOutput.add(valueOfPre.getText());
-		climatePanelOutput.add(valueOfKVAL.getText());
-		climatePanelOutput.add(valueOfOCV.getText());
-		climatePanelOutput.add(valueOfLRV.getText());
-		climatePanelOutput.add(valueOfAna.getText());
+		climatePanelOutput.add(textPre.getText());
+		climatePanelOutput.add(textKVAL.getText());
+		climatePanelOutput.add(textOCV.getText());
+		climatePanelOutput.add(textLRV.getText());
+		climatePanelOutput.add(textAna.getText());
 		
 		if(r1.isSelected()) {
-			for(int i = 1; i < mt1.model.getColumnCount(); i++) {
-				for(int j = 0; j < mt1.model.getRowCount() -1 ; j++) {
-					climatePanelOutput.add(mt1.model.data[j][i].toString());
+			if(r3.isSelected()) {
+				for(int i = 0; i < 12; i++) {
+					double v1 = Double.parseDouble(mt1.model.data[i][1].toString());
+					double v2 = Double.parseDouble(mt1.model.data[i][2].toString());
+					double sub = v1 - v2;
+					if(sub < 0)
+						climatePanelOutput.add("0.00");
+					else
+						climatePanelOutput.add(Double.toString(sub));
+				}
+			}
+			else if(r4.isSelected()) {
+				for(int i = 0; i < 12; i++) {
+					double v1 = Double.parseDouble(mt1.model.data[i][1].toString());
+					double v2 = Double.parseDouble(mt1.model.data[i][2].toString());
+					double sub = v1 - v2;
+					climatePanelOutput.add(Double.toString(sub));
+				}
+			}			
+			else if(r5.isSelected()) {
+				for(int i = 0; i < 12; i++) {				
+					climatePanelOutput.add(mt1.model.data[i][1].toString());
 				}
 			}									
 		}
 		else {
-			for(int i = 1; i < mt2.model.getColumnCount(); i++) {
-				for(int j = 0; j < mt2.model.getRowCount(); j++) {
-					climatePanelOutput.add(mt2.model.data[j][i].toString());
+			if(r3.isSelected()) {
+				for(int i = 0; i < 12; i++) {
+					double v1 = Double.parseDouble(mt1.model.data[i][1].toString());
+					double v2 = Double.parseDouble(mt1.model.data[i][2].toString());
+					double sub = v1 - v2;
+					if(sub < 0)
+						climatePanelOutput.add("0.00");
+					else
+						climatePanelOutput.add(Double.toString(sub));
 				}
-			}									
+			}
+			else if(r4.isSelected()) {
+				for(int i = 0; i < 12; i++) {
+					double v1 = Double.parseDouble(mt1.model.data[i][1].toString());
+					double v2 = Double.parseDouble(mt1.model.data[i][2].toString());
+					double sub = v1 - v2;
+					climatePanelOutput.add(Double.toString(sub));
+				}
+			}			
+			else if(r5.isSelected()) {
+				for(int i = 0; i < 12; i++) {				
+					climatePanelOutput.add(mt2.model.data[i][1].toString());
+				}
+			}										
 		}
-		
-		// test output
-		/*for(int i = 0; i < climatePanelOutput.size(); i++) {
-			System.out.print(climatePanelOutput.get(i));
-		}*/
-		
-		
+
 	}
 	private void initialData() {
 		currentElement = climateDataByState.get(0);
@@ -238,16 +273,16 @@ public class ClimatePanel extends JPanel {
 		labelLrv = new JLabel("LRV Max:");
 		labelAlr = new JLabel("Anaerobic Load Rate:");
 
-		valueOfPre = new JTextField(currentElement.data[0]);
-		valueOfPre.setPreferredSize(new Dimension(60, 25));
-		valueOfKVAL = new JTextField(currentElement.data[25]);
-		valueOfKVAL.setPreferredSize(new Dimension(65, 25));
-		valueOfOCV = new JTextField(currentElement.data[27]);
-		valueOfOCV.setPreferredSize(new Dimension(65, 25));
-		valueOfLRV = new JTextField(currentElement.data[28]);
-		valueOfLRV.setPreferredSize(new Dimension(65, 25));
-		valueOfAna = new JTextField(currentElement.data[26]);
-		valueOfAna.setPreferredSize(new Dimension(65, 25));
+		textPre = new JTextField(currentElement.data[0]);
+		textPre.setPreferredSize(new Dimension(60, 25));
+		textKVAL = new JTextField(currentElement.data[25]);
+		textKVAL.setPreferredSize(new Dimension(65, 25));
+		textOCV = new JTextField(currentElement.data[27]);
+		textOCV.setPreferredSize(new Dimension(65, 25));
+		textLRV = new JTextField(currentElement.data[28]);
+		textLRV.setPreferredSize(new Dimension(65, 25));
+		textAna = new JTextField(currentElement.data[26]);
+		textAna.setPreferredSize(new Dimension(65, 25));
 
 		jl1 = new JLabel("lbx VS/cu. ft/day");
 		jl2 = new JLabel("lbx VS/cu. ft/day");
@@ -342,7 +377,7 @@ public class ClimatePanel extends JPanel {
 
 		JPanel prePanel = new JPanel();
 		prePanel.add(labelPrecipitation);
-		prePanel.add(valueOfPre);
+		prePanel.add(textPre);
 		prePanel.add(labelInches);
 
 		// 3. labelRate
@@ -368,11 +403,11 @@ public class ClimatePanel extends JPanel {
 
 		gbcRa.gridx = 3;
 		gbcRa.gridy = 0;
-		rationalPanel.add(valueOfKVAL, gbcRa);
+		rationalPanel.add(textKVAL, gbcRa);
 		gbcRa.gridy = 1;
-		rationalPanel.add(valueOfOCV, gbcRa);
+		rationalPanel.add(textOCV, gbcRa);
 		gbcRa.gridy = 2;
-		rationalPanel.add(valueOfLRV, gbcRa);
+		rationalPanel.add(textLRV, gbcRa);
 
 		gbcRa.gridx = 4;
 		gbcRa.gridy = 1;
@@ -389,7 +424,7 @@ public class ClimatePanel extends JPanel {
 
 		nrcsPanel.add(labelAlr);
 		nrcsPanel.add(Box.createHorizontalStrut(10));
-		nrcsPanel.add(valueOfAna);
+		nrcsPanel.add(textAna);
 		nrcsPanel.add(jl3);
 		nrcsPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "NRCS Design Method"));
 
@@ -485,15 +520,61 @@ public class ClimatePanel extends JPanel {
 
 
 	private void initialActionLiseners() {
+		
+		
+		
+		textPre.getDocument().addDocumentListener(new DocumentListener() {			
+			//pane = parent.tabbedPane;
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				try {
+					int index = pane.indexOfTab("runoff");    // it is associate with location panel.
+					if(index >= 0) {
+						runoffPanel = (RunoffPanel) pane.getComponentAt(index);
+						runoffPanel.pervious25Yr = Double.parseDouble(textPre.getText().toString());
+						int num = Integer.parseInt(runoffPanel.textPCN1.getText().toString());
+						double a1 = Double.parseDouble(runoffPanel.textPWA.getText().toString());
+						double a2 = Double.parseDouble(runoffPanel.textIA.getText().toString());					
+						runoffPanel.updateRunoff(num, a1, a2);
+					}
+				}catch(Exception e1) {
+					
+				}
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				try {
+					int index = pane.indexOfTab("runoff");    // it is associate with location panel.
+					if(index >= 0) {
+						runoffPanel = (RunoffPanel) pane.getComponentAt(index);
+						runoffPanel.pervious25Yr = Double.parseDouble(textPre.getText().toString());
+						int num = Integer.parseInt(runoffPanel.textPCN1.getText().toString());
+						double a1 = Double.parseDouble(runoffPanel.textPWA.getText().toString());
+						double a2 = Double.parseDouble(runoffPanel.textIA.getText().toString());					
+						runoffPanel.updateRunoff(num, a1, a2);
+					}
+				}catch(Exception e1) {
+					
+				}
+				
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+
+			}
+		});
+		
 		r1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					r1.setSelected(true);
-					valueOfPre.setText(currentElement.data[0]);
-					valueOfKVAL.setText(currentElement.data[25]);
-					valueOfOCV.setText(currentElement.data[27]);
-					valueOfLRV.setText(currentElement.data[28]);
-					valueOfAna.setText(currentElement.data[26]);
+					textPre.setText(currentElement.data[0]);
+					textKVAL.setText(currentElement.data[25]);
+					textOCV.setText(currentElement.data[27]);
+					textLRV.setText(currentElement.data[28]);
+					textAna.setText(currentElement.data[26]);
 					scrollPane.setViewportView(databaseTable);
 					secondLeft.remove(customerPlacePanel);
 					secondLeft.add(databasePlacePanel, 0);
@@ -508,11 +589,11 @@ public class ClimatePanel extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					r2.setSelected(true);
-					valueOfPre.setText("0");
-					valueOfKVAL.setText("0");
-					valueOfOCV.setText("0");
-					valueOfLRV.setText("0");
-					valueOfAna.setText("0");
+					textPre.setText("0");
+					textKVAL.setText("0");
+					textOCV.setText("0");
+					textLRV.setText("0");
+					textAna.setText("0");
 					scrollPane.setViewportView(customTable);
 					secondLeft.remove(databasePlacePanel);
 					secondLeft.add(buildCustomerPlacePanel(), 0);
@@ -523,9 +604,42 @@ public class ClimatePanel extends JPanel {
 				}
 			}
 		});
-		// r3.addActionListener(sliceActionListener);
-		// r4.addActionListener(sliceActionListener);
-		// r5.addActionListener(sliceActionListener);
+		
+		r3.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					r3.setSelected(true);
+					r4.setSelected(false);
+					r5.setSelected(false);
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
+		
+		r4.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					r4.setSelected(true);
+					r3.setSelected(false);
+					r5.setSelected(false);
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
+		
+		r5.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					r5.setSelected(true);
+					r3.setSelected(false);
+					r4.setSelected(false);
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
 
 		// state listener: select different state name to get corresponding data.
 		bCounty.addActionListener(new ActionListener() {
@@ -627,11 +741,11 @@ public class ClimatePanel extends JPanel {
 		mt1.setColor(rowcount1 - 1, rowcount1 - 1, 1, colcount1, Color.cyan);
 		scrollPane.setViewportView(databaseTable);
 
-		valueOfPre.setText(currentElement.data[0]);
-		valueOfKVAL.setText(currentElement.data[25]);
-		valueOfOCV.setText(currentElement.data[27]);
-		valueOfLRV.setText(currentElement.data[28]);
-		valueOfAna.setText(currentElement.data[26]);
+		textPre.setText(currentElement.data[0]);
+		textKVAL.setText(currentElement.data[25]);
+		textOCV.setText(currentElement.data[27]);
+		textLRV.setText(currentElement.data[28]);
+		textAna.setText(currentElement.data[26]);
 	}
 
 	public HashMap<String, ArrayList<String>> getMap(ArrayList<ClimateInfo> data) {
