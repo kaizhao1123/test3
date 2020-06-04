@@ -2,6 +2,7 @@ package Model_Tables;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.event.MouseEvent;
 import java.text.DecimalFormat;
 
 import javax.swing.JTable;
@@ -27,9 +28,32 @@ public class AnimalsTable implements TableModelListener {
 		model.addTableModelListener(this);
 		model.addTotalRow(model.getEachSum());
 
-		ntable = new JTable(model);
-		int rowcount = ntable.getRowCount();
-		int colcount = ntable.getColumnCount();
+		ntable = new JTable(model) {
+			 public String getToolTipText(MouseEvent e) {   
+	                int row=ntable.rowAtPoint(e.getPoint());   
+	                int col=ntable.columnAtPoint(e.getPoint());   
+	                String tiptextString=null;   
+	                if(row>-1 && col == 3){   
+	                    double value= Double.parseDouble(ntable.getValueAt(row, col).toString()); 
+	                    String type = model.data[row][1].toString();
+	                    if(type.equals("Beef") && (value > 1200 || value < 150))   
+	                        tiptextString = "The Range for " + type + " weight is 150-1200"; 
+	                    else if(type.equals("Horse") )
+	                    	tiptextString = "The Range for " + type + " weight is ?";
+	                    else if(type.equals("Poultry") && (value > 25 || value < 2 ))
+	                    	tiptextString = "The Range for " + type + " weight is 2-25";
+	                    else if(type.equals("Dairy") && (value > 1400 || value < 150 ))
+	                    	tiptextString = "The Range for " + type + " weight is 150-1400";
+	                    else if(type.equals("Sheep") && (value > 500 || value < 25 ))
+	                    	tiptextString = "The Range for " + type + " weight is 25-500";
+	                    else if(type.equals("Swine") && (value > 600 || value < 8 ))
+	                    	tiptextString = "The Range for " + type + " weight is 8-600";
+	                    else if(type.equals("Veal") && (value > 200 || value < 70 ))
+	                    	tiptextString = "The Range for " + type + " weight is 70-200";	                    
+	                }   
+	                return tiptextString; 
+		}};
+		int rowcount = ntable.getRowCount();	
 		setColor(0,rowcount-2,2,6,Color.lightGray);
 
 		ntable.setVisible(true);		
@@ -44,12 +68,28 @@ public class AnimalsTable implements TableModelListener {
 					Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
 					if (row >= row_start && row <= row_end && column >= col_start && column <= col_end) {
-						setBackground(ncolor);
-					} else if (column == 0 || column == 1) {
-						setBackground(null);
-					} else
+						setBackground(ncolor);	
+						if (column == 3) {
+							try {
+								double v= Double.parseDouble(model.data[row][3].toString()); 
+			                    String type = model.data[row][1].toString();
+			                    if( (type.equals("Beef") && (v > 1200 || v < 150))  
+			                    		||  (type.equals("Horse")) 
+			                    		||  (type.equals("Poultry") && (v > 25 || v < 2 ))
+			                    		|| 	(type.equals("Dairy") && (v > 1400 || v < 150 ))
+			                    		||	(type.equals("Sheep") && (v > 500 || v < 25 ))
+			                    		||	(type.equals("Swine") && (v > 600 || v < 8 ))
+			                    		||  (type.equals("Veal") && (v > 200 || v < 70 ))  )			                    	
+			                    	setBackground(Color.red);   
+							}catch(Exception ev) {
+								
+							}						
+						}
+					}													                   																 
+					else if (column == 0 || column == 1) 
+						setBackground(null);					
+					else
 						setBackground(cc);
-
 					return c;
 				}
 			};

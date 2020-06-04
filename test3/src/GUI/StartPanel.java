@@ -12,6 +12,7 @@ import java.util.HashSet;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
@@ -32,10 +33,14 @@ public class StartPanel extends JPanel {
 	ClimatePanel climate = null;
 
 	// declare the data structure used in the panel
-	ArrayList<ClimateInfo> climateDataSet; // store input data
-	HashSet<String> allStateNames; // store all state names
-	String sourceForData; // store the source name
-	String stateForData; // store the state name
+	//ArrayList<ClimateInfo> climateDataSet; // store input data
+	
+	//HashSet<String> allStateNames; // store all state names
+	String[] stateNames;	// the input state names
+	String[] sourceNames;  // the input source names
+		
+	String sourceForData; // store the source name for output
+	String stateForData; // store the state name for output
 	String[] output; // output data, will be stored in Manager, be used in the future
 
 	// declare the elements shown in the panel
@@ -60,13 +65,20 @@ public class StartPanel extends JPanel {
 		initialLayout(gbc);
 	}
 
-	private void initialData() {
+	private void initialData() {					
+		// initial state names
+		HashSet<String>allStateNames = panelManager.getAllStateNames(); 
+		stateNames = new String[allStateNames.size()];
+		allStateNames.toArray(stateNames);
+		Arrays.sort(stateNames);
 		
-		// get climate dataset		
-		climateDataSet = panelManager.allClimateData;
-		
-		// get all state names
-		allStateNames = getSet(climateDataSet); 
+		// initial source names
+		sourceNames = new String[3];
+		sourceNames[0] = " ";
+		sourceNames[1] = "MWPS";
+		sourceNames[2] = "NRCS-2008";
+			
+		// initial output 
 		output = new String[2];
 	}
 
@@ -78,15 +90,10 @@ public class StartPanel extends JPanel {
 		jl5 = new JLabel("<html> Click button above to define or <br> modify the operating period(s) </html>");
 		ownerName = new JTextField();
 		designerName = new JTextField();
-
-		String[] source = { " ", "MWPS", "NRCS-2008" };
-		dataSource = new JComboBox<>(source);
-		dataSource.setSelectedIndex(0);
-
-		String[] state = new String[allStateNames.size()];
-		allStateNames.toArray(state);
-		Arrays.sort(state);
-		selectState = new JComboBox<>(state);
+	
+		dataSource = new JComboBox<>(sourceNames);
+		dataSource.setSelectedIndex(0);		
+		selectState = new JComboBox<>(stateNames);
 		selectState.setSelectedIndex(0);
 
 		buttonSetup = new JButton("Operating Period Setup");
@@ -130,12 +137,11 @@ public class StartPanel extends JPanel {
 		gbc.ipadx = 20;
 		add(selectState, gbc);
 
+		// add ***setup period ***
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.gridx = 3;
 		gbc.gridy = 8;
 		add(buttonSetup, gbc);
-
-		// gbc.gridx = 3;
 		gbc.gridy = 10;
 		add(jl5, gbc);
 
@@ -160,7 +166,6 @@ public class StartPanel extends JPanel {
 		dataSource.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					// dataSource.getSelectedIndex();
 					dataSource.setPrototypeDisplayValue(dataSource.getSelectedItem());
 					sourceForData = (String) dataSource.getPrototypeDisplayValue();
 				} catch (Exception e1) {
@@ -182,7 +187,7 @@ public class StartPanel extends JPanel {
 			}
 		});
 
-		// setup the period
+		// open the operating period dialog, to setup the period
 		buttonSetup.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
@@ -197,11 +202,10 @@ public class StartPanel extends JPanel {
 		// After selected the data source, open the climate frame with data;
 		buttonOK.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (dataSource.getSelectedIndex() == 0) {
-					// must select one data source, otherwise, the button doesn't work
-					System.out.print("Nothing selected");
-				} else if ((dataSource.getSelectedIndex() == 1 || dataSource.getSelectedIndex() == 2)
-						&& selectState.getSelectedIndex() != 0) { // select the first or second data source
+				if (dataSource.getSelectedIndex() == 0 || selectState.getSelectedIndex() == 0) {
+					JOptionPane.showMessageDialog(null,"Nothing selected");					
+				} else if ((dataSource.getSelectedIndex() > 0)
+						&& selectState.getSelectedIndex() > 0) { // select the first or second data source
 
 					try {
 						pane = parent.tabbedPane;
@@ -233,20 +237,14 @@ public class StartPanel extends JPanel {
 
 		buttonCancel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				
 				// dispose();
 				// frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
 			}
 		});
 	}
 
-	private HashSet<String> getSet(ArrayList<ClimateInfo> data) {
-		HashSet<String> allStateNames = new HashSet<String>();
-		allStateNames.add(" ");
-		for (ClimateInfo element : data) {
-			allStateNames.add(element.state);
-		}
-		return allStateNames;
-	}
+	
 
 	public void setParent(MainFrame frame) {
 		this.parent = frame;

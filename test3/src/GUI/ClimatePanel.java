@@ -52,10 +52,10 @@ public class ClimatePanel extends JPanel {
 	// declare the data structure
 	ArrayList<ClimateInfo> climateDataByState;
 	ArrayList<ClimateInfo> climateDataByCounty;
-	ClimateInfo currentElement;
-	HashMap<String, ArrayList<String>> countyStationMap; // store the county and its stations
-	String[] listOfCounty; // list all county
-	String[] listOfStation; // list all station per county
+	ClimateInfo currentElement;		// getting data to show in the table, also used for creating output
+	HashMap<String, ArrayList<String>> countyStationMap; 	// store the county and its stations
+	String[] listOfCounty; 		// list all county, to show in comboBox county
+	String[] listOfStation; 	// list all station per county, to show in comboBox station
 	double valuePre, valueKVAL, valueOCV, valueLRV, valueAna;
 	ArrayList<String> climatePanelOutput;
 	
@@ -64,32 +64,34 @@ public class ClimatePanel extends JPanel {
 	JLabel labelCounty, labelStation, labelEnterCounty,labelEnterStation, labelInches, labelPrecipitation, labelRate, labelKval, labelOcv, labelLrv,
 			labelAlr;
 	JLabel jl1, jl2, jl3;
-	JScrollPane scrollPane; // used for table
+	JScrollPane scrollPane;
 	JPanel secondLeft;
-	JPanel databasePlacePanel; // the panel of county and station, used to get the data from the database
-	JPanel customerPlacePanel; // the panel of county and station, used to input the data by the customer
+	JPanel databasePlacePanel; 		// the panel of county and station, used for getting the data from the database
+	JPanel customerPlacePanel; 		// the panel of county and station, used for input the data by the customer
 	JTextField textPre;
 	JTextField textKVAL;
 	JTextField textOCV;
 	JTextField textLRV;
 	JTextField textAna;
-	JComboBox bCounty; // to display the county
-	JComboBox bStation = new JComboBox(); // to display the station
+	JComboBox comboBoxCounty; 	// to display the county names
+	JComboBox comboBoxStation; 	// to display the station names
 	JTextField textEnterCounty;
 	JTextField textEnterStation;
 	JButton buttonHelp, buttonOK;
 	
-	ClimateTable mt1 = new ClimateTable(); // used for download the existing AWM data
-	JTable databaseTable;
-	ClimateTable mt2 = new ClimateTable(); // used for input data by the customer
-	JTable customTable;
+	ClimateTable climateTable1 = new ClimateTable(); // used for download the existing AWM data
+	JTable jTable_database;
+	ClimateTable climateTable2 = new ClimateTable(); // used for input data by the customer
+	JTable jTable_customer;
 	
-	// data for table
+	
 	String[] months = { "January", "February", "March", "April", "May", "June", "July", "August", "September",
 			"October", "November", "December" };
+	
+	// data for table
 	String[] tableColumnName = { " ", "Prec(in)", "Evap(in)" };
-	Object[][] tableData1; // the data from the database
-	Object[][] tableData2 = { { "January", "0.00", "0.00" }, { "February", "0.00", "0.00" },
+	Object[][] data_database; 	// the data from the database
+	Object[][] data_customer = { { "January", "0.00", "0.00" }, { "February", "0.00", "0.00" },
 			{ "March", "0.00", "0.00" }, { "April", "0.00", "0.00" }, { "May", "0.00", "0.00" },
 			{ "June", "0.00", "0.00" }, { "July", "0.00", "0.00" }, { "August", "0.00", "0.00" },
 			{ "September", "0.00", "0.00" }, { "October", "0.00", "0.00" }, { "November", "0.00", "0.00" },
@@ -119,12 +121,10 @@ public class ClimatePanel extends JPanel {
 			count++;
 		}
 		Arrays.sort(listOfCounty);
-
 		ArrayList<String> firstCounty = countyStationMap.get(listOfCounty[0]);
 		listOfStation = convertToStringList(firstCounty);
-
-		tableData1 = getTableData(currentElement);
 		
+		data_database = getTableData(currentElement);		
 		valuePre = 0;
 		valueKVAL = 0;
 		valueOCV = 0;
@@ -148,13 +148,14 @@ public class ClimatePanel extends JPanel {
 		r5.setFont(new Font(r5.getFont().getName(),Font.PLAIN,12));
 
 		labelCounty = new JLabel("Select County:");
-		bCounty = new JComboBox<>(listOfCounty);
-		bCounty.setPreferredSize(new Dimension(230, 25));
+		comboBoxCounty = new JComboBox<>(listOfCounty);
+		comboBoxCounty.setPreferredSize(new Dimension(230, 25));
 
 		labelStation = new JLabel("Select Station:");
 		DefaultComboBoxModel stationModel = new DefaultComboBoxModel(listOfStation);
-		bStation.setModel(stationModel);
-		bStation.setPreferredSize(new Dimension(230, 25));
+		comboBoxStation = new JComboBox();
+		comboBoxStation.setModel(stationModel);
+		comboBoxStation.setPreferredSize(new Dimension(230, 25));
 		
 		labelEnterCounty = new JLabel("Enter County: ");
 		labelEnterStation = new JLabel("Enter Station: ");
@@ -205,7 +206,7 @@ public class ClimatePanel extends JPanel {
 	
 	private void initialActionLiseners() {
 				
-		// it is associate with runoff panel.
+		// it is associate with runoff panel. the valuePre affect some value of runoffPanel
 		textPre.getDocument().addDocumentListener(new DocumentListener() {						
 			@Override
 			public void insertUpdate(DocumentEvent e) {
@@ -368,7 +369,7 @@ public class ClimatePanel extends JPanel {
 					updateTextField(textLRV);
 					updateTextField(textAna);
 					
-					scrollPane.setViewportView(databaseTable);
+					scrollPane.setViewportView(jTable_database);
 					secondLeft.remove(customerPlacePanel);
 					secondLeft.add(databasePlacePanel, 0);
 					secondLeft.updateUI();
@@ -395,7 +396,7 @@ public class ClimatePanel extends JPanel {
 					updateTextField(textLRV);
 					updateTextField(textAna);
 					
-					scrollPane.setViewportView(customTable);
+					scrollPane.setViewportView(jTable_customer);
 					secondLeft.remove(databasePlacePanel);
 					secondLeft.add(buildCustomerPlacePanel(), 0);
 					secondLeft.updateUI();
@@ -443,21 +444,16 @@ public class ClimatePanel extends JPanel {
 		});
 
 		// state listener: select different state name to get corresponding data.
-		bCounty.addActionListener(new ActionListener() {
+		comboBoxCounty.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					int index = bCounty.getSelectedIndex();
+					int index = comboBoxCounty.getSelectedIndex();
 					String countyName = listOfCounty[index];
 					climateDataByCounty = panelManager.filterByCounty(countyName, climateDataByState);
-					/*
-					 * climateDataByCounty = new ArrayList<>(); for(ClimateInfo ele :
-					 * climateDataByState) { if(ele.county.equals(countyName)) {
-					 * climateDataByCounty.add(ele); } }
-					 */
 					ArrayList<String> countyValue = countyStationMap.get(countyName);
 					String[] staList = convertToStringList(countyValue);
 					DefaultComboBoxModel stationModel = new DefaultComboBoxModel(staList);
-					bStation.setModel(stationModel);
+					comboBoxStation.setModel(stationModel);
 					if (climateDataByCounty.size() == 1) {
 						refreshData(0);
 					}
@@ -469,13 +465,12 @@ public class ClimatePanel extends JPanel {
 		});
 
 		// state listener: select different state name to getcorresponding data.
-		bStation.addActionListener(new ActionListener() {
+		comboBoxStation.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					int index = bStation.getSelectedIndex();
-					String stationName = listOfStation[index];
+					int index = comboBoxStation.getSelectedIndex();
+					//String stationName = listOfStation[index];
 					refreshData(index);
-
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
@@ -587,12 +582,12 @@ public class ClimatePanel extends JPanel {
 		gcl.gridy = 0;
 		databasePlacePanel.add(labelCounty, gcl);
 		gcl.gridx = 1;
-		databasePlacePanel.add(bCounty, gcl);
+		databasePlacePanel.add(comboBoxCounty, gcl);
 		gcl.gridx = 0;
 		gcl.gridy = 1;
 		databasePlacePanel.add(labelStation, gcl);
 		gcl.gridx = 1;
-		databasePlacePanel.add(bStation, gcl);
+		databasePlacePanel.add(comboBoxStation, gcl);
 
 		// 2. the panel for "Precipitation"
 
@@ -707,17 +702,17 @@ public class ClimatePanel extends JPanel {
 		JPanel jtab = new JPanel();
 		jtab.setLayout(new BorderLayout());
 
-		databaseTable = mt1.buildMyTable(tableColumnName, tableData1); // the table with data from the AWS
-		int rowcount1 = databaseTable.getRowCount();
-		int colcount1 = databaseTable.getColumnCount();
-		mt1.setColor(rowcount1 - 1, rowcount1 - 1, 1, colcount1, Color.cyan);
+		jTable_database = climateTable1.buildMyTable(tableColumnName, data_database); // the table with data from the AWS
+		int rowcount1 = jTable_database.getRowCount();
+		int colcount1 = jTable_database.getColumnCount();
+		climateTable1.setColor(rowcount1 - 1, rowcount1 - 1, 1, colcount1, Color.cyan);
 
-		customTable = mt2.buildMyTable(tableColumnName, tableData2); // the table without data.
-		int rowcount2 = customTable.getRowCount();
-		int colcount2 = customTable.getColumnCount();
-		mt2.setColor(rowcount2 - 1, rowcount2 - 1, 1, colcount2, Color.cyan);
+		jTable_customer = climateTable2.buildMyTable(tableColumnName, data_customer); // the table without data.
+		int rowcount2 = jTable_customer.getRowCount();
+		int colcount2 = jTable_customer.getColumnCount();
+		climateTable2.setColor(rowcount2 - 1, rowcount2 - 1, 1, colcount2, Color.cyan);
 
-		scrollPane = new JScrollPane(databaseTable);
+		scrollPane = new JScrollPane(jTable_database);
 		scrollPane.setPreferredSize(new Dimension(210, 250));
 		jtab.add(scrollPane, BorderLayout.CENTER);
 		secondRight.add(jtab, gbcTwoRight); // add the table into the second right.
@@ -739,6 +734,7 @@ public class ClimatePanel extends JPanel {
 
 	}
 
+	// There are some limitation of each value of JtextField, this function is used for set limitation.
 	private void updateTextField(JTextField text) {
 		switch (text.getName()) {
 		case "textPre":
@@ -818,18 +814,18 @@ public class ClimatePanel extends JPanel {
 	private void getOutput() {
 		climatePanelOutput = new ArrayList<>();
 		if(r1.isSelected()) {
-			if(bCounty.getSelectedIndex() < 0)
+			if(comboBoxCounty.getSelectedIndex() < 0)
 			{
-				climatePanelOutput.add(bCounty.getItemAt(0).toString());
+				climatePanelOutput.add(comboBoxCounty.getItemAt(0).toString());
 			}
 			else				
-				climatePanelOutput.add(bCounty.getSelectedItem().toString());	
-			if(bStation.getSelectedIndex() < 0)
+				climatePanelOutput.add(comboBoxCounty.getSelectedItem().toString());	
+			if(comboBoxStation.getSelectedIndex() < 0)
 			{
-				climatePanelOutput.add(bStation.getItemAt(0).toString());
+				climatePanelOutput.add(comboBoxStation.getItemAt(0).toString());
 			}
 			else				
-				climatePanelOutput.add(bStation.getSelectedItem().toString());
+				climatePanelOutput.add(comboBoxStation.getSelectedItem().toString());
 		}
 		else {
 			climatePanelOutput.add(textEnterCounty.getText());
@@ -845,8 +841,8 @@ public class ClimatePanel extends JPanel {
 		if(r1.isSelected()) {
 			if(r3.isSelected()) {
 				for(int i = 0; i < 12; i++) {
-					double v1 = Double.parseDouble(mt1.model.data[i][1].toString());
-					double v2 = Double.parseDouble(mt1.model.data[i][2].toString());
+					double v1 = Double.parseDouble(climateTable1.model.data[i][1].toString());
+					double v2 = Double.parseDouble(climateTable1.model.data[i][2].toString());
 					double sub = v1 - v2;
 					if(sub < 0)
 						climatePanelOutput.add("0.00");
@@ -856,23 +852,23 @@ public class ClimatePanel extends JPanel {
 			}
 			else if(r4.isSelected()) {
 				for(int i = 0; i < 12; i++) {
-					double v1 = Double.parseDouble(mt1.model.data[i][1].toString());
-					double v2 = Double.parseDouble(mt1.model.data[i][2].toString());
+					double v1 = Double.parseDouble(climateTable1.model.data[i][1].toString());
+					double v2 = Double.parseDouble(climateTable1.model.data[i][2].toString());
 					double sub = v1 - v2;
 					climatePanelOutput.add(Double.toString(sub));
 				}
 			}			
 			else if(r5.isSelected()) {
 				for(int i = 0; i < 12; i++) {				
-					climatePanelOutput.add(mt1.model.data[i][1].toString());
+					climatePanelOutput.add(climateTable1.model.data[i][1].toString());
 				}
 			}									
 		}
 		else {
 			if(r3.isSelected()) {
 				for(int i = 0; i < 12; i++) {
-					double v1 = Double.parseDouble(mt1.model.data[i][1].toString());
-					double v2 = Double.parseDouble(mt1.model.data[i][2].toString());
+					double v1 = Double.parseDouble(climateTable1.model.data[i][1].toString());
+					double v2 = Double.parseDouble(climateTable1.model.data[i][2].toString());
 					double sub = v1 - v2;
 					if(sub < 0)
 						climatePanelOutput.add("0.00");
@@ -882,15 +878,15 @@ public class ClimatePanel extends JPanel {
 			}
 			else if(r4.isSelected()) {
 				for(int i = 0; i < 12; i++) {
-					double v1 = Double.parseDouble(mt1.model.data[i][1].toString());
-					double v2 = Double.parseDouble(mt1.model.data[i][2].toString());
+					double v1 = Double.parseDouble(climateTable1.model.data[i][1].toString());
+					double v2 = Double.parseDouble(climateTable1.model.data[i][2].toString());
 					double sub = v1 - v2;
 					climatePanelOutput.add(Double.toString(sub));
 				}
 			}			
 			else if(r5.isSelected()) {
 				for(int i = 0; i < 12; i++) {				
-					climatePanelOutput.add(mt2.model.data[i][1].toString());
+					climatePanelOutput.add(climateTable2.model.data[i][1].toString());
 				}
 			}										
 		}
@@ -917,12 +913,12 @@ public class ClimatePanel extends JPanel {
 
 	public void refreshData(int index) {
 		currentElement = climateDataByCounty.get(index);
-		tableData1 = getTableData(currentElement);
-		databaseTable = mt1.buildMyTable(tableColumnName, tableData1);
-		int rowcount1 = databaseTable.getRowCount();
-		int colcount1 = databaseTable.getColumnCount();
-		mt1.setColor(rowcount1 - 1, rowcount1 - 1, 1, colcount1, Color.cyan);
-		scrollPane.setViewportView(databaseTable);
+		data_database = getTableData(currentElement);
+		jTable_database = climateTable1.buildMyTable(tableColumnName, data_database);
+		int rowcount1 = jTable_database.getRowCount();
+		int colcount1 = jTable_database.getColumnCount();
+		climateTable1.setColor(rowcount1 - 1, rowcount1 - 1, 1, colcount1, Color.cyan);
+		scrollPane.setViewportView(jTable_database);
 
 		textPre.setText(currentElement.data[0]);
 		textKVAL.setText(currentElement.data[25]);

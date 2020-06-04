@@ -13,6 +13,7 @@ import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -172,25 +173,29 @@ public class LocationsPanel extends JPanel {
 		}						
 		);
         buttonOK.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e){	
+			public void actionPerformed(ActionEvent e){			
 				pane = parent.tabbedPane;
 				if (additionsPanel == null) {
 					getOutput();
-					panelManager.storeLocationPanelOutput(locationPanelOutput);
-					additionsPanel = new AdditionsPanel(panelManager);
-					additionsPanel.setParent(parent);
-					pane.add("additions", additionsPanel);					
-
+					if(locationPanelOutput.isEmpty()) {
+						JOptionPane.showMessageDialog(null,"No location added");
+						
+					}
+					else {
+						panelManager.storeLocationPanelOutput(locationPanelOutput);
+						additionsPanel = new AdditionsPanel(panelManager);
+						additionsPanel.setParent(parent);
+						pane.add("additions", additionsPanel);
+						pane.setSelectedIndex(pane.indexOfTab("additions"));
+					}										
 				} else {
 					// get the location table and add column.
 					
 				}
-				pane.setSelectedIndex(pane.indexOfTab("additions"));
-			
 				
+						
 			}							
-		}						
-		);
+		});
         
         databaseTable1.addMouseListener(new MouseAdapter(){
             public void mouseClicked(MouseEvent e) {              

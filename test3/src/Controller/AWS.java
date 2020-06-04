@@ -18,12 +18,10 @@ public class AWS {
 				int width = (int) screenSize.getWidth() * 3 / 5;
 				int height = (int) screenSize.getHeight() * 3 / 5;
 
-				/*System.out.print("width: ");
-				System.out.print(width);
-				System.out.print("height: ");
-				System.out.print(height);*/
-				
+				// read data
 				String path = "C:/Users/Kai Zhao/Desktop/AWSdata.xlsx";
+				
+				// initial main frame and panel manager
 				JFrame frame = null;
 				PanelManager panelManager;
 				try {

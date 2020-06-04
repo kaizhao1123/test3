@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -20,13 +22,12 @@ public class PanelManager {
 	
 	public Workbook workbook = null;
 	
-	// for input data
+	// for input data structure
 	public ArrayList<ClimateInfo> allClimateData = new ArrayList<>();
 	public ArrayList<AnimalInfo> allAnimalData = new ArrayList<>();
 	public ArrayList<BeddingInfo> allBeddingData = new ArrayList<>();
-	
-	
-	// for output of each panel
+		
+	// for output data structure of each panel
 	public String[] startPanelOutput = new String[2];
 	public ArrayList<String> climatePanelOutout;
 	public ArrayList<OutputOfAnimalPanel> animalPanelOutput;
@@ -116,15 +117,15 @@ public class PanelManager {
 	/***
 	 * Manage start panel
 	 ***/
-	// get data filtered by the state 
-	public ArrayList<ClimateInfo> filterByState(String name, ArrayList<ClimateInfo> upperLevelData) {
-		ArrayList<ClimateInfo> list = new ArrayList<>();
-		for(ClimateInfo ele : upperLevelData) {
-			if(ele.state.equals(name)) {
-				list.add(ele);
-			}
-		}	
-		return list;
+
+	// get state names, used as the input data of start panel
+	public HashSet<String> getAllStateNames() {		
+		HashSet<String> allStateNames = new HashSet<String>();
+		allStateNames.add(" ");
+		for (ClimateInfo element : allClimateData) {
+			allStateNames.add(element.state);
+		}
+		return allStateNames;
 	}
 
 	// store output data
@@ -138,6 +139,17 @@ public class PanelManager {
 	/***
 	 * Manage climate panel
 	 ***/
+	// get data filtered by the state 
+	public ArrayList<ClimateInfo> filterByState(String name, ArrayList<ClimateInfo> upperLevelData) {
+		ArrayList<ClimateInfo> list = new ArrayList<>();
+		for(ClimateInfo ele : upperLevelData) {
+			if(ele.state.equals(name)) {
+				list.add(ele);
+			}
+		}	
+		return list;
+	}
+	
 	public ArrayList<ClimateInfo> filterByCounty(String name, ArrayList<ClimateInfo> upperLevelData) {
 		ArrayList<ClimateInfo> list = new ArrayList<>();
 		for(ClimateInfo ele : upperLevelData) {

@@ -2,6 +2,7 @@ package Model_Tables;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -20,10 +21,13 @@ public class AdditionsTable implements TableModelListener {
 
 	JTable ntable;
 	public TableModel model;
-
+	public String newElement = null;
+	ArrayList<String> newElementList = new ArrayList();
+	
 	String[] columnNamess;
 	Object[][] dataa;
 	Color cc = Color.lightGray;
+	
 	
 	ArrayList<BeddingInfo> beddingDataset;
 	BeddingInfo bed = null;
@@ -41,7 +45,7 @@ public class AdditionsTable implements TableModelListener {
 
 		int rowcount = ntable.getRowCount();
 		int colcount = ntable.getColumnCount();
-		setColor(0,rowcount-1,6,colcount,Color.cyan);
+		setColorAndFont(0,rowcount-1,6,colcount,Color.cyan);
 		FitTableColumns(ntable);
 		TableColumn column = ntable.getColumnModel().getColumn(3);
         column.setWidth(160);
@@ -51,7 +55,7 @@ public class AdditionsTable implements TableModelListener {
 		return ntable;
 	}
 
-	public void setColor(int row_start, int row_end, int col_start, int col_end, Color ncolor) {
+	public void setColorAndFont(int row_start, int row_end, int col_start, int col_end, Color ncolor) {
 		try {
 			DefaultTableCellRenderer tcr = new DefaultTableCellRenderer() {
 				public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
@@ -59,7 +63,12 @@ public class AdditionsTable implements TableModelListener {
 					Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 					if (row >= row_start && row <= row_end && column >= col_start && column <= col_end) {
 						setBackground(ncolor);
-					} else if (column == 0) {
+					} else if (column == 0) {					
+						newElementList.add(newElement);
+						if(model.data[row][0].toString().equals(newElement) 
+								|| newElementList.contains(model.data[row][0].toString())) {							
+							setFont(new Font(getFont().getFontName(), Font.ITALIC, 12));
+						}						
 						setBackground(null);
 					} else
 						setBackground(cc);
@@ -127,9 +136,8 @@ public class AdditionsTable implements TableModelListener {
 	
 	@Override
 	public void tableChanged(TableModelEvent e) {
-		// int col = e.getColumn();
+
 		int col = ntable.getSelectedColumn();
-		//String colName = ntable.getColumnName(col);
 		int row = ntable.getSelectedRow();
 		Object[] ele = model.data[row];
 		String s = ntable.getValueAt(row, col).toString();		

@@ -42,14 +42,12 @@ public class AdditionsPanel extends JPanel {
 	JScrollPane scrollPane;
 
 	// the header of table
-	String[] columnName = { "<html> Waste Streams  <br> ---Units --->  </html>", // the header of table
+	String[] columnName = { "<html> Waste Streams  <br> ---Units --->  </html>",
 			"<html>Wash Water  <br> (gal/day) </html>", "<html>Flush Water  <br> (gal/day) </html>",
 			"<html>Bedding Type  <br>   </html>", "<html>Eff  <br> (Density) </html>",
 			"<html> Amout <br> (lbs/day) </html>", "<html> LV Amt <br> (cu.ft/day) </html>",
 			"<html> Cv Amt <br> (cu.ft/day) </html>" };
 	Object data[][];
-		//{ { "dd", "0.00", "0.00", " 0.00", "0.00", "0.00", "0.00", "0.00" },
-		//	{ "ss", "0.00", "0.00", " 0.00", "0.00", "0.00", "0.00", "0.00" } };
 
 	JButton buttonAdd;
 	JButton buttonReset;
@@ -58,7 +56,7 @@ public class AdditionsPanel extends JPanel {
 	JPanel panel;
 	GridBagConstraints gc;
 	JComboBox<String> comboboxType;
-	
+
 	ArrayList<String> streamName;
 	ArrayList<BeddingInfo> dataset;
 	ArrayList<String> beddingType;
@@ -76,26 +74,26 @@ public class AdditionsPanel extends JPanel {
 
 	private void initialData() {
 		panel = this;
-		// get the database data		
+		// get the database data
 		dataset = panelManager.allBeddingData;
 		beddingType = new ArrayList<>();
-		for(int i = 0; i < dataset.size(); i++) {
+		for (int i = 0; i < dataset.size(); i++) {
 			beddingType.add(dataset.get(i).name);
 		}
-	
-		// get the first column data
+
+		// get the first column data of table
 		streamName = panelManager.locationPanelOutput;
-		
-		// initial the table data
-		data = new Object[streamName.size()][8];		
-		for(int i = 0; i < streamName.size(); i ++) {
+
+		// initial the other table data
+		data = new Object[streamName.size()][8];
+		for (int i = 0; i < streamName.size(); i++) {
 			data[i][0] = streamName.get(i);
-			for(int j = 1; j < 8; j++) {
+			for (int j = 1; j < 8; j++) {
 				if (j == 3)
 					data[i][j] = "";
 				else
-					data[i][j] = "0.00";				
-			}			
+					data[i][j] = "0.00";
+			}
 		}
 
 	}
@@ -120,11 +118,8 @@ public class AdditionsPanel extends JPanel {
 		buttonOK = new JButton("OK");
 		myTable = new AdditionsTable();		
 		databaseTable = myTable.buildMyTable(columnName, data, dataset);
-    	//TableColumn column = databaseTable.getColumnModel().getColumn(3);
-       // column.setPreferredWidth(120);
 		scrollPane = new JScrollPane(databaseTable);
 		scrollPane.setPreferredSize(new Dimension(660, 100));
-
 		TableColumn sportColumn = databaseTable.getColumnModel().getColumn(3);
 		sportColumn.setCellEditor(new DefaultCellEditor(comboboxType));
 	}
@@ -147,8 +142,10 @@ public class AdditionsPanel extends JPanel {
 
 					myTable.model.addRow(dataTable);
 					// data = myTable.model.data;
-					myTable.setColor(0, databaseTable.getRowCount() - 1, 6, databaseTable.getColumnCount() - 1,
+					myTable.newElement = s;
+					myTable.setColorAndFont(0, databaseTable.getRowCount() - 1, 6, databaseTable.getColumnCount() - 1,
 							Color.cyan);
+
 					databaseTable.updateUI();
 
 					textAdd.setText("");
@@ -168,15 +165,14 @@ public class AdditionsPanel extends JPanel {
 			}
 		});
 
-		buttonOK.addActionListener(new ActionListener() 
-		{
+		buttonOK.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
 				pane = parent.tabbedPane;
 
 				try {
 					if (runoffPanel == null) {
-						//panelManager.storeClimatePanelOutput(Output);
+						// panelManager.storeClimatePanelOutput(Output);
 						runoffPanel = new RunoffPanel(panelManager);
 						runoffPanel.setParent(parent);
 						pane.add("runoff", runoffPanel);
@@ -234,7 +230,7 @@ public class AdditionsPanel extends JPanel {
 		gc.gridheight = 1;
 		add(buttonHelp, gc);
 		gc.anchor = GridBagConstraints.EAST;
-		//gc.gridx = 4;
+		// gc.gridx = 4;
 		gc.gridwidth = 2;
 		add(buttonOK, gc);
 
