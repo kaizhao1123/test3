@@ -19,6 +19,28 @@ import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
+/**
+ * AWM has two options for defining operating periods.
+ * <p>
+ * Click the 1 Operating Period radio button for 1 operating period when the facility 
+ * is operated the entire year without variation.  For example, this option would be 
+ * selected for a dairy where animals are in confinement for the entire year.
+ * <p>
+ * Click the 2 Operating Periods radio button for 2 operating periods when a facility
+ * operates in two distinct periods. An example of when this option would be selected
+ * is for a dairy that keeps its animals in confinement for a part of the year and 
+ * pastures the remainder.
+ * <p>
+ * When 2 Operating Periods are selected, the beginning and ending month for the first 
+ * operating period must be selected. Once this period is selected, AWM uses the 
+ * remaining months for the second period.
+ * <p>
+ * The operating period is from the first day of the beginning month to the last day of
+ * the ending month.
+ * 
+ * @author Kai Zhao
+ *
+ */
 public class OperatingPeriodDialog extends JDialog{
 	MainFrame parent;
 	JTabbedPane pane;
@@ -31,9 +53,7 @@ public class OperatingPeriodDialog extends JDialog{
 	String operatingPeriod;
 	String firstOperatingPeriod;
 	String secondOperatingPeriod;
-	
-	
-	
+			
 	public OperatingPeriodDialog() {
 		JPanel panel = new JPanel();    	
     	panel.setLayout(new GridBagLayout());
@@ -253,8 +273,6 @@ public class OperatingPeriodDialog extends JDialog{
 		gc.gridx = 1;
 		gc.gridy = 3;
 		panel.add(buttonOK,gc);
-		
-		
 		
 		
 		Container container = getContentPane();

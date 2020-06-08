@@ -20,11 +20,15 @@ import javax.swing.JTextField;
 import Controller.PanelManager;
 import Model_Entity.ClimateInfo;
 
+/**
+ * This is the panel of "Start".
+ * It will start a new design.
+ * 
+ * @author Kai Zhao
+ *
+ */
 public class StartPanel extends JPanel {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	MainFrame parent;
 	JTabbedPane pane;
@@ -32,47 +36,66 @@ public class StartPanel extends JPanel {
 	OperatingPeriodDialog periodDialog;
 	ClimatePanel climate = null;
 
-	// declare the data structure used in the panel
-	//ArrayList<ClimateInfo> climateDataSet; // store input data
+	/*********************************************************
+	 * declare the data structures used in this panel
+	 */
 	
-	//HashSet<String> allStateNames; // store all state names
-	String[] stateNames;	// the input state names
-	String[] sourceNames;  // the input source names
-		
+	String[] stateNames;	// all input state names
+	String[] sourceNames;  // all input source names		
 	String sourceForData; // store the source name for output
 	String stateForData; // store the state name for output
 	String[] output; // output data, will be stored in Manager, be used in the future
 
-	// declare the elements shown in the panel
-	JLabel jl1, jl2, jl3, jl4, jl5;
-	JTextField ownerName;
-	JTextField designerName;
-	JComboBox dataSource;
+	/*********************************************************
+	 * declare the elements of this panel
+	 */
+	
+	JLabel jl1, jl2, jl3, jl4, jl5;		// the labels of this panel
+	JTextField ownerName;	// Click in the box and then type in the land owner’s name.
+	JTextField designerName;	// Click in the box and then type in the designer’s name.
+	
+	/*
+	 *  Click on the drop-down list box to access the various animal data sources available
+	 *  for use within AWM. Click on the preferred data source to select it for use within AWM. 
+	 */
+	JComboBox dataSource; 	
+	
+	/*
+	 * Click on the drop-down list box to select a state. AWM will use state-specific data 
+	 * stored in the database for animals, climate, and bedding.  AWM will also generate 
+	 * custom reports that are stored in the database for the selected state.
+	 */
 	JComboBox selectState;
-	JButton buttonSetup;
-	JButton buttonOK;
+	
+	JButton buttonSetup; //Click the Operating Period Setup button to see the Operating Period screen.
+	JButton buttonOK;	// store output and open next panel
 	JButton buttonCancel;
 	JButton buttonHelp;
 
+	GridBagConstraints gbc;
+	
+	
+	/**
+	 * The constructor of this class.
+	 * @param pm	The "controller" of this project.
+	 */
 	public StartPanel(PanelManager pm) {
 		panelManager = pm;
-
 		initialData();
 		initialElements();
-		initialActionLiseners();
-		setLayout(new GridBagLayout());
-		GridBagConstraints gbc = new GridBagConstraints();
-		initialLayout(gbc);
+		initialListeners();
+		initialLayout();
 	}
 
+	// initials all data structure, mainly to get the input data.
 	private void initialData() {					
-		// initial state names
+		// get all state names
 		HashSet<String>allStateNames = panelManager.getAllStateNames(); 
 		stateNames = new String[allStateNames.size()];
 		allStateNames.toArray(stateNames);
 		Arrays.sort(stateNames);
 		
-		// initial source names
+		// get all source names
 		sourceNames = new String[3];
 		sourceNames[0] = " ";
 		sourceNames[1] = "MWPS";
@@ -82,6 +105,7 @@ public class StartPanel extends JPanel {
 		output = new String[2];
 	}
 
+	// initials all elements in this panel
 	private void initialElements() {
 		jl1 = new JLabel("Landowner:");
 		jl2 = new JLabel("Designer:");
@@ -101,9 +125,13 @@ public class StartPanel extends JPanel {
 		buttonOK = new JButton("OK");
 		buttonCancel = new JButton("Cancel");
 		buttonHelp = new JButton("Help");
+		
+		gbc = new GridBagConstraints();
 	}
 
-	private void initialLayout(GridBagConstraints gbc) {
+	// initials the layout of this panel
+	private void initialLayout() {
+		setLayout(new GridBagLayout());
 		gbc.insets = new Insets(10, 10, 0, 0);
 
 		// add *** Landowner ***
@@ -160,7 +188,8 @@ public class StartPanel extends JPanel {
 
 	}
 
-	private void initialActionLiseners() {
+	// initials all listeners of this panel
+	private void initialListeners() {
 
 		// source listener: select different source to get corresponding data.
 		dataSource.addActionListener(new ActionListener() {
@@ -199,7 +228,7 @@ public class StartPanel extends JPanel {
 			}
 		});
 
-		// After selected the data source, open the climate frame with data;
+		// After selected the data source, open the climate panel with data;
 		buttonOK.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (dataSource.getSelectedIndex() == 0 || selectState.getSelectedIndex() == 0) {

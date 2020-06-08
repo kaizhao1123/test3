@@ -8,7 +8,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,22 +25,33 @@ import javax.swing.JTable;
 
 import Controller.PanelManager;
 import Model_Entity.AnimalInfo;
-import Model_Entity.OutputOfAnimalPanel;
+import Model_Entity.AnimalPanelTableInfo;
 import Model_Tables.AnimalsTable;
-import Model_Tables.ClimateTable;
-
+/**
+ * The purpose of this class is to build the animal panel.
+ * In this panel, the user can choose different kinds of animals,
+ * or create new kind of animal. What the user do is just input the 
+ * quantity and the weight of the animal after choosing the animal. 
+ * The user can also set up the property of the animals based on 
+ * user's experience. 
+ * @author Kai Zhao
+ *
+ */
 public class AnimalsPanel extends JPanel {
-	/**
-	 * 
-	 */
+	
 	private static final long serialVersionUID = 1L;
 	MainFrame parent;
 	JTabbedPane pane;
 	PanelManager panelManager;
 	LocationsPanel locationPanel;
-	AddAnimalDialog modelDialog;
+	AddAnimalDialog newAnimalDialog;
 
-	// declare the data structure used in the panel
+	Font font = new Font("Arial Narrow", Font.PLAIN, 13);
+	
+	/**********************************************************
+	 *  declare the data structure used in the panel
+	 */
+	
 	ArrayList<AnimalInfo> animalData; 				// store the input data filtered by source
 	HashMap<String, JList<String>> choicesMap; 		// K is the name of animal type, V is the original JList respond the name
 	HashMap<String, JList<String>> selectedMap;		// K is the name of animal, V is the JList where the animal come from.
@@ -52,7 +62,7 @@ public class AnimalsPanel extends JPanel {
 	ArrayList<AnimalInfo> animalInTable; 			
 	
 	// store the output of panel: the name, the quantity and the weight of each animal
-	ArrayList<OutputOfAnimalPanel> animalPanelOutput;  
+	ArrayList<AnimalPanelTableInfo> animalPanelOutput;  
 	
 	// the header of table
 	String[]  columnNamess = { "<html> Animal  </html>", 
@@ -63,8 +73,15 @@ public class AnimalsPanel extends JPanel {
 			"<html>Manure <br> (lbs/day) </html>" };
 	Object[][] dataa;        // the data of table
 	
-	// declare the elements shown in the panel
-	Font font = new Font("Arial Narrow", Font.PLAIN, 13);
+	JList<String> choicesList; // to display the choices, corresponding to the choicesScrollPane
+	JList<String> selectedList; // to display the selected, corresponding to the selectedScrollPane
+	DefaultListModel<String> selectedModel;
+	
+	
+	/**********************************************************
+	 * declare the elements shown in the panel
+	 */	
+	
 	JLabel jl1, jl2, jl3, jl4, jl5, jl6;
 	JScrollPane choicesScrollPane;
 	JScrollPane selectedScrollPane;
@@ -80,23 +97,23 @@ public class AnimalsPanel extends JPanel {
 	JButton buttonDeleteRow;
 	JButton buttonOK;
 	JButton buttonHelp;
-	JList<String> choicesList; // to display the choices
-	JList<String> selectedList; // to display the selected
-	DefaultListModel<String> selectedModel;
-
+	GridBagConstraints gc;
+	
+	/**
+	 * The constructor of this class.
+	 * @param pm	The "controller" of this project.
+	 */
 	public AnimalsPanel(PanelManager pm) {
 		panelManager = pm;
 		initialData();
 		initialElements();
-		initialActionLiseners();
-		setLayout(new GridBagLayout());
-		GridBagConstraints gc = new GridBagConstraints();
-		initialLayout(gc);
+		initialListeners();
+		initialLayout();
 	}
 
-	private void initialData() {
-
-		// get animal dataset
+	// initials all data structure, mainly to get the input data.
+	private void initialData() {		
+		// get animal data
 		animalData = panelManager.filterByDataSource(panelManager.startPanelOutput[0], panelManager.allAnimalData);
 		choicesMap = new HashMap<>();
 		selectedMap = new HashMap<>();
@@ -166,6 +183,7 @@ public class AnimalsPanel extends JPanel {
 		choicesList = beefList;
 	}
 
+	// initials all elements in this panel
 	private void initialElements() {
 		// initial the labels and buttons
 		jl1 = new JLabel("Choices");
@@ -228,10 +246,13 @@ public class AnimalsPanel extends JPanel {
 		jTable.getTableHeader().setPreferredSize(new Dimension(10, 35));
 		tableScrollPane = new JScrollPane(jTable);
 		tableScrollPane.setPreferredSize(new Dimension(800, 120));
+		
+		// initial gridBagConstraints
+		gc = new GridBagConstraints();
 	}
 
-	private void initialActionLiseners() {
-		
+	// initials all listeners of this panel
+	private void initialListeners() {		
 		// initial actionlistener of JCombox animalType
 		comboBoxAnimalType.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -241,35 +262,52 @@ public class AnimalsPanel extends JPanel {
 			}
 		});
 
-		// add listeners of each button
+		/*
+		 *  "add" listener, move the target animal from the "choiceList" to "selectedList",
+		 *  and add into the table.
+		 */
 		buttonAdd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				addToSelectedList();				
 			}
 		});
+		/*
+		 * "remove" listener, move the target animal from the "selectedList" to "choiceList",
+		 * and remove from the table
+		 */
 		buttonRemove.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				removeFromSelectedList();
 			}
 		});
+		/*
+		 * "add all" listener, move all animals in the "choicesList" to " selectedList",
+		 * and add into the table.
+		 */
 		buttonAddAll.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				addAllToSelectedList();
 			}
 		});
+		/*
+		 * "remove all" listener, move all animals in the "selectedList" back to "choicesList",
+		 * and remove from the table.
+		 */
 		buttonRemoveAll.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				removeAllFromSelectedList();
 			}
 		});
+		// "new animal" listener, creates new animalInfo, and add into the table
 		buttonNewAnimal.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String source = panelManager.startPanelOutput[0];
 				String station = panelManager.startPanelOutput[1];
-				modelDialog = new AddAnimalDialog(animalsTable, jTable, source, station);
-				modelDialog.setParent(parent);
+				newAnimalDialog = new AddAnimalDialog(animalsTable, jTable, source, station);
+				newAnimalDialog.setParent(parent);
 			}
 		});
+		// "delete row" listener, delete the target row from the table.
 		buttonDeleteRow.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int row = jTable.getSelectedRow();
@@ -283,17 +321,15 @@ public class AnimalsPanel extends JPanel {
 						AnimalInfo ele = getInfoByName(item, animalData);
 						addToModel(ele, oldModel, animalData);
 						selectedMap.remove(item, oldList);
-						deleteTableRow(item);
-						
-						
+						deleteTableRow(item);											
 					} else {
 						if (!item.equals("Total"))
 							deleteTableRow(item);
 					}
 				}
-
 			}
 		});
+		// after getting the output, stores the output into the "controller", and creates the next panel
 		buttonOK.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				pane = parent.tabbedPane;
@@ -317,8 +353,9 @@ public class AnimalsPanel extends JPanel {
 		});
 	}
 
-	private void initialLayout(GridBagConstraints gc) {
-
+	// initials the layout of this panel
+	private void initialLayout() {
+		setLayout(new GridBagLayout());
 		gc.anchor = GridBagConstraints.NORTHWEST;
 		gc.insets = new Insets(0, 10, 0, 10);
 
@@ -380,18 +417,20 @@ public class AnimalsPanel extends JPanel {
 		add(buttonOK, gc);
 	}
 	
+	// gets the output of this panel
 	private void getOutput() {
 		animalPanelOutput = new ArrayList<>();
 		for(int i = 0; i < animalInTable.size(); i++) {
 			AnimalInfo ani = animalInTable.get(i);
 			String quantity = animalsTable.model.data[i][2].toString();
 			String weight = animalsTable.model.data[i][3].toString();
-			OutputOfAnimalPanel ele = new OutputOfAnimalPanel(ani,quantity,weight);
+			AnimalPanelTableInfo ele = new AnimalPanelTableInfo(ani,quantity,weight);
 			animalPanelOutput.add(ele);
 		}				
 	}
 	
 
+	//move the target animal from the "choiceList" to "selectedList", and add into the table.
 	private void addToSelectedList() {
 		int index = choicesList.getSelectedIndex();
 		if (index >= 0) {
@@ -400,13 +439,12 @@ public class AnimalsPanel extends JPanel {
 			model.remove(index);
 			selectedModel.addElement(item);
 			selectedMap.put(item, choicesList);
-			addTableRow(item);
-			
+			addTableRow(item);			
 		}
 	}
 
+	//move the target animal from the "selectedList" to "choiceList", and remove from the table.
 	private void removeFromSelectedList() {
-
 		int index = selectedList.getSelectedIndex();
 		if (index >= 0) {
 			DefaultListModel<String> model = (DefaultListModel<String>) selectedList.getModel();
@@ -421,6 +459,7 @@ public class AnimalsPanel extends JPanel {
 		}
 	}
 
+	//move all animals in the "choiceList" to "selectedList", and add into the table.
 	private void addAllToSelectedList() {
 		DefaultListModel<String> model = (DefaultListModel<String>) choicesList.getModel();
 		if (model != null) {
@@ -437,6 +476,7 @@ public class AnimalsPanel extends JPanel {
 		}
 	}
 
+	//move all animals in the "selectedList" back to "choiceList", and remove from the table.
 	private void removeAllFromSelectedList() {
 		DefaultListModel<String> model = (DefaultListModel<String>) selectedList.getModel();
 		int size = model.getSize();
@@ -458,6 +498,7 @@ public class AnimalsPanel extends JPanel {
 		}
 	}
 
+	// delete the selected row from the table
 	private void deleteTableRow(String item) {
 		if (animalsTable.model.isContained(item)) {
 			int row = animalsTable.model.rowOfElement(item);
@@ -476,6 +517,7 @@ public class AnimalsPanel extends JPanel {
 		}
 	}
 
+	// add a row into the table
 	private void addTableRow(String item) {
 		AnimalInfo ele = getInfoByName(item, animalData);
 		if (ele != null) {
@@ -521,6 +563,7 @@ public class AnimalsPanel extends JPanel {
 
 	}
 
+	// add the input data into "model", which used for create JList at the beginning.
 	private void InputElementIntoModel(ArrayList<AnimalInfo> list, DefaultListModel<String> model) {
 		for (int i = 0; i < list.size(); i++) {
 			AnimalInfo ele = list.get(i);
@@ -528,7 +571,8 @@ public class AnimalsPanel extends JPanel {
 			model.add(i, ele.name);
 		}
 	}
-
+	
+	// add animalInfo into model, used for "add" or "delete" animal in the "choiceList" and "seletedList".
 	private void addToModel(AnimalInfo ani, DefaultListModel<String> model, ArrayList<AnimalInfo> data) {
 		if (model == null)
 			model.add(0, ani.name);
@@ -558,6 +602,7 @@ public class AnimalsPanel extends JPanel {
 		}
 	}
 
+	// gets all types of animals, used for show in the JcomboBox "type"
 	private String[] getTypes(ArrayList<AnimalInfo> data) {
 		ArrayList<String> list = new ArrayList<>();
 		for (AnimalInfo a : data) {
@@ -574,6 +619,7 @@ public class AnimalsPanel extends JPanel {
 		return sList;
 	}
 
+	// gets animalInfo with target name
 	private AnimalInfo getInfoByName(String name, ArrayList<AnimalInfo> data) {
 		AnimalInfo ele = null;
 		for (AnimalInfo ani : data) {
@@ -584,6 +630,7 @@ public class AnimalsPanel extends JPanel {
 		return ele;
 	}
 
+	// gets all animalInfo with the target type.
 	private ArrayList<AnimalInfo> filterByType(String tp, ArrayList<AnimalInfo> data) {
 		ArrayList<AnimalInfo> list = new ArrayList<>();
 		for (AnimalInfo ani : data) {

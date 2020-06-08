@@ -15,26 +15,38 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import Model_Entity.AnimalInfo;
 import Model_Entity.BeddingInfo;
 import Model_Entity.ClimateInfo;
-import Model_Entity.OutputOfAnimalPanel;
+import Model_Entity.AnimalPanelTableInfo;
 
 
 public class PanelManager {
 	
 	public Workbook workbook = null;
 	
-	// for input data structure
+	// the input data structure
 	public ArrayList<ClimateInfo> allClimateData = new ArrayList<>();
 	public ArrayList<AnimalInfo> allAnimalData = new ArrayList<>();
 	public ArrayList<BeddingInfo> allBeddingData = new ArrayList<>();
 		
-	// for output data structure of each panel
+	// the output data structures of each panel
 	public String[] startPanelOutput = new String[2];
 	public ArrayList<String> climatePanelOutout;
-	public ArrayList<OutputOfAnimalPanel> animalPanelOutput;
+	public ArrayList<AnimalPanelTableInfo> animalPanelOutput;
 	public ArrayList<String> locationPanelOutput;
 	public ArrayList<String> runoffPanelOutput;
 	
-	
+	/**
+	 * This constructor is used for getting the data from the excel file, 
+	 * which includes several sheets in it.
+	 * And store the data into different data structure categories corresponding 
+	 * to the sheets in the excel file :
+	 * climate data, animal data, and bedding data.
+	 * 
+	 * @param path the location of the database
+	 * @throws IOException
+	 * @see readCLimateDataset()
+	 * @see readAnimalDataset()
+	 * @see readBeddingDataset()
+	 */
 	public PanelManager(String path) throws IOException {
 		InputStream fis = new FileInputStream(path);		
 		if (path.toLowerCase().endsWith("xlsx")) {
@@ -47,7 +59,12 @@ public class PanelManager {
 		readBeddingDataset("Bedding");
 	}
 	
-	// reading data from climate sheet
+	/**
+	 * Gets the climate data from the sheet of the excel file.
+	 * Read each row of the "climate" sheet of the excel file, and store
+	 * into the ArrayList: allCLimateData.
+	 * @param sheetName 
+	 */
 	public void readClimateDataset(String sheetName) {
 		try {    		
     	    Sheet sheet = workbook.getSheet(sheetName);	     
@@ -70,7 +87,12 @@ public class PanelManager {
     	}  			
 	}	
 	
-	// reading data from animal sheet
+	/**
+	 * gets the animal data from the sheet of the excel file.
+	 * Read each row of the "animal" sheet of the excel file, and store
+	 * into the ArrayList: allAnimalData.
+	 * @param sheetName
+	 */
 	public void readAnimalDataset(String sheetName){
 		try {    		
     	    Sheet sheet = workbook.getSheet(sheetName);	     
@@ -93,7 +115,12 @@ public class PanelManager {
     	}  		
 	}
 	
-	// reading data from bedding sheet
+	/**
+	 * gets the bedding data from the sheet of the excel file.
+	 * Read each row of the "bedding" sheet of the excel file, and store
+	 * into the ArrayList: allBeddingData.
+	 * @param sheetName
+	 */
 	public void readBeddingDataset(String sheetName){
 		try {    		
     	    Sheet sheet = workbook.getSheet(sheetName);	     
@@ -114,11 +141,13 @@ public class PanelManager {
     	}  		
 	}
 	
-	/***
-	 * Manage start panel
-	 ***/
+	
+	
+	/*************************************************************
+	 * 					Manage start panel
+	 */
 
-	// get state names, used as the input data of start panel
+	// gets all state names, used as the input data of start panel
 	public HashSet<String> getAllStateNames() {		
 		HashSet<String> allStateNames = new HashSet<String>();
 		allStateNames.add(" ");
@@ -128,18 +157,21 @@ public class PanelManager {
 		return allStateNames;
 	}
 
-	// store output data
+	// To store the output data
 	public void storeStartPanelOutput(String[] s) {
 		startPanelOutput = s;
-	}
+	}		
 	
+	/**************************************************************
+	 *                Manage climate panel
+	 */
 	
-	
-	
-	/***
-	 * Manage climate panel
-	 ***/
-	// get data filtered by the state 
+	/**
+	 * gets the climate data with the same state, and store into an ArrayList. 
+	 * @param name the state name.
+	 * @param upperLevelData the origin data which needs to be filtered.
+	 * @return ArrayList<ClimateInfo>
+	 */
 	public ArrayList<ClimateInfo> filterByState(String name, ArrayList<ClimateInfo> upperLevelData) {
 		ArrayList<ClimateInfo> list = new ArrayList<>();
 		for(ClimateInfo ele : upperLevelData) {
@@ -149,7 +181,12 @@ public class PanelManager {
 		}	
 		return list;
 	}
-	
+	/**
+	 * gets the climate data with the same county, and store into an ArrayList.
+	 * @param name the county name
+	 * @param upperLevelData the origin data which needs to be filtered.
+	 * @return ArrayList<CLimateInfo>
+	 */
 	public ArrayList<ClimateInfo> filterByCounty(String name, ArrayList<ClimateInfo> upperLevelData) {
 		ArrayList<ClimateInfo> list = new ArrayList<>();
 		for(ClimateInfo ele : upperLevelData) {
@@ -160,67 +197,90 @@ public class PanelManager {
 		return list;
 	}
 	
-	// store output data
+	// To store the output data
 	public void storeClimatePanelOutput(ArrayList<String> list) {
 		climatePanelOutout = list;
 	}
+		
+	/*************************************************************
+	 * 				Manage animal panel
+	 */
 	
-	
-	/***
-	 * Manage animal panel
-	 ***/
-	
-	public ArrayList<AnimalInfo> filterByDataSource(String ds, ArrayList<AnimalInfo> data) {
+	/**
+	 * gets the data with the same source, and store into an ArrayList. 
+	 * @param source the name of the source
+	 * @param data the origin data which needs to be filtered.
+	 * @return ArrayList<AnimalInfo>
+	 */
+	public ArrayList<AnimalInfo> filterByDataSource(String source, ArrayList<AnimalInfo> data) {
 		ArrayList<AnimalInfo> list = new ArrayList<>();
 		for(AnimalInfo a : data) {
-			if(a.dataSource.equals(ds)) {
+			if(a.dataSource.equals(source)) {
 				list.add(a);
 			}
 		}		
 		return list;
 	}
 	
-	// store output data
-	public void storeAnimalPanelOutput(ArrayList<OutputOfAnimalPanel> o) {
+	// To store the output data
+	public void storeAnimalPanelOutput(ArrayList<AnimalPanelTableInfo> o) {
 		animalPanelOutput = o;
 	}
-
 	
-	/***
-	 * Manage location panel
-	 ***/
+	/*************************************************************
+	 * 				Manage location panel
+	 */
+	
+	/**
+	 * Gets the data form the output of animal panel, used as the input data.
+	 * The table in location panel needs the column names, which are the animal 
+	 * name of the output of the animal panel. 
+	 * @return ArrayList<AnimalInfo>
+	 */
 	public ArrayList<AnimalInfo> getDataFromAnimalPanel(){
 		ArrayList<AnimalInfo> list = new ArrayList<>();
-		for(OutputOfAnimalPanel ele : animalPanelOutput) {
+		for(AnimalPanelTableInfo ele : animalPanelOutput) {
 			list.add(ele.aniInfo);
 		}				
 		return list;
 	}
 
-	// store output data
+	// To store the output data
 	public void storeLocationPanelOutput(ArrayList<String> o) {
 		locationPanelOutput = o;
 	}
 	
 	
 	
-	/***
-	 * Manage Addition panel
-	 ***/
+	/***************************************************************
+	 * 				Manage Addition panel
+	 */
 	
 	
 	
 	
-	/***
-	 * Manage runoff panel
-	 ***/
-	public double getPrecipitation25Yr(ArrayList<String> list) {
+	/***************************************************************
+	 * 				Manage runoff panel
+	 */
+	
+	/**
+	 * Gets the value of precipitation of 25Yr from the 
+	 * output of the climate panel.
+	 * @return double the value of precipitation of 25Yr
+	 */
+	public double getPrecipitation25Yr() {
+		ArrayList<String> list = climatePanelOutout;
 		String s = list.get(2);
 		double res = Double.parseDouble(s);
 		return res;
 	}
 	
-	public String[] getPrecData(ArrayList<String> list) {
+	/**
+	 * Gets the precData from the output of the climate panel.
+	 * @return String[] the precData
+	 */
+	public String[] getPrecData() {
+		ArrayList<String> list = climatePanelOutout;
 		String[] res = new String[12];
 		for(int i = 0; i < 12; i++) {
 			res[i] = list.get(i + 7);			
@@ -230,8 +290,8 @@ public class PanelManager {
 	
 	
 	
-	/***
-	 * Manage management panel
+	/****************************************************************
+	 * 				Manage management panel
 	 */
 	
 	

@@ -22,17 +22,24 @@ import javax.swing.JTextField;
 
 import Controller.PanelManager;
 import Model_Entity.AnimalInfo;
-import Model_Entity.OutputOfAnimalPanel;
+import Model_Entity.AnimalPanelTableInfo;
 import Model_Tables.ClimateTable;
 import Model_Tables.LocationsTable;
 
-
-
-
+/**
+ * This class is to create the location panel.
+ * The purpose of this class is to define where the animals deposit their manure
+ * throughout a day for each operating period. It also establishes a manure waste
+ * stream from a location to which the waste water, flush water, and bedding are 
+ * added to form the total waste stream directed to agricultural waste management 
+ * system treatment/storage components such as a waste storage facility or waste 
+ * treatment lagoon.
+ * 
+ * @author Kai Zhao
+ *
+ */
 public class LocationsPanel extends JPanel {
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = 1L;
 	MainFrame parent;
 	JTabbedPane pane;
@@ -40,15 +47,22 @@ public class LocationsPanel extends JPanel {
 	OperatingPeriodDialog periodDialog;
 	AdditionsPanel additionsPanel;
 	  
+	/***********************************************************
+	 * declare the data structures used in this panel
+	 */
 	String[] columnName;
 	Object data1[][];   // for table1
 	Object data2[][];	// for table2
-	ArrayList<AnimalInfo> animalsList;	// get output of animalPanel, to generate the column names;
+	// the input data from the output of animalPanel, to generate the column names;
+	ArrayList<AnimalInfo> animalsList;	
 	int rowIndex;  //  the row index of selected to delete
-		
-	JPanel panel = this;
-	GridBagConstraints gc;
+    ArrayList<String> locationPanelOutput;	   // to store the output of location panel
 	
+	/***********************************************************
+	 * declare the elements used in this panel
+	 */
+	JPanel panel = this;
+
 	JLabel label_1;
 	JLabel label_2;
     LocationsTable myTable1;
@@ -69,22 +83,21 @@ public class LocationsPanel extends JPanel {
     String firstPeriod;
     String secondPeriod;
     
-    // to store the output
-    ArrayList<String> locationPanelOutput;
-    
+	GridBagConstraints gc;
+	
+   /**
+    * The constructor of this class
+    * @param pm	 the data "controller" of this project
+    */
  	public LocationsPanel(PanelManager pm) {
  		panelManager = pm;
- 				
- 		// initial this panel
  		initialData();
  		initialElements();
- 		initialActionLiseners();
- 		setLayout(new GridBagLayout());
- 		gc = new GridBagConstraints();
- 		initialLayout(gc);
-
+ 		initialLiseners();
+ 		initialLayout();
  	}
     
+ 	// initials the data structures, mainly to get the input data.
     private void initialData() {
     	
     	animalsList = panelManager.getDataFromAnimalPanel();
@@ -98,6 +111,7 @@ public class LocationsPanel extends JPanel {
 		}
 		columnName = name;
     }
+    // initials the elements of this panel
     private void initialElements() {		
 		label_1 = new JLabel("Enter Location: ");
 		textLocation = new JTextField();
@@ -123,8 +137,12 @@ public class LocationsPanel extends JPanel {
         buttonDelete = new JButton("Delete Selected Row");
         buttonHelp = new JButton("Help");
         buttonOK = new JButton("OK");
+
+ 		gc = new GridBagConstraints();
     }
-    private void initialActionLiseners() {
+    // initials the listeners of this panel
+    private void initialLiseners() {
+    	
     	buttonAdd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e){	
 				if(textLocation != null) {
@@ -197,6 +215,12 @@ public class LocationsPanel extends JPanel {
 			}							
 		});
         
+        /*
+         * add mouse listener:
+         * 1. to guarantee the selected row of the first table is the same as the second table.
+         * 2. to guarantee that the editing data in the second table will be store, when the mouse
+         * 	  click outside of the second table after entered the data.
+         */
         databaseTable1.addMouseListener(new MouseAdapter(){
             public void mouseClicked(MouseEvent e) {              
               int r= databaseTable1.getSelectedRow();
@@ -208,6 +232,7 @@ public class LocationsPanel extends JPanel {
             }
         }); 
 	    
+        // similar with the above listener.
 	    databaseTable2.addMouseListener(new MouseAdapter(){
             public void mouseClicked(MouseEvent e) {              
               int r= databaseTable2.getSelectedRow();              
@@ -219,7 +244,10 @@ public class LocationsPanel extends JPanel {
             }
         });
     }
-    private void initialLayout(GridBagConstraints gc) {
+    
+    // initials the layout of this panel
+    private void initialLayout() {
+ 		setLayout(new GridBagLayout());
     	gc.anchor = GridBagConstraints.NORTHWEST;
         gc.insets = new Insets(0,5,5,0);
 		
@@ -255,8 +283,7 @@ public class LocationsPanel extends JPanel {
 		add(buttonOK,gc);		
     }
  
-	
-	
+	// get the output of this panel	
 	private void getOutput() {
 		locationPanelOutput = new ArrayList<>();
 		for(int i = 0; i < myTable1.model.data.length-1; i++) {
@@ -264,7 +291,7 @@ public class LocationsPanel extends JPanel {
 		}
 	}
     
-	// Corresponding the first option of periodDialog
+	// Corresponding the first option of periodDialog, that is, only table1 will be shown
 	public void update1() {
     	label_3.setText(" ");
     	label_4.setText(" ");
@@ -275,7 +302,7 @@ public class LocationsPanel extends JPanel {
     }
 	
 	
-	// Corresponding the second option of periodDialog
+	// Corresponding the second option of periodDialog, that is, both table will be shown.
     public void update2() {
     	
     	periodDialog = parent.startPanel.periodDialog;
@@ -295,7 +322,8 @@ public class LocationsPanel extends JPanel {
 		panel.setSize(new Dimension(500,600));
 		panel.updateUI();
     }
-    // change the start and end month of the period
+    
+    // after update2, changing of the start and end month of the period will lead to the change of the label
     public void update3() {
     	firstPeriod = periodDialog.firstOperatingPeriod;
     	secondPeriod = periodDialog.secondOperatingPeriod;
@@ -303,6 +331,7 @@ public class LocationsPanel extends JPanel {
     	label_4.setText("2nd Operating Period: " + secondPeriod);
     }
     
+    // delete row data from the table
     private void deleteTableRow() {	   
 		if(rowIndex != data1.length - 1 &&
 		   rowIndex != data2.length - 1) {
@@ -324,6 +353,7 @@ public class LocationsPanel extends JPanel {
 		}
     }
 	
+    // add column data into the table
     private void addTableColumn(String s) {
     	String[] ncolumnNamess = new String[columnName.length+1];
 		for(int i = 0; i < columnName.length; i++) {
@@ -374,6 +404,7 @@ public class LocationsPanel extends JPanel {
 	    
     }
     
+    // delete the column data from the table
     private void deleteTableColumn(String s) {
     	int col = 1;
     	for (int i = 0; i < columnName.length; i++) {
@@ -432,15 +463,21 @@ public class LocationsPanel extends JPanel {
  
     }
     
+    //****!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // update table when the column changed, (need to be refined) !!!!!
+    //****!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    
     private void updateTable(LocationsTable t1, LocationsTable t2) {
     	
-    	//myTable1.model.deleteColumn(col);
     	data1 = t1.model.data;	
     	data2 = t2.model.data;
     	t1 = new LocationsTable();	
     	t2 = new LocationsTable();
+    	
     	databaseTable1 = t1.buildMyTable(columnName, data1);
     	databaseTable2 = t2.buildMyTable(columnName, data2);
+    	
+    	
     	scrollPane1.setViewportView(databaseTable1);    	
     	scrollPane2.setViewportView(databaseTable2);
     	

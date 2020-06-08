@@ -19,13 +19,24 @@ import javax.swing.JTabbedPane;
 
 import Controller.PanelManager;
 
+/**
+ * This is the main frame of this project.
+ * It inherits from JFrame.
+ * Its structure includes two parts: the menuBar and the TabbedPane.
+ * It creates a frame with a main panel, then creates the menuBar
+ * and the tabbedPane in the main panel.
+ * The TabbedPane is initialed to includes two children pane: the 
+ * instruction and the start panel.
+ * @author Kai Zhao
+ *
+ */
 public class MainFrame extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	
 	// the elements of the mainFrame
 	public JPanel mainPanel; // the main panel include the MenuBar and tabbedPane
-	public MenuBar menubar;
+	public MenuBar menuBar;
 	public JTabbedPane tabbedPane;
 	public PanelManager panelManager;
 	
@@ -35,6 +46,14 @@ public class MainFrame extends JFrame {
 	public AnimalsPanel animalPanel;
 	public AddAnimalDialog addAnimalDialog;
 
+	/**
+	 * This is the constructor to create the frame and the mainPanel.
+	 * 
+	 * @param pm	the "controller" of this project, manage all input and output data
+	 * @param width		set the width of the tabbedPane
+	 * @param height	set the height of the tabbedPane
+	 * @throws IOException
+	 */
 	public MainFrame(PanelManager pm, int width, int height) throws IOException {
 		super("AWM"); // the title of the window
 		mainPanel = new JPanel(); // include the menubarPane and tabbedPane
@@ -42,25 +61,26 @@ public class MainFrame extends JFrame {
 		panelManager = pm;
 
 		createTabbedPanes(tabbedPane, width, height);
-		createMainPane(mainPanel, tabbedPane, startPanel, climatePanel, animalPanel);
+		createMenuPane(mainPanel, tabbedPane, startPanel, climatePanel, animalPanel);
+				
+		mainPanel.setLayout(new BorderLayout());
+		mainPanel.add(menuBar, BorderLayout.NORTH);
+		mainPanel.add(tabbedPane);
+						
 		add(mainPanel);
 	}
-
-	private void createMainPane(JPanel main, JTabbedPane tab, StartPanel start, ClimatePanel climate,
+	
+	// Creates menuBar
+	private void createMenuPane(JPanel main, JTabbedPane tab, StartPanel start, ClimatePanel climate,
 			AnimalsPanel animal) {
 		Container[] containers = { start, climate, animal };
-		menubar = new MenuBar(panelManager, containers);
-		main.setLayout(new BorderLayout());
-		main.add(menubar, BorderLayout.NORTH);
-		main.add(tabbedPane);
+		menuBar = new MenuBar(panelManager, containers);
 	}
 
+	// Creates tabbedPane
 	private void createTabbedPanes(JTabbedPane pane, int width, int height) throws IOException {
 
-		/***
-		 * k*** build the introduction panel z
-		 ***/
-
+		// creates "Introduction" panel
 		Font font1 = new Font("Arial Narrow", Font.PLAIN, 13);
 		String introductionLabel1 = "AWM";
 		String introductionLabel2 = "Animal Waste Management";
@@ -140,13 +160,11 @@ public class MainFrame extends JFrame {
 		 * gc.gridx = 0; gc.gridy = 3; introPanel.add(fillSpaceLabel, gc);
 		 */
 
-		/***
-		 * add the function panels to the tabbedPane
-		 */
-
+		// creates "start" panel
 		startPanel = new StartPanel(panelManager);
 		startPanel.setParent(this);
 
+		// add children panels (introcution and start) to tabbedPane		
 		pane.setPreferredSize(new Dimension(width,height));
 		pane.addTab("Introduction", introPanel);
 		pane.addTab("Start", startPanel);

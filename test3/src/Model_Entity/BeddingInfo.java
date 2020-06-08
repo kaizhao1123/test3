@@ -1,5 +1,10 @@
 package Model_Entity;
 
+/**
+ * This class is used to create the bedding info entity.
+ * @author Kai Zhao
+ *
+ */
 public class BeddingInfo {
 
 	public String name;

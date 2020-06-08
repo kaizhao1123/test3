@@ -10,6 +10,14 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 
+/**
+ * The purpose of this class is to create a JTable based on the table model.
+ * At the same time, it implements TableModelListener. In this class, some
+ * special properties of the JTable can be set up. Such as: the color or font of the
+ * table cell, the change of the cell's content.
+ * @author Kai Zhao
+ *
+ */
 public class AnimalsTable implements TableModelListener {
 
 	public JTable ntable;
@@ -17,8 +25,15 @@ public class AnimalsTable implements TableModelListener {
 
 	String[] columnNames;
 	Object[][] data;
+	// the default color of the table. 
 	Color cc = Color.CYAN;
 
+	/**
+	 * To create a JTable with tool tip and set up the color of the table. 
+	 * @param s the table column name
+	 * @param o the table data
+	 * @return JTable with color
+	 */
 	public JTable buildMyTable(String[] s, Object[][] o) {
 
 		columnNames = s;
@@ -28,7 +43,13 @@ public class AnimalsTable implements TableModelListener {
 		model.addTableModelListener(this);
 		model.addTotalRow(model.getEachSum());
 
+		
 		ntable = new JTable(model) {
+			/**
+			 * creates the tool tip, a kind of floating window.
+			 * it used for offer the tip of the limitation of the value in the cell.
+			 * it will show the tip, when the mouse stops at the target cell. 
+			 */
 			 public String getToolTipText(MouseEvent e) {   
 	                int row=ntable.rowAtPoint(e.getPoint());   
 	                int col=ntable.columnAtPoint(e.getPoint());   
@@ -60,6 +81,15 @@ public class AnimalsTable implements TableModelListener {
 		return ntable;
 	}
 
+	/**
+	 *  Sets the background color of a specific rectangular area: between two-row, and between two-column
+	 *  At the same time, set the color of the cell whose value over the limitation to red.
+	 * @param row_start
+	 * @param row_end
+	 * @param col_start
+	 * @param col_end
+	 * @param ncolor
+	 */
 	public void setColor(int row_start, int row_end, int col_start, int col_end, Color ncolor) {
 		try {
 			DefaultTableCellRenderer tcr = new DefaultTableCellRenderer() {
@@ -104,6 +134,12 @@ public class AnimalsTable implements TableModelListener {
 	}
 
 	@Override
+	/**
+	 * the data changing of some cell will lead to the change of "other" cells of the table.
+	 * the "other" cells include the "total" row (the last row) and several special columns.
+	 * the data in the columns (from the 3rd to the 7th) affect the data in the 
+	 * columns (from 8th to the last)
+	 */
 	public void tableChanged(TableModelEvent e) {
 
 		int col = e.getColumn();

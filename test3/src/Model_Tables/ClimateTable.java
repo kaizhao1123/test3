@@ -8,7 +8,14 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 
-
+/**
+ * The purpose of this class is to create a JTable based on the table model.
+ * At the same time, it implements TableModelListener. In this class, some
+ * special properties of the JTable can be set up. Such as: the color or font of the
+ * table cell, the change of the cell's content.
+ * @author Kai Zhao
+ *
+ */
 public class ClimateTable implements TableModelListener{
 	
 	public JTable ntable;
@@ -16,13 +23,18 @@ public class ClimateTable implements TableModelListener{
 	
 	String[] columnName;
 	Object[][] data;
+	// the default color of the table. 
 	Color cc = Color.lightGray;
 
+	/**
+	 * To create a JTable and set up the color of the table. 
+	 * @param s the table column name
+	 * @param o the table data
+	 * @return JTable with color
+	 */
 	public JTable buildMyTable(String[] s, Object[][] o) {
-
 		columnName = s;
-		data = o;
-		
+		data = o;		
 		model = new TableModelWithTotal(columnName,data);				
 	    model.addTableModelListener(this);
 	    model.addTotalRow(model.getEachSum());				
@@ -37,6 +49,15 @@ public class ClimateTable implements TableModelListener{
 	}
 
 	
+	 
+	/**
+	 * Sets the background color of a specific rectangular area: between two-row, and between two-column
+	 * @param row_start
+	 * @param row_end
+	 * @param col_start
+	 * @param col_end
+	 * @param ncolor the target color to be drawn
+	 */
 	public void setColor(int row_start, int row_end, int col_start, int col_end, Color ncolor){
 		try {
 			DefaultTableCellRenderer tcr = new DefaultTableCellRenderer(){				
@@ -50,9 +71,7 @@ public class ClimateTable implements TableModelListener{
 						setBackground(null);
 					}
 					else 
-						setBackground(cc);
-
-					
+						setBackground(cc);					
 					return c;
 				}
 			};	
@@ -66,13 +85,10 @@ public class ClimateTable implements TableModelListener{
 		}
 	}
 	
-
-
 	@Override
+	// the data changing of one cell will lead to the change of the "total" row (the last row)
     public void tableChanged(TableModelEvent e) { 
-
         int col = e.getColumn();  	
-        String colname = model.getColumnName(col);
         model.mySetValueAt(model.getNewSum(col), model.getRowCount()-1, col);    
         ntable.repaint();
     }

@@ -26,7 +26,21 @@ import javax.swing.event.DocumentListener;
 
 import Controller.PanelManager;
 import Model_Tables.RunoffTable;
-
+/**
+ * This class is used to create the runoff panel.
+ * The Runoff screen estimates the contaminated runoff that must be managed by the 
+ * waste management system.  Runoff volumes estimated by AWM are conservative 
+ * overestimates.  Because of this, the user is encouraged to use a method outside 
+ * the program to determine the monthly and the 25-year, 24-hour runoff volumes, 
+ * especially when larger watersheds are involved.
+ * <p>
+ * AWM computes runoff for two types of "watersheds": "impervious" watersheds such 
+ * as roofs and frequently scraped concrete slabs; and "pervious" watersheds including 
+ * feedlots with a manure package.
+ * 
+ * @author Kai Zhao
+ *
+ */
 public class RunoffPanel extends JPanel {
 
 	MainFrame parent;
@@ -34,16 +48,37 @@ public class RunoffPanel extends JPanel {
 	MgmtTrainPanel mgmtTrainPanel;
 	PanelManager panelManager;
 	
-	// the data will be used in this panel
+	/****************************************************************
+	 * declare the data structures used in this panel
+	 */
 	String[] perData;
 	int curveNum_30;
 	double pervious25Yr;
 	double valuePWA, valuePCN1, valuePCN2, valueIA, valueT1, valueT2;
 	DecimalFormat df;
 
-	// declare the elements of this panel
+	// the column of the table
+	String[] columnName = { " ", "Pervious", "Impervious", "Monthly Totals" };
+	// the data from the database
+	Object[][] tableData1 = { { "January", "0.00", "0.00", "0.00" }, { "February", "0.00", "0.00", "0.00" },
+			{ "March", "0.00", "0.00", "0.00" }, { "April", "0.00", "0.00", "0.00" }, { "May", "0.00", "0.00", "0.00" },
+			{ "June", "0.00", "0.00", "0.00" }, { "July", "0.00", "0.00", "0.00" },
+			{ "August", "0.00", "0.00", "0.00" }, { "September", "0.00", "0.00", "0.00" },
+			{ "October", "0.00", "0.00", "0.00" }, { "November", "0.00", "0.00", "0.00" },
+			{ "December", "0.00", "0.00", "0.00" } };
+	// the data for customer
+	Object[][] tableData2 = { { "January", "0.00", "0.00", "0.00" }, { "February", "0.00", "0.00", "0.00" },
+			{ "March", "0.00", "0.00", "0.00" }, { "April", "0.00", "0.00", "0.00" }, { "May", "0.00", "0.00", "0.00" },
+			{ "June", "0.00", "0.00", "0.00" }, { "July", "0.00", "0.00", "0.00" },
+			{ "August", "0.00", "0.00", "0.00" }, { "September", "0.00", "0.00", "0.00" },
+			{ "October", "0.00", "0.00", "0.00" }, { "November", "0.00", "0.00", "0.00" },
+			{ "December", "0.00", "0.00", "0.00" } };
+	
+	/****************************************************************
+	 * declare the elements of this panel
+	 */
+	
 	JPanel childPanel_1, childPanel_2;
-	GridBagConstraints gc;
 	JLabel labelMethods;
 	JLabel label_1, label_2;
 	JRadioButton r1, r2, r3, r4;
@@ -67,39 +102,26 @@ public class RunoffPanel extends JPanel {
 	JTable customerTable;
 	JScrollPane scrollPane;
 
-	// the column of the table
-	String[] columnName = { " ", "Pervious", "Impervious", "Monthly Totals" };
-	// the data from the database
-	Object[][] tableData1 = { { "January", "0.00", "0.00", "0.00" }, { "February", "0.00", "0.00", "0.00" },
-			{ "March", "0.00", "0.00", "0.00" }, { "April", "0.00", "0.00", "0.00" }, { "May", "0.00", "0.00", "0.00" },
-			{ "June", "0.00", "0.00", "0.00" }, { "July", "0.00", "0.00", "0.00" },
-			{ "August", "0.00", "0.00", "0.00" }, { "September", "0.00", "0.00", "0.00" },
-			{ "October", "0.00", "0.00", "0.00" }, { "November", "0.00", "0.00", "0.00" },
-			{ "December", "0.00", "0.00", "0.00" } };
-	// the data for customer
-	Object[][] tableData2 = { { "January", "0.00", "0.00", "0.00" }, { "February", "0.00", "0.00", "0.00" },
-			{ "March", "0.00", "0.00", "0.00" }, { "April", "0.00", "0.00", "0.00" }, { "May", "0.00", "0.00", "0.00" },
-			{ "June", "0.00", "0.00", "0.00" }, { "July", "0.00", "0.00", "0.00" },
-			{ "August", "0.00", "0.00", "0.00" }, { "September", "0.00", "0.00", "0.00" },
-			{ "October", "0.00", "0.00", "0.00" }, { "November", "0.00", "0.00", "0.00" },
-			{ "December", "0.00", "0.00", "0.00" } };
+	GridBagConstraints gbc;
 
-
+	/** 
+	 * The constructor of this panel
+	 * @param pm
+	 */
 	public RunoffPanel(PanelManager pm) {
 		panelManager = pm;
 		initialData();
 		initialElements();
-		initialActionLiseners();
-		setLayout(new GridBagLayout());
-		gc = new GridBagConstraints();
-		initialLayout(gc);
+		initialListeners();
+		initialLayout();
 	}
 
+	// initial data structures, mainly to get the input data.
 	private void initialData() {
 		df = new DecimalFormat("0.00");
-		perData = panelManager.getPrecData(panelManager.climatePanelOutout);
+		perData = panelManager.getPrecData();
 		curveNum_30 = 77;
-		pervious25Yr = panelManager.getPrecipitation25Yr(panelManager.climatePanelOutout);
+		pervious25Yr = panelManager.getPrecipitation25Yr();
 		valuePWA = 0;
 		valuePCN1 = 0;
 		valuePCN2 = 0;
@@ -108,6 +130,7 @@ public class RunoffPanel extends JPanel {
 		valueT2 = 0;
 	}
 
+	// initial the elements of this panel
 	private void initialElements() {
 		labelMethods = new JLabel("Methods for determining monthly runoff volumes:");
 		label_1 = new JLabel("1.) Calculate volumes from climate and watershed data.");
@@ -155,9 +178,12 @@ public class RunoffPanel extends JPanel {
 		buttonHelp.setPreferredSize(new Dimension(60, 25));
 		buttonOK = new JButton("OK");
 		buttonOK.setPreferredSize(new Dimension(60, 25));
+
+		gbc = new GridBagConstraints();
 	}
 
-	private void initialActionLiseners() {
+	// initial the listeners of this panel
+	private void initialListeners() {
 
 		r1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -168,15 +194,15 @@ public class RunoffPanel extends JPanel {
 		            	  customerTable.getCellEditor().stopCellEditing(); 
 					updateTablePerv(curveNum_30, valuePWA, perData);
 					updateTableImperv(curveNum_30, valueIA, perData);
-					updateRunoff(valuePCN1, valuePWA, valueIA);
+					updateRunoff25Yr(valuePCN1, valuePWA, valueIA);
 					databaseTable.setEnabled(false);
 					text_1.setEditable(false);
 					text_2.setEditable(false);
 					scrollPane.setViewportView(databaseTable);
-					gc.gridx = 0;
-					gc.gridy = 4;
-					gc.gridheight = 1;
-					add(childPanel_2, gc);
+					gbc.gridx = 0;
+					gbc.gridy = 4;
+					gbc.gridheight = 1;
+					add(childPanel_2, gbc);
 					updateUI();
 				} catch (Exception e1) {
 					e1.printStackTrace();
@@ -323,7 +349,9 @@ public class RunoffPanel extends JPanel {
 		});
 	}
 
-	private void initialLayout(GridBagConstraints gbc) {
+	// initial the layout of the panel
+	private void initialLayout() {
+		setLayout(new GridBagLayout());
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		gbc.insets = new Insets(5, 10, 5, 5);
 
@@ -385,6 +413,7 @@ public class RunoffPanel extends JPanel {
 		add(buttonOK, gbc);
 	}
 	
+	// initial the 1st child panel: the group of the radio buttons
 	private void initialPanel_1() {
 		childPanel_1 = new JPanel();
 		r1 = new JRadioButton("Calculate Monthly Runoff Volumes");
@@ -399,6 +428,7 @@ public class RunoffPanel extends JPanel {
 		childPanel_1.setPreferredSize(new Dimension(310, 80));
 	}
 
+	// initial the 2ed child panel: the four rows below the 1st panel.
 	private void initialPanel_2() {
 		childPanel_2 = new JPanel();
 		labelPWA = new JLabel("Pervious Watershed Area: ");
@@ -511,8 +541,7 @@ public class RunoffPanel extends JPanel {
 		childPanel_2.setPreferredSize(new Dimension(310, 140));
 	}
 
-	
-
+	// calculate the curve number form 1 day to 30 days.
 	private void getCurveNum_30(int num) {
 		double res = Math.pow(num, 2.365) / 631.79;
 		res = (num - res - 15) * Math.log10(30);
@@ -520,6 +549,7 @@ public class RunoffPanel extends JPanel {
 		curveNum_30 = (int) res;
 	}
 
+	// update perv data of the table, when curve number and area changed.
 	public void updateTablePerv(int num, double area, String[] data) {
 
 		double s = 1000.00 / num - 10;
@@ -543,6 +573,7 @@ public class RunoffPanel extends JPanel {
 
 	}
 
+	// update imperv data of the table, when curve number and area changed.
 	public void updateTableImperv(int num, double area, String[] data) {
 		
 		double s = 1000.00 / num - 10;
@@ -565,7 +596,8 @@ public class RunoffPanel extends JPanel {
 		databaseTable.updateUI();
 	}
 
-	public void updateRunoff(double numCN, double areaPWA, double areaIPWA) {
+	// update 25yr run off data of the table, when curve number and areas changed.
+	public void updateRunoff25Yr(double numCN, double areaPWA, double areaIPWA) {
 
 		double s = 1000.00 / numCN - 10;
 		s = Double.parseDouble(df.format(s));
@@ -586,6 +618,7 @@ public class RunoffPanel extends JPanel {
 		
 	}
 
+	// update the textfield value and set up the limetation
 	public void updateTextField(JTextField textField) {
 
 		switch (textField.getName()) {
@@ -602,7 +635,7 @@ public class RunoffPanel extends JPanel {
 
 			if (curveNum_30 > 0 && valuePCN1 >= 60 && valuePCN1 <= 92 && valuePCN2 >= 90 && valuePCN2 <= 97) {
 				updateTablePerv(curveNum_30, valuePWA, perData);
-				updateRunoff(valuePCN1, valuePWA, valueIA);
+				updateRunoff25Yr(valuePCN1, valuePWA, valueIA);
 			}
 
 			break;
@@ -618,10 +651,10 @@ public class RunoffPanel extends JPanel {
 			}
 			int val = (int) valuePCN1;
 			if (val >= 60 && val <= 92) {
-				updateRunoff(val, valuePWA, valueIA);
+				updateRunoff25Yr(val, valuePWA, valueIA);
 				textPCN1.setBackground(null);
 			} else {
-				updateRunoff(-1, 0, valueIA);
+				updateRunoff25Yr(-1, 0, valueIA);
 				textPCN1.setBackground(Color.red);
 				textPCN1.setToolTipText("Range: 60-92");				
 			}
@@ -670,7 +703,7 @@ public class RunoffPanel extends JPanel {
 			}
 			if(curveNum_30 > 0 && valuePCN1 >= 60 && valuePCN1 <= 92 && valuePCN2 >= 90 && valuePCN2 <= 97) {
 				updateTableImperv(95, valueIA, perData);
-				updateRunoff(valuePCN1, valuePWA, valueIA);
+				updateRunoff25Yr(valuePCN1, valuePWA, valueIA);
 			}
 			break;
 		case "text_1":
@@ -723,6 +756,7 @@ public class RunoffPanel extends JPanel {
 
 	}
 
+	// check the input of the textfield is only digit.
 	private boolean onlyContainDigit(String s) {
 
 		for (int i = 0; i < s.length(); i++) {

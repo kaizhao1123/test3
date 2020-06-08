@@ -16,29 +16,45 @@ import javax.swing.table.TableColumn;
 
 import Model_Entity.BeddingInfo;
 
-
+/**
+ * The purpose of this class is to create a JTable based on the table model.
+ * At the same time, it implements TableModelListener. In this class, some
+ * special properties of the JTable can be set up. Such as: the color or font of the
+ * table cell, the change of the cell's content.
+ * @author Kai Zhao
+ *
+ */
 public class AdditionsTable implements TableModelListener {
 
 	JTable ntable;
 	public TableModel model;
-	public String newElement = null;
-	ArrayList<String> newElementList = new ArrayList();
+	public String newElement = null;	// To record the new streams, the font of new element is ITALIC.
+	ArrayList<String> newElementList = new ArrayList(); // To record all new streams
 	
 	String[] columnNamess;
 	Object[][] dataa;
+	// the default color of the table. 
 	Color cc = Color.lightGray;
-	
-	
+		
 	ArrayList<BeddingInfo> beddingDataset;
 	BeddingInfo bed = null;
 
+	/**
+	 * To create a JTable 
+	 * set up the color of the table, and set up font of cell with the new steam name
+	 * (the cell located at the row of the new stream and the 1st column). 
+	 * Also set up the special column's width.
+	 * @param s the table column name
+	 * @param o the table data
+	 * @param list the beddingInfo
+	 * @return the JTable 
+	 */
 	public JTable buildMyTable(String[] s, Object[][] o, ArrayList<BeddingInfo> list) {
 		
 		columnNamess = s;
 		dataa = o;
 		beddingDataset = list;
-		
-		
+				
 		model = new TableModel(columnNamess, dataa);
 		model.addTableModelListener(this);
 		ntable = new JTable(model);
@@ -48,13 +64,21 @@ public class AdditionsTable implements TableModelListener {
 		setColorAndFont(0,rowcount-1,6,colcount,Color.cyan);
 		FitTableColumns(ntable);
 		TableColumn column = ntable.getColumnModel().getColumn(3);
-        column.setWidth(160);
-		
+        column.setWidth(160);		
 		ntable.setVisible(true);
 	
 		return ntable;
 	}
 
+	/**
+	 * Sets the background color of a specific rectangular area: between two-row, and between two-column.
+	 * And, set the font of the new stream's name to ITALIC. 
+	 * @param row_start
+	 * @param row_end
+	 * @param col_start
+	 * @param col_end
+	 * @param ncolor
+	 */
 	public void setColorAndFont(int row_start, int row_end, int col_start, int col_end, Color ncolor) {
 		try {
 			DefaultTableCellRenderer tcr = new DefaultTableCellRenderer() {
@@ -87,6 +111,11 @@ public class AdditionsTable implements TableModelListener {
 
 	}
 
+	/**
+	 * set the column's width is the same as the content of the cell, 
+	 * rather than the fixed same as each other.
+	 * @param jt the table needs to be resize the column's width
+	 */
 	public void FitTableColumns(JTable jt) {              
 
         JTableHeader header = jt.getTableHeader();
@@ -135,6 +164,8 @@ public class AdditionsTable implements TableModelListener {
 	
 	
 	@Override
+
+	// the data changing of one cell will lead to the change of the last two columns.
 	public void tableChanged(TableModelEvent e) {
 
 		int col = ntable.getSelectedColumn();

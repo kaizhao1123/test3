@@ -1,5 +1,10 @@
 package Model_Entity;
 
+/**
+ * This class is used to create the climate info entity.
+ * @author Kai Zhao
+ *
+ */
 public class ClimateInfo {
 	
 	public String state;

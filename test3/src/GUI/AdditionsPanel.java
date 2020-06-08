@@ -25,7 +25,14 @@ import javax.swing.table.TableColumn;
 import Controller.PanelManager;
 import Model_Entity.BeddingInfo;
 import Model_Tables.AdditionsTable;
-
+/**
+ * This class is to create the additions panel.
+ * The purpose of this class is to characterize the amount of flush water, 
+ * waste water, and bedding added to the manure waste stream for each of the
+ * locations identified on the Locations screen.
+ * @author Kai Zhao
+ *
+ */
 public class AdditionsPanel extends JPanel {
 
 	MainFrame parent;
@@ -33,7 +40,21 @@ public class AdditionsPanel extends JPanel {
 	PanelManager panelManager;
 	RunoffPanel runoffPanel;
 	WashWaterDialog washDialog;
+	
+	/***********************************************************
+	 * declare the data structures used in this panel
+	 */
+	
+	ArrayList<String> streamName;
+	ArrayList<BeddingInfo> dataset;
+	ArrayList<String> beddingType;
 
+	/************************************************************
+	 * declare the elements of this panel
+	 */
+	
+	JPanel panel;
+	GridBagConstraints gc;
 	JLabel label_1;
 	JLabel label_2;
 	JTextField textAdd;
@@ -49,32 +70,29 @@ public class AdditionsPanel extends JPanel {
 			"<html> Cv Amt <br> (cu.ft/day) </html>" };
 	Object data[][];
 
+	JComboBox<String> comboboxType;
 	JButton buttonAdd;
 	JButton buttonReset;
 	JButton buttonHelp;
 	JButton buttonOK;
-	JPanel panel;
-	GridBagConstraints gc;
-	JComboBox<String> comboboxType;
 
-	ArrayList<String> streamName;
-	ArrayList<BeddingInfo> dataset;
-	ArrayList<String> beddingType;
-
+	/**
+	 * The constructor of this panel
+	 * @param pm
+	 */
 	public AdditionsPanel(PanelManager pm) {
 
 		panelManager = pm;
 		initialData();
 		initalElements();
-		initalActionLiseners();
-		setLayout(new GridBagLayout());
-		gc = new GridBagConstraints();
-		initialLayout(gc);
+		initalListeners();
+		initialLayout();
 	}
 
+	// initials the data structures in this panel, mainly to get the input data.
 	private void initialData() {
 		panel = this;
-		// get the database data
+		// get the bedding data
 		dataset = panelManager.allBeddingData;
 		beddingType = new ArrayList<>();
 		for (int i = 0; i < dataset.size(); i++) {
@@ -98,6 +116,7 @@ public class AdditionsPanel extends JPanel {
 
 	}
 
+	// initials the elements of this panel
 	private void initalElements() {
 		label_1 = new JLabel("Aditional Waste Stream");
 		label_2 = new JLabel(
@@ -121,10 +140,14 @@ public class AdditionsPanel extends JPanel {
 		scrollPane = new JScrollPane(databaseTable);
 		scrollPane.setPreferredSize(new Dimension(660, 100));
 		TableColumn sportColumn = databaseTable.getColumnModel().getColumn(3);
-		sportColumn.setCellEditor(new DefaultCellEditor(comboboxType));
+		// set the cell editor of the 3rd column to JComboBox, to show the bedding type.
+		sportColumn.setCellEditor(new DefaultCellEditor(comboboxType)); 
+		
+		gc = new GridBagConstraints();
 	}
 
-	private void initalActionLiseners() {
+	// initial listeners of this panel
+	private void initalListeners() {
 
 		buttonAdd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -153,6 +176,11 @@ public class AdditionsPanel extends JPanel {
 			}
 		});
 
+		/*
+		 *  when click cell in the "wash water" column, open washWaterDialog, to enter the data;
+		 *  when click cell in the "flush water" column, open flushWaterDialog, to enter the data;
+		 *  
+		 */
 		databaseTable.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 				int col = databaseTable.getSelectedColumn();
@@ -194,7 +222,9 @@ public class AdditionsPanel extends JPanel {
 		});
 	}
 
-	private void initialLayout(GridBagConstraints gc) {
+	// initials the layout of this panel
+	private void initialLayout() {
+		setLayout(new GridBagLayout());
 		gc.anchor = GridBagConstraints.NORTHWEST;
 		gc.insets = new Insets(5, 5, 5, 5);
 

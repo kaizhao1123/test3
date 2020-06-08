@@ -11,7 +11,14 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 
-
+/**
+ * The purpose of this class is to create a JTable based on the table model.
+ * At the same time, it implements TableModelListener. In this class, some
+ * special properties of the JTable can be set up. Such as: the color or font of the
+ * table cell, the change of the cell's content.
+ * @author Kai Zhao
+ *
+ */
 public class RunoffTable implements TableModelListener{
 	
 	public JTable ntable;
@@ -20,7 +27,13 @@ public class RunoffTable implements TableModelListener{
 	String[] columnName;
 	Object[][] data;
 	Color cc = Color.cyan;
-
+	/**
+	 * To create a JTable with fixed row count and column count 
+	 * set up the color of the table
+	 * @param s the table column name
+	 * @param o the table data
+	 * @return the JTable 
+	 */
 	public JTable buildMyTable(String[] s, Object[][] o) {
 
 		columnName = s;
@@ -37,7 +50,15 @@ public class RunoffTable implements TableModelListener{
 		return ntable;
 	}
 
-	
+	/**
+	 * Sets the background color of a specific rectangular area: between two-row, and between two-column.
+	 * And, set the font of the new stream's name to ITALIC. 
+	 * @param row_start
+	 * @param row_end
+	 * @param col_start
+	 * @param col_end
+	 * @param ncolor
+	 */
 	public void setColor(int row_start, int row_end, int col_start, int col_end, Color ncolor){
 		try {
 			DefaultTableCellRenderer tcr = new DefaultTableCellRenderer(){				
@@ -51,9 +72,7 @@ public class RunoffTable implements TableModelListener{
 						setBackground(null);
 					}
 					else 
-						setBackground(cc);
-
-					
+						setBackground(cc);				
 					return c;
 				}
 			};	
@@ -66,6 +85,12 @@ public class RunoffTable implements TableModelListener{
 			ex.printStackTrace();
 		}
 	}
+	
+	/**
+	 * set the column's width is the same as the content of the cell, 
+	 * rather than the fixed same as each other.
+	 * @param jt the table needs to be resize the column's width
+	 */
 	public void FitTableColumns(JTable jt) {              
 
         JTableHeader header = jt.getTableHeader();
@@ -115,8 +140,8 @@ public class RunoffTable implements TableModelListener{
 
 
 	@Override
+	//  the data changing of one cell will lead to the change of the last column and last row.
     public void tableChanged(TableModelEvent e) { 
-
 		int col = ntable.getSelectedColumn();
 		int row = ntable.getSelectedRow();
 
