@@ -2,6 +2,7 @@ package GUI;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -11,6 +12,8 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -227,7 +230,7 @@ public class ClimatePanel extends JPanel {
 
 	// initials all listeners of this panel
 	private void initialListeners() {
-				
+	
 		// it is associate with runoff panel: the valuePre affect some value of runoffPanel
 		textPre.getDocument().addDocumentListener(new DocumentListener() {						
 			@Override
@@ -510,6 +513,8 @@ public class ClimatePanel extends JPanel {
 		{
 			public void actionPerformed(ActionEvent e) {
 				pane = parent.tabbedPane;
+				if (jTable_database.isEditing())
+	            	  jTable_database.getCellEditor().stopCellEditing(); 
 				try {					
 					if (animalPanel == null) {
 						getOutput();
@@ -541,7 +546,7 @@ public class ClimatePanel extends JPanel {
 		add(buildChildPanel_2(), border.CENTER);
 	}
 		
-	// creates the this child panel, includes two groups of ridioButtons
+	// creates the 1st child panel, includes two groups of ridioButtons
 	private JPanel buildChildPanel_1() {
 		JPanel firstPart = new JPanel();
 		
@@ -577,7 +582,7 @@ public class ClimatePanel extends JPanel {
 		return firstPart;
 	}
 	
-	// creates the second child panel, divided by two small parts: left and right.
+	// creates the 2nd child panel, divided by two small parts: left and right.
 	private JPanel buildChildPanel_2() {
 		JPanel secondPart = new JPanel();
 		secondPart.setLayout(new GridBagLayout());
@@ -596,7 +601,7 @@ public class ClimatePanel extends JPanel {
 		return secondPart;
 	}
 
-	// creates the left of the second child panel
+	// creates the left of the 2nd child panel
 	private JPanel buildChildPanel_2_Left() {
 		secondLeft = new JPanel();
 		secondLeft.setLayout(new GridBagLayout());
@@ -715,7 +720,7 @@ public class ClimatePanel extends JPanel {
 		return customerPlacePanel;
 	}
 	
-	// creats the right of the second child panel
+	// creates the right of the 2nd child panel
 	private JPanel buildChildPanel_2_right() {
 		// build the second right panel
 		JPanel secondRight = new JPanel();

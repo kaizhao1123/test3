@@ -347,6 +347,36 @@ public class RunoffPanel extends JPanel {
 
 			}
 		});
+		
+		buttonOK.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				pane = parent.tabbedPane;
+				if (customerTable.isEditing())
+					customerTable.getCellEditor().stopCellEditing(); 
+				try {
+					if (mgmtTrainPanel == null) {
+						// panelManager.storeClimatePanelOutput(Output);
+						mgmtTrainPanel = new MgmtTrainPanel(panelManager);
+						mgmtTrainPanel.setParent(parent);
+						pane.add("Mgmt Train", mgmtTrainPanel);
+					}
+					/*
+					 * else { pane.remove(index);
+					 * 
+					 * //System.out.print(index);
+					 * 
+					 * animal = new AnimalPanel(pane,animalData,source); animal.setParent(parent);
+					 * pane.insertTab("animal", null, animal, null, index); }
+					 */
+					pane.setSelectedIndex(pane.indexOfTab("Mgmt Train"));
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+
+			}
+		});
+		
 	}
 
 	// initial the layout of the panel

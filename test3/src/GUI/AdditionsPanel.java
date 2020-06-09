@@ -151,6 +151,8 @@ public class AdditionsPanel extends JPanel {
 
 		buttonAdd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if (databaseTable.isEditing())
+					databaseTable.getCellEditor().stopCellEditing(); 
 				if (textAdd != null) {
 					String s = textAdd.getText();
 					int col = myTable.model.getColumnCount();
@@ -183,6 +185,8 @@ public class AdditionsPanel extends JPanel {
 		 */
 		databaseTable.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
+				if (databaseTable.isEditing())
+					databaseTable.getCellEditor().stopCellEditing(); 
 				int col = databaseTable.getSelectedColumn();
 				if (col == 1) {
 					WashWaterDialog modelDialog = new WashWaterDialog(myTable, databaseTable);
@@ -197,7 +201,8 @@ public class AdditionsPanel extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 
 				pane = parent.tabbedPane;
-
+				if (databaseTable.isEditing())
+					databaseTable.getCellEditor().stopCellEditing(); 
 				try {
 					if (runoffPanel == null) {
 						// panelManager.storeClimatePanelOutput(Output);

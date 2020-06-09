@@ -268,6 +268,8 @@ public class AnimalsPanel extends JPanel {
 		 */
 		buttonAdd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if (jTable.isEditing())
+	            	  jTable.getCellEditor().stopCellEditing(); 
 				addToSelectedList();				
 			}
 		});
@@ -277,6 +279,8 @@ public class AnimalsPanel extends JPanel {
 		 */
 		buttonRemove.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if (jTable.isEditing())
+	            	  jTable.getCellEditor().stopCellEditing(); 
 				removeFromSelectedList();
 			}
 		});
@@ -284,8 +288,10 @@ public class AnimalsPanel extends JPanel {
 		 * "add all" listener, move all animals in the "choicesList" to " selectedList",
 		 * and add into the table.
 		 */
-		buttonAddAll.addActionListener(new ActionListener() {
+		buttonAddAll.addActionListener(new ActionListener() {			
 			public void actionPerformed(ActionEvent e) {
+				if (jTable.isEditing())
+	            	  jTable.getCellEditor().stopCellEditing(); 
 				addAllToSelectedList();
 			}
 		});
@@ -295,12 +301,16 @@ public class AnimalsPanel extends JPanel {
 		 */
 		buttonRemoveAll.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if (jTable.isEditing())
+	            	  jTable.getCellEditor().stopCellEditing(); 
 				removeAllFromSelectedList();
 			}
 		});
 		// "new animal" listener, creates new animalInfo, and add into the table
 		buttonNewAnimal.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if (jTable.isEditing())
+	            	  jTable.getCellEditor().stopCellEditing(); 
 				String source = panelManager.startPanelOutput[0];
 				String station = panelManager.startPanelOutput[1];
 				newAnimalDialog = new AddAnimalDialog(animalsTable, jTable, source, station);
@@ -310,6 +320,8 @@ public class AnimalsPanel extends JPanel {
 		// "delete row" listener, delete the target row from the table.
 		buttonDeleteRow.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if (jTable.isEditing())
+	            	  jTable.getCellEditor().stopCellEditing(); 
 				int row = jTable.getSelectedRow();
 				if (row != -1) {
 					String item = animalsTable.model.data[row][0].toString();
@@ -333,7 +345,9 @@ public class AnimalsPanel extends JPanel {
 		buttonOK.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				pane = parent.tabbedPane;
-				if (locationPanel == null) {
+				if (jTable.isEditing())
+	            	  jTable.getCellEditor().stopCellEditing(); 
+				if (locationPanel == null) {					
 					getOutput();
 					panelManager.storeAnimalPanelOutput(animalPanelOutput);
 					locationPanel = new LocationsPanel(panelManager);

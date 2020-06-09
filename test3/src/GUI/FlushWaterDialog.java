@@ -52,9 +52,10 @@ public class FlushWaterDialog extends JDialog{
 			
 		buttonOK.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if (databaseTable.isEditing())
+	            	  databaseTable.getCellEditor().stopCellEditing(); 
 				int rowCount = myTable.model.data.length;
 				result = myTable.model.data[rowCount-1][4].toString();
-				//int row = jTable.getSelectedRow();
 				int col = jTable.getSelectedColumn();
 				mt.model.data[row][col] = result;
 				jTable.updateUI();

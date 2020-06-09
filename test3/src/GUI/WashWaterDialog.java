@@ -52,8 +52,9 @@ public class WashWaterDialog extends JDialog{
 		
 		buttonOK.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if (databaseTable.isEditing())
+	            	  databaseTable.getCellEditor().stopCellEditing(); 
 				result = myTable.model.data[4][4].toString();
-				//int row = jTable.getSelectedRow();
 				int col = jTable.getSelectedColumn();
 				mt.model.data[row][col] = result;
 				jTable.updateUI();

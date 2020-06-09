@@ -74,6 +74,8 @@ public class AnimalsTable implements TableModelListener {
 	                }   
 	                return tiptextString; 
 		}};
+		
+
 		int rowcount = ntable.getRowCount();	
 		setColor(0,rowcount-2,2,6,Color.lightGray);
 

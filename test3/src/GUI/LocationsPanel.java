@@ -145,6 +145,10 @@ public class LocationsPanel extends JPanel {
     	
     	buttonAdd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e){	
+				if (databaseTable1.isEditing())
+					databaseTable1.getCellEditor().stopCellEditing(); 
+				if (databaseTable2.isEditing())
+					databaseTable2.getCellEditor().stopCellEditing(); 
 				if(textLocation != null) {
 					String s = textLocation.getText();
 					int col = myTable1.model.getColumnCount();
@@ -183,6 +187,10 @@ public class LocationsPanel extends JPanel {
         );
         buttonDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e){	
+				if (databaseTable1.isEditing())
+					databaseTable1.getCellEditor().stopCellEditing(); 
+				if (databaseTable2.isEditing())
+					databaseTable2.getCellEditor().stopCellEditing(); 
 				deleteTableRow();
 				data1 = myTable1.model.data;
 				data2 = myTable2.model.data;															
@@ -193,6 +201,10 @@ public class LocationsPanel extends JPanel {
         buttonOK.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e){			
 				pane = parent.tabbedPane;
+				if (databaseTable1.isEditing())
+					databaseTable1.getCellEditor().stopCellEditing(); 
+				if (databaseTable2.isEditing())
+					databaseTable2.getCellEditor().stopCellEditing(); 
 				if (additionsPanel == null) {
 					getOutput();
 					if(locationPanelOutput.isEmpty()) {
@@ -220,10 +232,11 @@ public class LocationsPanel extends JPanel {
          * 1. to guarantee the selected row of the first table is the same as the second table.
          * 2. to guarantee that the editing data in the second table will be store, when the mouse
          * 	  click outside of the second table after entered the data.
-         */
+         */             
         databaseTable1.addMouseListener(new MouseAdapter(){
             public void mouseClicked(MouseEvent e) {              
               int r= databaseTable1.getSelectedRow();
+              System.out.print(r);
               rowIndex = r;
               if (databaseTable2.isEditing())
             	  databaseTable2.getCellEditor().stopCellEditing();             
