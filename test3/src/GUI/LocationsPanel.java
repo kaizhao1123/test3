@@ -100,16 +100,17 @@ public class LocationsPanel extends JPanel {
  	// initials the data structures, mainly to get the input data.
     private void initialData() {
     	
-    	animalsList = panelManager.getDataFromAnimalPanel();
-    	
-    	// get the column of the table
-		int size = animalsList.size() + 1;
+    	//animalsList = panelManager.getDataFromAnimalPanel();
+    	/*int size = animalsList.size() + 1;
 		String[] name = new String[size];
 		name[0] = "Location";
 		for(int i = 1; i < size; i++) {
 			name[i] = animalsList.get(i - 1).name;
-		}
-		columnName = name;
+		}*/
+    	
+    		
+    	// get the column of the table		
+		columnName = panelManager.getColumnNames();
     }
     // initials the elements of this panel
     private void initialElements() {		
@@ -149,27 +150,26 @@ public class LocationsPanel extends JPanel {
 					databaseTable1.getCellEditor().stopCellEditing(); 
 				if (databaseTable2.isEditing())
 					databaseTable2.getCellEditor().stopCellEditing(); 
-				if(textLocation != null) {
+				addTableRow();
+				data1 = myTable1.model.data;
+				data2 = myTable2.model.data;
+				/*if(textLocation != null) {
 					String s = textLocation.getText();
 					int col = myTable1.model.getColumnCount();
-					String[] dataTable1 = new String[col];
-					dataTable1[0] = s;
+					String[] rowData = new String[col];
+					rowData[0] = s;
 					for(int i = 1 ; i < col; i++) {
-						dataTable1[i] = "0";
+						rowData[i] = "0";
 					}
 					
-					String[] dataTable2 = new String[col];
-					dataTable2[0] = s;
-					for(int i = 1 ; i < col; i++) {
-						dataTable2[i] = "0";
-					}
 					
-					myTable1.model.addRow(dataTable1);
+					
+					myTable1.model.addRow(rowData);
 					data1 = myTable1.model.data;
 					//columnNamess = myTable1.model.n;
 					databaseTable1.updateUI();
 					
-					myTable2.model.addRow(dataTable2);
+					myTable2.model.addRow(rowData);
 					data2 = myTable2.model.data;				
 					databaseTable2.updateUI();
 					
@@ -181,7 +181,7 @@ public class LocationsPanel extends JPanel {
 					myTable1.setColor(r-1,r-1,1,c-1,Color.cyan);
 					myTable2.setColor(r-1,r-1,1,c-1,Color.cyan);
 					
-				}
+				}*/
 			}							
 		}
         );
@@ -344,12 +344,38 @@ public class LocationsPanel extends JPanel {
     	label_4.setText("2nd Operating Period: " + secondPeriod);
     }
     
+    // adds row data into the table
+    private void addTableRow() {
+    	if(textLocation != null) {
+			String s = textLocation.getText();
+			int col = myTable1.model.getColumnCount();
+			String[] rowData = new String[col];
+			rowData[0] = s;
+			for(int i = 1 ; i < col; i++) {
+				rowData[i] = "0";
+			}
+			myTable1.model.addRow(rowData);									
+			myTable2.model.addRow(rowData);				
+	
+			// update color
+			int r = databaseTable1.getRowCount();
+			int c = databaseTable1.getColumnCount();					
+			myTable1.setColor(r-1,r-1,1,c-1,Color.cyan);
+			myTable2.setColor(r-1,r-1,1,c-1,Color.cyan);
+			
+			databaseTable1.updateUI();
+			databaseTable2.updateUI();
+			textLocation.setText("");
+		}
+    }
+    
     // delete row data from the table
     private void deleteTableRow() {	   
 		if(rowIndex != data1.length - 1 &&
 		   rowIndex != data2.length - 1) {
 			myTable1.model.deleteRow(rowIndex+1);
 			myTable2.model.deleteRow(rowIndex+1);
+			
 			for(int i = 1; i < myTable1.model.getColumnCount(); i++) {
 				myTable1.model.mySetValueAt(myTable1.model.getNewSum(i), myTable1.model.getRowCount()-1, i);
 				myTable2.model.mySetValueAt(myTable2.model.getNewSum(i), myTable2.model.getRowCount()-1, i);
@@ -367,7 +393,7 @@ public class LocationsPanel extends JPanel {
     }
 	
     // add column data into the table
-    private void addTableColumn(String s) {
+    public void addTableColumn(String s) {
     	String[] ncolumnNamess = new String[columnName.length+1];
 		for(int i = 0; i < columnName.length; i++) {
 			ncolumnNamess[i] = columnName[i];
@@ -377,48 +403,12 @@ public class LocationsPanel extends JPanel {
 		
 		myTable1.model.addColumn();
 		myTable2.model.addColumn();
-		updateTable(myTable1, myTable2);
-		/*data1 = myTable1.model.data;						
-		myTable1 = new LocationTable();	
-		databaseTable1 = myTable1.buildMyTable(columnName, data1);
-		scrollPane1.setViewportView(databaseTable1);
-		databaseTable1.addMouseListener(new MouseAdapter(){
-            public void mouseClicked(MouseEvent e) {              
-                int r= databaseTable1.getSelectedRow();
-                rowIndex = r;                           
-                if (databaseTable2.isEditing())
-              	  databaseTable2.getCellEditor().stopCellEditing();
-               
-                databaseTable2.changeSelection(rowIndex, 0,false,false);
-                databaseTable2.repaint();
-                //databaseTable2.updateUI();
-                
-              }
-          }); 
-		
-
-		myTable2.model.addColumn();
-		data2 = myTable2.model.data;						
-		myTable2 = new LocationTable();						
-		databaseTable2 = myTable2.buildMyTable(columnName, data2);	
-		scrollPane2.setViewportView(databaseTable2);
-		databaseTable2.addMouseListener(new MouseAdapter(){
-            public void mouseClicked(MouseEvent e) {              
-              int r= databaseTable2.getSelectedRow();              
-              rowIndex = r;
-              if (databaseTable1.isEditing())
-            	  databaseTable1.getCellEditor().stopCellEditing();
-              
-              databaseTable1.changeSelection(rowIndex, 0,false,false);
-              databaseTable1.repaint();
-              //databaseTable1.updateUI();
-            }
-        });*/
+		updateTable(myTable1, myTable2);		
 	    
     }
     
     // delete the column data from the table
-    private void deleteTableColumn(String s) {
+    public void deleteTableColumn(String s) {
     	int col = 1;
     	for (int i = 0; i < columnName.length; i++) {
     		if (columnName[i] == s)
@@ -431,65 +421,27 @@ public class LocationsPanel extends JPanel {
     	for(int i = col; i < columnName.length-1; i++) {
     		ncolumnName[i] = columnName[i+1];
     	}   	
-    	columnName = ncolumnName;   	
-    	
+    	columnName = ncolumnName;   	   	
     	myTable1.model.deleteColumn(col);
     	myTable2.model.deleteColumn(col);
-    	updateTable(myTable1, myTable2);
-    	
-    	/*data1 = myTable1.model.data;						
-    	myTable1 = new LocationTable();	
-    	databaseTable1 = myTable1.buildMyTable(columnName, data1);
-    	scrollPane1.setViewportView(databaseTable1);
-    	databaseTable1.addMouseListener(new MouseAdapter(){
-            public void mouseClicked(MouseEvent e) {              
-                int r= databaseTable1.getSelectedRow();
-                rowIndex = r;                           
-                if (databaseTable2.isEditing())
-              	  databaseTable2.getCellEditor().stopCellEditing();
-               
-                databaseTable2.changeSelection(rowIndex, 0,false,false);
-                databaseTable2.repaint();
-                //databaseTable2.updateUI();
-                
-              }
-          }); 
-    	
-    	
-    	myTable2.model.deleteColumn(col);
-    	data2 = myTable2.model.data;						
-    	myTable2 = new LocationTable();	
-    	databaseTable2 = myTable2.buildMyTable(columnName, data1);
-    	scrollPane2.setViewportView(databaseTable2);
-    	databaseTable2.addMouseListener(new MouseAdapter(){
-            public void mouseClicked(MouseEvent e) {              
-                int r= databaseTable2.getSelectedRow();
-                rowIndex = r;                           
-                if (databaseTable1.isEditing())
-              	  databaseTable1.getCellEditor().stopCellEditing();
-               
-                databaseTable1.changeSelection(rowIndex, 0,false,false);
-                databaseTable1.repaint();
-               // databaseTable1.updateUI();                
-              }
-          }); */
- 
+    	updateTable(myTable1, myTable2);   	
     }
     
-    //****!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    // update table when the column changed, (need to be refined) !!!!!
-    //****!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    
+   
+    // update table when the column changed  
     private void updateTable(LocationsTable t1, LocationsTable t2) {
     	
+    	// gets the new model data, that is, the data after add one column, but delete the last row "total"
     	data1 = t1.model.data;	
     	data2 = t2.model.data;
-    	t1 = new LocationsTable();	
-    	t2 = new LocationsTable();
-    	
+
+    	// creates new jtable based on the new model data, and the model's data will have "total" row
     	databaseTable1 = t1.buildMyTable(columnName, data1);
     	databaseTable2 = t2.buildMyTable(columnName, data2);
-    	
+    	   
+    	// update the class variables data1 and data2, which has includes the "total" row
+    	data1 = t1.model.data;	
+    	data2 = t2.model.data;
     	
     	scrollPane1.setViewportView(databaseTable1);    	
     	scrollPane2.setViewportView(databaseTable2);

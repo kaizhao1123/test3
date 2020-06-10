@@ -185,8 +185,8 @@ public class AdditionsPanel extends JPanel {
 		 */
 		databaseTable.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
-				if (databaseTable.isEditing())
-					databaseTable.getCellEditor().stopCellEditing(); 
+				/*if (databaseTable.isEditing())
+					databaseTable.getCellEditor().stopCellEditing();*/ 
 				int col = databaseTable.getSelectedColumn();
 				if (col == 1) {
 					WashWaterDialog modelDialog = new WashWaterDialog(myTable, databaseTable);

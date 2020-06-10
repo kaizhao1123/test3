@@ -231,18 +231,44 @@ public class PanelManager {
 	 * 				Manage location panel
 	 */
 	
-	/**
-	 * Gets the data form the output of animal panel, used as the input data.
-	 * The table in location panel needs the column names, which are the animal 
-	 * name of the output of the animal panel. 
-	 * @return ArrayList<AnimalInfo>
-	 */
+	/*
 	public ArrayList<AnimalInfo> getDataFromAnimalPanel(){
 		ArrayList<AnimalInfo> list = new ArrayList<>();
 		for(AnimalPanelTableInfo ele : animalPanelOutput) {
 			list.add(ele.aniInfo);
 		}				
 		return list;
+	}*/
+	
+	/**
+	 * Gets the column names from the animalPanelOutput, that is, the valid animal names.
+	 * @return
+	 */
+	public String[] getColumnNames() {
+
+		int size = animalPanelOutput.size() + 1;
+		String[] name = new String[size];
+		name[0] = "Location";
+		int index = 1;
+		for(AnimalPanelTableInfo ele : animalPanelOutput) {
+			name[index] = ele.aniInfo.name;
+			index ++;
+		}
+		return name;
+	}
+	
+	/**
+	 * Gets the column number of the target column name in the list of column names.
+	 * @param s	the target column name
+	 * @param list	the list of column names
+	 * @return	the column number
+	 */
+	public int getColumn(String s, String[] list) {
+		for(int i = 0; i < list.length; i++) {
+			if(s.equals(list[i]))
+				return i+1;
+		}
+		return -1;
 	}
 
 	// To store the output data

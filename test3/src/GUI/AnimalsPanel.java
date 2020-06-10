@@ -344,7 +344,7 @@ public class AnimalsPanel extends JPanel {
 		// after getting the output, stores the output into the "controller", and creates the next panel
 		buttonOK.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				pane = parent.tabbedPane;
+				//pane = parent.tabbedPane;
 				if (jTable.isEditing())
 	            	  jTable.getCellEditor().stopCellEditing(); 
 				if (locationPanel == null) {					
@@ -439,7 +439,8 @@ public class AnimalsPanel extends JPanel {
 			String quantity = animalsTable.model.data[i][2].toString();
 			String weight = animalsTable.model.data[i][3].toString();
 			AnimalPanelTableInfo ele = new AnimalPanelTableInfo(ani,quantity,weight);
-			animalPanelOutput.add(ele);
+			if(Double.parseDouble(quantity) > 0)
+				animalPanelOutput.add(ele);
 		}				
 	}
 	
@@ -516,23 +517,45 @@ public class AnimalsPanel extends JPanel {
 	private void deleteTableRow(String item) {
 		if (animalsTable.model.isContained(item)) {
 			int row = animalsTable.model.rowOfElement(item);
-			animalsTable.model.deleteRow(row);
-			for (int i = 2; i < animalsTable.model.getColumnCount(); i++) {
-				if (i == 3 || i == 4 || i == 5 || i == 6) {
-					animalsTable.model.mySetValueAt("N/A", animalsTable.model.getRowCount() - 1, i);
-
-				} else
-					animalsTable.model.mySetValueAt(animalsTable.model.getNewSum(i), animalsTable.model.getRowCount() - 1, i);
+			String itemName = null;	// to store the animal name before the model deleting.
+			if(Double.parseDouble(animalsTable.model.data[row-1][2].toString()) > 0 ) {
+				itemName = item;
 			}
+			
+			// delete the item data from the table
+			animalsTable.model.deleteRow(row);
 			animalsTable.setColor(0,jTable.getRowCount()-2,2,6,Color.lightGray);
+			
+			// set special value of the "total" row in column 1,3,4,5,6
+			animalsTable.model.mySetValueAt(" ", animalsTable.model.getRowCount() - 1, 1);
+			for (int i = 3; i < 7; i++) {
+				if (i == 3 || i == 4 || i == 5 || i == 6) 
+					animalsTable.model.mySetValueAt("N/A", animalsTable.model.getRowCount() - 1, i);
+			}
+			
+			// refresh the table
 			jTable.updateUI();
-			AnimalInfo a = getInfoByName(item, animalInTable);
+			
+			// remove this animal info from the data structure
+			AnimalInfo a = getInfoByName(item, animalInTable);			
 			animalInTable.remove(a);
+			
+			// delete the corresponding column of the "location Table"
+			if(locationPanel != null) {
+				if(itemName != null) {
+					//int col = panelManager.getColumn(itemName, locationPanel.columnName);
+					locationPanel.deleteTableColumn(itemName);
+				}
+					
+			}
+			
 		}
 	}
 
 	// add a row into the table
 	private void addTableRow(String item) {
+		
+		// add the item data into the table
 		AnimalInfo ele = getInfoByName(item, animalData);
 		if (ele != null) {
 			DecimalFormat df = new DecimalFormat("0.00");
@@ -560,19 +583,23 @@ public class AnimalsPanel extends JPanel {
 			rowData[8] = df.format(vsDou * qDou * wDou / 1000);
 			rowData[9] = df.format(tsDou * qDou * wDou / 1000);
 			rowData[10] = df.format(mDou * qDou * wDou * 60 / 1000);
-			// rowData[10] = Double.toString(mDou * qDou * wDou * 60 / 1000);
 			animalsTable.model.addRow(rowData);
 			animalsTable.setColor(0,jTable.getRowCount()-2,2,6,Color.lightGray);
 			
-			for (int i = 2; i < rowData.length; i++) {
-				if (i == 3 || i == 4 || i == 5 || i == 6) {
-					animalsTable.model.mySetValueAt("N/A", animalsTable.model.getRowCount() - 1, i);
-
-				} else
-					animalsTable.model.mySetValueAt(animalsTable.model.getNewSum(i), animalsTable.model.getRowCount() - 1, i);
+			// set special value of the "total" row in column 1,3,4,5,6
+			animalsTable.model.mySetValueAt(" ", animalsTable.model.getRowCount() - 1, 1);
+			for (int i = 3; i < 7; i++) {			
+				if (i == 3 || i == 4 || i == 5 || i == 6) 
+					animalsTable.model.mySetValueAt("N/A", animalsTable.model.getRowCount() - 1, i);				
 			}
-			jTable.updateUI();			
+			
+			// refresh the table
+			jTable.updateUI();
+			// add this animal info into the data structure
 			animalInTable.add(ele);
+			// transfer pane into the table.
+			pane = parent.tabbedPane;
+			animalsTable.getTabbedPane(pane);
 		}
 
 	}

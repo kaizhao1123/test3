@@ -5,10 +5,14 @@ import java.awt.Component;
 import java.awt.event.MouseEvent;
 import java.text.DecimalFormat;
 
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
+
+import GUI.LocationsPanel;
+import GUI.RunoffPanel;
 
 /**
  * The purpose of this class is to create a JTable based on the table model.
@@ -20,8 +24,10 @@ import javax.swing.table.DefaultTableCellRenderer;
  */
 public class AnimalsTable implements TableModelListener {
 
+	public JTabbedPane pane;
 	public JTable ntable;
 	public TableModelWithTotal model;
+	public LocationsPanel locationsPanel;
 
 	String[] columnNames;
 	Object[][] data;
@@ -32,13 +38,15 @@ public class AnimalsTable implements TableModelListener {
 	 * To create a JTable with tool tip and set up the color of the table. 
 	 * @param s the table column name
 	 * @param o the table data
+	 * @param tbp the tabbedPane
 	 * @return JTable with color
 	 */
 	public JTable buildMyTable(String[] s, Object[][] o) {
 
 		columnNames = s;
 		data = o;
-
+		
+		
 		model = new TableModelWithTotal(columnNames, data);		
 		model.addTableModelListener(this);
 		model.addTotalRow(model.getEachSum());
@@ -83,6 +91,11 @@ public class AnimalsTable implements TableModelListener {
 		return ntable;
 	}
 
+	public void getTabbedPane(JTabbedPane jtp) {
+		pane = jtp;
+	}
+	
+	
 	/**
 	 *  Sets the background color of a specific rectangular area: between two-row, and between two-column
 	 *  At the same time, set the color of the cell whose value over the limitation to red.
@@ -144,18 +157,6 @@ public class AnimalsTable implements TableModelListener {
 	 */
 	public void tableChanged(TableModelEvent e) {
 
-		int col = e.getColumn();
-		String colname = model.getColumnName(col);
-
-		if (colname.equals("<html>Weight <br> (lbs) </html>")
-				|| colname.equals("<html>Manure <br> (cu.ft/day/AU) </html>")
-				|| colname.equals("<html> VS <br> (lbs/day/AU) </html>")
-				|| colname.equals("<html> TS <br> (lbs/day/AU) </html>"))
-			model.mySetValueAt("N/A", model.getRowCount() - 1, col);
-
-		else
-			model.mySetValueAt(model.getNewSum(col), model.getRowCount() - 1, col);
-
 		int row = ntable.getSelectedRow();
 		Object[] ele = model.data[row];
 		DecimalFormat df = new DecimalFormat("0.00");
@@ -165,15 +166,48 @@ public class AnimalsTable implements TableModelListener {
 		Double tsDou = Double.parseDouble(ele[6].toString());
 		Double vsDou = Double.parseDouble(ele[5].toString());
 
+		ele[2] = df.format(Math.round(qDou));
 		ele[7] = df.format(mDou * qDou * wDou / 1000);
 		ele[8] = df.format(vsDou * qDou * wDou / 1000);
 		ele[9] = df.format(tsDou * qDou * wDou / 1000);
 		ele[10] = df.format(mDou * qDou * wDou * 60 / 1000);
 
-		for (int i = 0; i < 4; i++) {
-			model.mySetValueAt(model.getNewSum(7 + i), model.getRowCount() - 1, 7 + i);
+		for (int i = 2; i < 11; i++) {
+			if(i == 2)
+				model.mySetValueAt(df.format(model.getNewSum(i)), model.getRowCount() - 1, i);
+			else if(i >= 3 && i <= 6)
+				model.mySetValueAt("N/A", model.getRowCount() - 1, i);
+			else
+				model.mySetValueAt(model.getNewSum(i), model.getRowCount() - 1, i);
 		}
-
 		ntable.repaint();
+		
+		if(Double.parseDouble(ele[2].toString()) > 0.00) {			
+			try {
+				int index = pane.indexOfTab("location"); 				
+				if(index >= 0) {
+					locationsPanel = (LocationsPanel) pane.getComponentAt(index);																	
+					locationsPanel.addTableColumn(ele[0].toString());
+					System.out.print("QQ");
+				}
+			}catch(Exception ef) {
+				
+			}
+					
+		}
+		if(Double.parseDouble(ele[2].toString()) <= 0.00) {
+			try {
+				int index = pane.indexOfTab("location"); 				
+				if(index >= 0) {
+					locationsPanel = (LocationsPanel) pane.getComponentAt(index);																	
+					locationsPanel.deleteTableColumn(ele[0].toString());
+					System.out.print("WW");
+				}
+			}catch(Exception ef) {
+				
+			}
+		}
+		
+		
 	}
 }
