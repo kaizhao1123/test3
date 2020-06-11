@@ -169,26 +169,34 @@ public class AdditionsTable implements TableModelListener {
 	public void tableChanged(TableModelEvent e) {
 
 		int col = ntable.getSelectedColumn();
-		int row = ntable.getSelectedRow();
-		Object[] ele = model.data[row];
-		String s = ntable.getValueAt(row, col).toString();		
+		if(col > 2) {
+			int row = ntable.getSelectedRow();
+			Object[] ele = model.data[row];
+			String s = ntable.getValueAt(row, col).toString();		
+			
+			// for loop to get the data of the target beddingtype
+			for(int i = 0; i < beddingDataset.size(); i++) {
+				if(beddingDataset.get(i).name.equals(s)) {
+					bed = beddingDataset.get(i);
+					ele[4] = bed.eff_Density;
+				}	
+				else
+					bed = null;
+			}
 		
-		for(int i = 0; i < beddingDataset.size(); i++) {
-			if(beddingDataset.get(i).name.equals(s)) {
-				bed = beddingDataset.get(i);
-				ele[4] = bed.eff_Density;
-			}				
+			DecimalFormat df = new DecimalFormat("0.00");
+			Double aDou = Double.parseDouble(ele[5].toString());
+			Double dDou = 0.00;
+			if(bed != null)
+				dDou = Double.parseDouble(bed.density);
+			Double edDou = Double.parseDouble(ele[4].toString());
+			
+			ele[6] = df.format(aDou / dDou);
+			ele[7] = df.format(aDou / edDou);		
+			
+			ntable.repaint();
 		}
-	
-		DecimalFormat df = new DecimalFormat("0.00");
-		Double aDou = Double.parseDouble(ele[5].toString());
-		Double dDou = Double.parseDouble(bed.density);
-		Double edDou = Double.parseDouble(ele[4].toString());
 		
-		ele[6] = df.format(aDou / dDou);
-		ele[7] = df.format(aDou / edDou);		
-		
-		ntable.repaint();
 	}
 }
 

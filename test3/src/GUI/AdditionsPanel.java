@@ -25,11 +25,13 @@ import javax.swing.table.TableColumn;
 import Controller.PanelManager;
 import Model_Entity.BeddingInfo;
 import Model_Tables.AdditionsTable;
+
 /**
- * This class is to create the additions panel.
- * The purpose of this class is to characterize the amount of flush water, 
- * waste water, and bedding added to the manure waste stream for each of the
- * locations identified on the Locations screen.
+ * This class is to create the additions panel. The purpose of this class is to
+ * characterize the amount of flush water, waste water, and bedding added to the
+ * manure waste stream for each of the locations identified on the Locations
+ * screen.
+ * 
  * @author Kai Zhao
  *
  */
@@ -40,11 +42,12 @@ public class AdditionsPanel extends JPanel {
 	PanelManager panelManager;
 	RunoffPanel runoffPanel;
 	WashWaterDialog washDialog;
-	
+	FlushWaterDialog flushDialog;
+
 	/***********************************************************
 	 * declare the data structures used in this panel
 	 */
-	
+
 	ArrayList<String> streamName;
 	ArrayList<BeddingInfo> dataset;
 	ArrayList<String> beddingType;
@@ -52,7 +55,7 @@ public class AdditionsPanel extends JPanel {
 	/************************************************************
 	 * declare the elements of this panel
 	 */
-	
+
 	JPanel panel;
 	GridBagConstraints gc;
 	JLabel label_1;
@@ -78,6 +81,7 @@ public class AdditionsPanel extends JPanel {
 
 	/**
 	 * The constructor of this panel
+	 * 
 	 * @param pm
 	 */
 	public AdditionsPanel(PanelManager pm) {
@@ -135,14 +139,14 @@ public class AdditionsPanel extends JPanel {
 		buttonReset = new JButton("Reset Effective Densities");
 		buttonHelp = new JButton("Help");
 		buttonOK = new JButton("OK");
-		myTable = new AdditionsTable();		
+		myTable = new AdditionsTable();
 		databaseTable = myTable.buildMyTable(columnName, data, dataset);
 		scrollPane = new JScrollPane(databaseTable);
 		scrollPane.setPreferredSize(new Dimension(660, 100));
 		TableColumn sportColumn = databaseTable.getColumnModel().getColumn(3);
 		// set the cell editor of the 3rd column to JComboBox, to show the bedding type.
-		sportColumn.setCellEditor(new DefaultCellEditor(comboboxType)); 
-		
+		sportColumn.setCellEditor(new DefaultCellEditor(comboboxType));
+
 		gc = new GridBagConstraints();
 	}
 
@@ -152,7 +156,7 @@ public class AdditionsPanel extends JPanel {
 		buttonAdd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (databaseTable.isEditing())
-					databaseTable.getCellEditor().stopCellEditing(); 
+					databaseTable.getCellEditor().stopCellEditing();
 				if (textAdd != null) {
 					String s = textAdd.getText();
 					int col = myTable.model.getColumnCount();
@@ -179,20 +183,19 @@ public class AdditionsPanel extends JPanel {
 		});
 
 		/*
-		 *  when click cell in the "wash water" column, open washWaterDialog, to enter the data;
-		 *  when click cell in the "flush water" column, open flushWaterDialog, to enter the data;
-		 *  
-		 */
+		 * when click cell in the "wash water" column, open washWaterDialog, to enter
+		 * the data; when click cell in the "flush water" column, open flushWaterDialog,
+		 * to enter the data;
+		 * 
+		 */		
 		databaseTable.addMouseListener(new MouseAdapter() {
-			public void mouseClicked(MouseEvent e) {
-				/*if (databaseTable.isEditing())
-					databaseTable.getCellEditor().stopCellEditing();*/ 
-				int col = databaseTable.getSelectedColumn();
+			public void mouseClicked(MouseEvent e) {				
+				int col = databaseTable.getSelectedColumn();				
 				if (col == 1) {
-					WashWaterDialog modelDialog = new WashWaterDialog(myTable, databaseTable);
+					washDialog = new WashWaterDialog(myTable, databaseTable);					
 				} else if (col == 2) {
-					FlushWaterDialog modelDialog = new FlushWaterDialog(myTable, databaseTable);
-				}
+					flushDialog = new FlushWaterDialog(myTable, databaseTable);
+				}				
 				databaseTable.repaint();
 			}
 		});
@@ -202,7 +205,7 @@ public class AdditionsPanel extends JPanel {
 
 				pane = parent.tabbedPane;
 				if (databaseTable.isEditing())
-					databaseTable.getCellEditor().stopCellEditing(); 
+					databaseTable.getCellEditor().stopCellEditing();
 				try {
 					if (runoffPanel == null) {
 						// panelManager.storeClimatePanelOutput(Output);
@@ -270,6 +273,55 @@ public class AdditionsPanel extends JPanel {
 		add(buttonOK, gc);
 
 	}
+
+	/*
+	public static class MyMouseListener extends java.awt.event.MouseAdapter {
+		private static boolean flag = false;
+		private static int clickNum = 0;
+
+		public void mouseClicked(MouseEvent e) {
+			final MouseEvent me = e;
+			this.flag = false;
+
+			if(this.clickNum == 1) {
+				this.mouseDoubleClicked(me);
+			this.clickNum=0;
+			this.flag=true;
+			return;
+		}
+
+		java.util.Timer timer = new java.util.Timer();
+		timer.schedule(new java.util.TimerTask() {
+			private int n = 0;
+			public void run(){				
+				if(MyMouseListener.flag){
+					n = 0;
+					MyMouseListener.clickNum=0;
+					this.cancel();
+					return;
+				}
+				if (n == 1) {
+					mouseSingleClicked(me);
+					MyMouseListener.flag = true;
+					MyMouseListener.clickNum=0;
+					n=0;
+					this.cancel();
+					return;
+				}
+				clickNum++;
+				n++;
+			}
+		}, new java.util.Date(),500);
+		}
+
+		public void	mouseSingleClicked(MouseEvent e){
+			System.out.println("Single Clicked!");
+		}
+
+		public void mouseDoubleClicked(MouseEvent e){
+			System.out.println("Doublc Clicked!");
+		}
+	}  */
 
 	public void setParent(MainFrame frame) {
 		this.parent = frame;
