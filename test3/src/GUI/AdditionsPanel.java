@@ -172,11 +172,7 @@ public class AdditionsPanel extends JPanel {
 					myTable.model.addRow(dataTable);
 					// data = myTable.model.data;
 					myTable.newElement = s;
-					myTable.setColorAndFont(0, databaseTable.getRowCount() - 1, 6, databaseTable.getColumnCount() - 1,
-							Color.cyan);
-
 					databaseTable.updateUI();
-
 					textAdd.setText("");
 				}
 			}
@@ -274,54 +270,6 @@ public class AdditionsPanel extends JPanel {
 
 	}
 
-	/*
-	public static class MyMouseListener extends java.awt.event.MouseAdapter {
-		private static boolean flag = false;
-		private static int clickNum = 0;
-
-		public void mouseClicked(MouseEvent e) {
-			final MouseEvent me = e;
-			this.flag = false;
-
-			if(this.clickNum == 1) {
-				this.mouseDoubleClicked(me);
-			this.clickNum=0;
-			this.flag=true;
-			return;
-		}
-
-		java.util.Timer timer = new java.util.Timer();
-		timer.schedule(new java.util.TimerTask() {
-			private int n = 0;
-			public void run(){				
-				if(MyMouseListener.flag){
-					n = 0;
-					MyMouseListener.clickNum=0;
-					this.cancel();
-					return;
-				}
-				if (n == 1) {
-					mouseSingleClicked(me);
-					MyMouseListener.flag = true;
-					MyMouseListener.clickNum=0;
-					n=0;
-					this.cancel();
-					return;
-				}
-				clickNum++;
-				n++;
-			}
-		}, new java.util.Date(),500);
-		}
-
-		public void	mouseSingleClicked(MouseEvent e){
-			System.out.println("Single Clicked!");
-		}
-
-		public void mouseDoubleClicked(MouseEvent e){
-			System.out.println("Doublc Clicked!");
-		}
-	}  */
 
 	public void setParent(MainFrame frame) {
 		this.parent = frame;

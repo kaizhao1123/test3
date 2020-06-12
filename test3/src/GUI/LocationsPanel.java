@@ -356,12 +356,6 @@ public class LocationsPanel extends JPanel {
 			}
 			myTable1.model.addRow(rowData);									
 			myTable2.model.addRow(rowData);				
-	
-			// update color
-			int r = databaseTable1.getRowCount();
-			int c = databaseTable1.getColumnCount();					
-			myTable1.setColor(r-1,r-1,1,c-1,Color.cyan);
-			myTable2.setColor(r-1,r-1,1,c-1,Color.cyan);
 			
 			databaseTable1.updateUI();
 			databaseTable2.updateUI();
@@ -380,13 +374,6 @@ public class LocationsPanel extends JPanel {
 				myTable1.model.mySetValueAt(myTable1.model.getNewSum(i), myTable1.model.getRowCount()-1, i);
 				myTable2.model.mySetValueAt(myTable2.model.getNewSum(i), myTable2.model.getRowCount()-1, i);
 			}
-			
-			// update color
-			int r = databaseTable1.getRowCount();
-			int c = databaseTable1.getColumnCount();			
-			myTable1.setColor(r-1,r-1,1,c-1,Color.cyan);
-			myTable2.setColor(r-1,r-1,1,c-1,Color.cyan);
-			
 			databaseTable1.updateUI();
 			databaseTable2.updateUI();
 		}

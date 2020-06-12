@@ -524,7 +524,6 @@ public class AnimalsPanel extends JPanel {
 			
 			// delete the item data from the table
 			animalsTable.model.deleteRow(row);
-			animalsTable.setColor(0,jTable.getRowCount()-2,2,6,Color.lightGray);
 			
 			// set special value of the "total" row in column 1,3,4,5,6
 			animalsTable.model.mySetValueAt(" ", animalsTable.model.getRowCount() - 1, 1);
@@ -584,7 +583,6 @@ public class AnimalsPanel extends JPanel {
 			rowData[9] = df.format(tsDou * qDou * wDou / 1000);
 			rowData[10] = df.format(mDou * qDou * wDou * 60 / 1000);
 			animalsTable.model.addRow(rowData);
-			animalsTable.setColor(0,jTable.getRowCount()-2,2,6,Color.lightGray);
 			
 			// set special value of the "total" row in column 1,3,4,5,6
 			animalsTable.model.mySetValueAt(" ", animalsTable.model.getRowCount() - 1, 1);

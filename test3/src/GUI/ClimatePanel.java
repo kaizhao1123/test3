@@ -957,9 +957,6 @@ public class ClimatePanel extends JPanel {
 		currentElement = climateDataByCounty.get(index);
 		data_database = getTableData(currentElement);
 		jTable_database = climateTable1.buildMyTable(tableColumnName, data_database);
-		int rowcount1 = jTable_database.getRowCount();
-		int colcount1 = jTable_database.getColumnCount();
-		climateTable1.setColor(rowcount1 - 1, rowcount1 - 1, 1, colcount1, Color.cyan);
 		scrollPane.setViewportView(jTable_database);
 
 		textPre.setText(currentElement.data[0]);

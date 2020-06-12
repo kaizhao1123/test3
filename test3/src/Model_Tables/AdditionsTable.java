@@ -15,6 +15,7 @@ import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 
 import Model_Entity.BeddingInfo;
+import Model_Tables.ClimateTable.MyCellRenderer;
 
 /**
  * The purpose of this class is to create a JTable based on the table model.
@@ -33,21 +34,19 @@ public class AdditionsTable implements TableModelListener {
 	
 	String[] columnNamess;
 	Object[][] dataa;
-	// the default color of the table. 
-	Color cc = Color.lightGray;
+	// the default color of the table. The cell with this color can be editable. 
+	Color defaultColor = Color.lightGray;
+	// the color of the "total" row. The cell with this color can't be editable.
+	Color newColor = Color.cyan;
 		
 	ArrayList<BeddingInfo> beddingDataset;
 	BeddingInfo bed = null;
 
 	/**
-	 * To create a JTable 
-	 * set up the color of the table, and set up font of cell with the new steam name
-	 * (the cell located at the row of the new stream and the 1st column). 
-	 * Also set up the special column's width.
+	  * To create a JTable and set up the special cellRenderer of the table. 
 	 * @param s the table column name
 	 * @param o the table data
-	 * @param list the beddingInfo
-	 * @return the JTable 
+	 * @return JTable with special cellRenderer
 	 */
 	public JTable buildMyTable(String[] s, Object[][] o, ArrayList<BeddingInfo> list) {
 		
@@ -58,57 +57,53 @@ public class AdditionsTable implements TableModelListener {
 		model = new TableModel(columnNamess, dataa);
 		model.addTableModelListener(this);
 		ntable = new JTable(model);
-
-		int rowcount = ntable.getRowCount();
-		int colcount = ntable.getColumnCount();
-		setColorAndFont(0,rowcount-1,6,colcount,Color.cyan);
+		ntable.getTableHeader().setReorderingAllowed(false);	//fix the header
+		setCellRenderer();
+		
 		FitTableColumns(ntable);
 		TableColumn column = ntable.getColumnModel().getColumn(3);
-        column.setWidth(160);		
+        column.setWidth(160);		// sets the 4th column's width
 		ntable.setVisible(true);
 	
 		return ntable;
 	}
 
 	/**
-	 * Sets the background color of a specific rectangular area: between two-row, and between two-column.
-	 * And, set the font of the new stream's name to ITALIC. 
-	 * @param row_start
-	 * @param row_end
-	 * @param col_start
-	 * @param col_end
-	 * @param ncolor
+	 * Sets up cellRenderers of all cells following the column.
 	 */
-	public void setColorAndFont(int row_start, int row_end, int col_start, int col_end, Color ncolor) {
-		try {
-			DefaultTableCellRenderer tcr = new DefaultTableCellRenderer() {
-				public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-						boolean hasFocus, int row, int column) {
-					Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-					if (row >= row_start && row <= row_end && column >= col_start && column <= col_end) {
-						setBackground(ncolor);
-					} else if (column == 0) {					
-						newElementList.add(newElement);
-						if(model.data[row][0].toString().equals(newElement) 
-								|| newElementList.contains(model.data[row][0].toString())) {							
-							setFont(new Font(getFont().getFontName(), Font.ITALIC, 12));
-						}						
-						setBackground(null);
-					} else
-						setBackground(cc);
-
-					return c;
-				}
-			};
-
-			for (int i = 0; i < col_end; i++) {
-				ntable.setDefaultRenderer(ntable.getColumnClass(i), tcr);
-			}
-
-		} catch (Exception ex) {
-			ex.printStackTrace();
+	public void setCellRenderer() {
+		MyCellRenderer tcr = new MyCellRenderer();
+		for(int i = 0; i < ntable.getColumnCount(); i++) {
+			ntable.getColumnModel().getColumn(i).setCellRenderer(tcr);
 		}
-
+	}
+	
+	/**
+	 * Define special cellRenderer based on the requirement of the table.
+	 * In climate table, it only requires that the color of the "total" row is special.
+	 * @author Kai Zhao
+	 *
+	 */
+	class MyCellRenderer extends DefaultTableCellRenderer{
+		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+				boolean hasFocus, int row, int column) {
+				
+				Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+				if (column == 0 ) {
+					newElementList.add(newElement);
+					if(model.data[row][0].toString().equals(newElement) 
+							|| newElementList.contains(model.data[row][0].toString())) {							
+						setFont(new Font(getFont().getFontName(), Font.ITALIC, 12));
+					}
+					setBackground(null);							
+				}				
+				else if( (column == 6 ||  column == 7)) {
+					setBackground(newColor);										
+				} 						
+				else 
+					setBackground(defaultColor);
+			return c;
+		}
 	}
 
 	/**

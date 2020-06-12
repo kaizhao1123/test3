@@ -13,6 +13,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 import GUI.LocationsPanel;
 import GUI.RunoffPanel;
+import Model_Tables.ClimateTable.MyCellRenderer;
 
 /**
  * The purpose of this class is to create a JTable based on the table model.
@@ -31,8 +32,10 @@ public class AnimalsTable implements TableModelListener {
 
 	String[] columnNames;
 	Object[][] data;
-	// the default color of the table. 
-	Color cc = Color.CYAN;
+	// the default color of the table. The cell with this color can be editable. 
+	Color defaultColor = Color.lightGray;
+	// the color of the "total" row. The cell with this color can't be editable.
+	Color newColor = Color.cyan;
 
 	/**
 	 * To create a JTable with tool tip and set up the color of the table. 
@@ -45,12 +48,10 @@ public class AnimalsTable implements TableModelListener {
 
 		columnNames = s;
 		data = o;
-		
-		
+				
 		model = new TableModelWithTotal(columnNames, data);		
 		model.addTableModelListener(this);
-		model.addTotalRow(model.getEachSum());
-
+		model.addTotalRow(model.getEachSum());	// add the "total" row.
 		
 		ntable = new JTable(model) {
 			/**
@@ -62,7 +63,7 @@ public class AnimalsTable implements TableModelListener {
 	                int row=ntable.rowAtPoint(e.getPoint());   
 	                int col=ntable.columnAtPoint(e.getPoint());   
 	                String tiptextString=null;   
-	                if(row>-1 && col == 3){   
+	                if(row >= 0 && row < ntable.getRowCount()-1 && col == 3){   
 	                    double value= Double.parseDouble(ntable.getValueAt(row, col).toString()); 
 	                    String type = model.data[row][1].toString();
 	                    if(type.equals("Beef") && (value > 1200 || value < 150))   
@@ -82,11 +83,8 @@ public class AnimalsTable implements TableModelListener {
 	                }   
 	                return tiptextString; 
 		}};
-		
-
-		int rowcount = ntable.getRowCount();	
-		setColor(0,rowcount-2,2,6,Color.lightGray);
-
+		ntable.getTableHeader().setReorderingAllowed(false);	// fix the header
+		setCellRenderer();
 		ntable.setVisible(true);		
 		return ntable;
 	}
@@ -95,58 +93,65 @@ public class AnimalsTable implements TableModelListener {
 		pane = jtp;
 	}
 	
-	
 	/**
-	 *  Sets the background color of a specific rectangular area: between two-row, and between two-column
-	 *  At the same time, set the color of the cell whose value over the limitation to red.
-	 * @param row_start
-	 * @param row_end
-	 * @param col_start
-	 * @param col_end
-	 * @param ncolor
+	 * Sets up cellRenderers of all cells following the column.
 	 */
-	public void setColor(int row_start, int row_end, int col_start, int col_end, Color ncolor) {
-		try {
-			DefaultTableCellRenderer tcr = new DefaultTableCellRenderer() {
-				public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-						boolean hasFocus, int row, int column) {
-					Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-
-					if (row >= row_start && row <= row_end && column >= col_start && column <= col_end) {
-						setBackground(ncolor);	
-						if (column == 3) {
-							try {
-								double v= Double.parseDouble(model.data[row][3].toString()); 
-			                    String type = model.data[row][1].toString();
-			                    if( (type.equals("Beef") && (v > 1200 || v < 150))  
-			                    		||  (type.equals("Horse")) 
-			                    		||  (type.equals("Poultry") && (v > 25 || v < 2 ))
-			                    		|| 	(type.equals("Dairy") && (v > 1400 || v < 150 ))
-			                    		||	(type.equals("Sheep") && (v > 500 || v < 25 ))
-			                    		||	(type.equals("Swine") && (v > 600 || v < 8 ))
-			                    		||  (type.equals("Veal") && (v > 200 || v < 70 ))  )			                    	
-			                    	setBackground(Color.red);   
-							}catch(Exception ev) {
-								
-							}						
-						}
-					}													                   																 
-					else if (column == 0 || column == 1) 
-						setBackground(null);					
-					else
-						setBackground(cc);
-					return c;
-				}
-			};
-
-			for (int i = 0; i < col_end; i++) {
-				ntable.setDefaultRenderer(ntable.getColumnClass(i), tcr);
-			}
-
-		} catch (Exception ex) {
-			ex.printStackTrace();
+	public void setCellRenderer() {
+		MyCellRenderer tcr = new MyCellRenderer();
+		for(int i = 0; i < ntable.getColumnCount(); i++) {
+			ntable.getColumnModel().getColumn(i).setCellRenderer(tcr);
 		}
 	}
+	
+	/**
+	 * Define special cellRenderer based on the requirement of the table.
+	 * In climate table, except the "total" row, the color of the cell in the columns from 3 to 7 
+	 * is default color, and these cells can be editable; columns from 8 to 11 is new color, and 
+	 * can't be editable.
+	 * @author Kai Zhao
+	 *
+	 */
+	class MyCellRenderer extends DefaultTableCellRenderer{
+		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+				boolean hasFocus, int row, int column) {
+				Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+				int rowCount = ntable.getRowCount();
+				if (column == 0 || column == 1) {
+					setBackground(null);							
+				}				
+				else if(column == 3 && row < rowCount-1) {
+					try {
+						double v= Double.parseDouble(model.data[row][3].toString()); 
+	                    String type = model.data[row][1].toString();
+	                    
+	                    //sets up the color of the cell with the limitation value
+	                    if( (type.equals("Beef") && (v > 1200 || v < 150))  
+	                    		||  (type.equals("Horse")) 
+	                    		||  (type.equals("Poultry") && (v > 25 || v < 2 ))
+	                    		|| 	(type.equals("Dairy") && (v > 1400 || v < 150 ))
+	                    		||	(type.equals("Sheep") && (v > 500 || v < 25 ))
+	                    		||	(type.equals("Swine") && (v > 600 || v < 8 ))
+	                    		||  (type.equals("Veal") && (v > 200 || v < 70 ))  )			                    	
+	                    	setBackground(Color.red);
+	                    else
+	                    	setBackground(defaultColor);
+					}catch(Exception ev) {
+						
+					}											
+				}
+				else if( (column == 2 || column == 4 || column == 5 || column == 6) && row < rowCount-1) {
+					setBackground(defaultColor);
+				}
+				else if( (column == 7 || column == 8 || column == 9 || column == 10) && row < rowCount-1) {
+					setBackground(newColor);
+				}
+				else 
+					setBackground(newColor);
+			return c;
+		}
+	}
+
+	
 
 	@Override
 	/**
@@ -182,13 +187,17 @@ public class AnimalsTable implements TableModelListener {
 		}
 		ntable.repaint();
 		
+		/*
+		 *  The value of the "quantity" associate with the table in the location panel.
+		 *  If the value > 0, then it will appear in the table in the location panel,
+		 *  otherwise, not.
+		 */
 		if(Double.parseDouble(ele[2].toString()) > 0.00) {			
 			try {
 				int index = pane.indexOfTab("location"); 				
 				if(index >= 0) {
 					locationsPanel = (LocationsPanel) pane.getComponentAt(index);																	
 					locationsPanel.addTableColumn(ele[0].toString());
-					System.out.print("QQ");
 				}
 			}catch(Exception ef) {
 				
@@ -201,7 +210,6 @@ public class AnimalsTable implements TableModelListener {
 				if(index >= 0) {
 					locationsPanel = (LocationsPanel) pane.getComponentAt(index);																	
 					locationsPanel.deleteTableColumn(ele[0].toString());
-					System.out.print("WW");
 				}
 			}catch(Exception ef) {
 				

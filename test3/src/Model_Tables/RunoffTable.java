@@ -11,6 +11,8 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 
+import Model_Tables.ClimateTable.MyCellRenderer;
+
 /**
  * The purpose of this class is to create a JTable based on the table model.
  * At the same time, it implements TableModelListener. In this class, some
@@ -26,7 +28,11 @@ public class RunoffTable implements TableModelListener{
 	
 	String[] columnName;
 	Object[][] data;
-	Color cc = Color.cyan;
+	// the default color of the table. The cell with this color can be editable. 
+	Color defaultColor = Color.lightGray;
+	// the color of the "total" row. The cell with this color can't be editable.
+	Color newColor = Color.cyan;
+	
 	/**
 	 * To create a JTable with fixed row count and column count 
 	 * set up the color of the table
@@ -44,45 +50,43 @@ public class RunoffTable implements TableModelListener{
 	    model.addTotalRow(model.getEachSum());				
 		ntable = new JTable(model);
 	
-		setColor(0,11,1,2,Color.lightGray);	
+		ntable.getTableHeader().setReorderingAllowed(false);	//fix the header
+		setCellRenderer();	
 		FitTableColumns(ntable);
 		ntable.setVisible(true);
 		return ntable;
 	}
 
+	
 	/**
-	 * Sets the background color of a specific rectangular area: between two-row, and between two-column.
-	 * And, set the font of the new stream's name to ITALIC. 
-	 * @param row_start
-	 * @param row_end
-	 * @param col_start
-	 * @param col_end
-	 * @param ncolor
+	 * Sets up cellRenderers of all cells following the column.
 	 */
-	public void setColor(int row_start, int row_end, int col_start, int col_end, Color ncolor){
-		try {
-			DefaultTableCellRenderer tcr = new DefaultTableCellRenderer(){				
-				public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,boolean hasFocus,int row,int column){
-					Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-		
-					if(row >= row_start && row <= row_end && column >= col_start && column <= col_end){
-						setBackground(ncolor);
-					}
-					else if(column == 0) {
-						setBackground(null);
-					}
-					else 
-						setBackground(cc);				
-					return c;
-				}
-			};	
-			
-			for(int i = 0; i < col_end ; i++) {
-				ntable.setDefaultRenderer(ntable.getColumnClass(i), tcr);				
-			}	
-
-		}catch(Exception ex){
-			ex.printStackTrace();
+	public void setCellRenderer() {
+		MyCellRenderer tcr = new MyCellRenderer();
+		for(int i = 0; i < ntable.getColumnCount(); i++) {
+			ntable.getColumnModel().getColumn(i).setCellRenderer(tcr);
+		}
+	}
+	
+	/**
+	 * Define special cellRenderer based on the requirement of the table.
+	 * In climate table, it only requires that the color of the "total" row is special.
+	 * @author Kai Zhao
+	 *
+	 */
+	class MyCellRenderer extends DefaultTableCellRenderer{
+		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+				boolean hasFocus, int row, int column) {
+				Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+				if (column == 0 ) {
+					setBackground(null);							
+				}				
+				else if( (column == 1 ||  column == 2) && row < 12) {
+					setBackground(defaultColor);										
+				} 						
+				else 
+					setBackground(newColor);
+			return c;
 		}
 	}
 	
