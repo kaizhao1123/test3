@@ -55,7 +55,9 @@ public class LocationsPanel extends JPanel {
 	Object data2[][];	// for table2
 	// the input data from the output of animalPanel, to generate the column names;
 	ArrayList<AnimalInfo> animalsList;	
+	ArrayList<String> firstColNames; // the first column's name;
 	int rowIndex;  //  the row index of selected to delete
+	String deleteName; // the location name to be delete.
     ArrayList<String> locationPanelOutput;	   // to store the output of location panel
 	
 	/***********************************************************
@@ -99,18 +101,11 @@ public class LocationsPanel extends JPanel {
     
  	// initials the data structures, mainly to get the input data.
     private void initialData() {
-    	
-    	//animalsList = panelManager.getDataFromAnimalPanel();
-    	/*int size = animalsList.size() + 1;
-		String[] name = new String[size];
-		name[0] = "Location";
-		for(int i = 1; i < size; i++) {
-			name[i] = animalsList.get(i - 1).name;
-		}*/
-    	
-    		
+		
     	// get the column of the table		
 		columnName = panelManager.getColumnNames();
+		// initial the firstColNames;
+		firstColNames = new ArrayList<>();
     }
     // initials the elements of this panel
     private void initialElements() {		
@@ -144,54 +139,42 @@ public class LocationsPanel extends JPanel {
     // initials the listeners of this panel
     private void initialLiseners() {
     	
+    	// associated with additionsPanel. the stream names cannot be duplicated.
     	buttonAdd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e){	
 				if (databaseTable1.isEditing())
 					databaseTable1.getCellEditor().stopCellEditing(); 
 				if (databaseTable2.isEditing())
 					databaseTable2.getCellEditor().stopCellEditing(); 
-				addTableRow();
-				data1 = myTable1.model.data;
-				data2 = myTable2.model.data;
-				/*if(textLocation != null) {
+				if(textLocation != null) {
 					String s = textLocation.getText();
-					int col = myTable1.model.getColumnCount();
-					String[] rowData = new String[col];
-					rowData[0] = s;
-					for(int i = 1 ; i < col; i++) {
-						rowData[i] = "0";
+					if(s.length() > 0) {
+						if(additionsPanel != null) {
+							if(!additionsPanel.streamNames.contains(s)) {								
+								addTableRow(s);
+							}
+							additionsPanel.addTableRow(s);
+						}
+						else
+							addTableRow(s);						
 					}
-					
-					
-					
-					myTable1.model.addRow(rowData);
-					data1 = myTable1.model.data;
-					//columnNamess = myTable1.model.n;
-					databaseTable1.updateUI();
-					
-					myTable2.model.addRow(rowData);
-					data2 = myTable2.model.data;				
-					databaseTable2.updateUI();
-					
-					textLocation.setText("");
-					
-					// update color
-					int r = databaseTable1.getRowCount();
-					int c = databaseTable1.getColumnCount();					
-					myTable1.setColor(r-1,r-1,1,c-1,Color.cyan);
-					myTable2.setColor(r-1,r-1,1,c-1,Color.cyan);
-					
-				}*/
-			}							
-		}
-        );
+				
+				}							
+			}
+    	});
+    	
         buttonDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e){	
 				if (databaseTable1.isEditing())
 					databaseTable1.getCellEditor().stopCellEditing(); 
 				if (databaseTable2.isEditing())
 					databaseTable2.getCellEditor().stopCellEditing(); 
+				deleteName = myTable1.model.data[rowIndex][0].toString();
+				if(additionsPanel != null) {
+					additionsPanel.deleteTableRow(deleteName);
+				}
 				deleteTableRow();
+				firstColNames.remove(deleteName);
 				data1 = myTable1.model.data;
 				data2 = myTable2.model.data;															
 				
@@ -235,8 +218,7 @@ public class LocationsPanel extends JPanel {
          */             
         databaseTable1.addMouseListener(new MouseAdapter(){
             public void mouseClicked(MouseEvent e) {              
-              int r= databaseTable1.getSelectedRow();
-              System.out.print(r);
+              int r= databaseTable1.getSelectedRow();              
               rowIndex = r;
               if (databaseTable2.isEditing())
             	  databaseTable2.getCellEditor().stopCellEditing();             
@@ -345,9 +327,8 @@ public class LocationsPanel extends JPanel {
     }
     
     // adds row data into the table
-    private void addTableRow() {
-    	if(textLocation != null) {
-			String s = textLocation.getText();
+    private void addTableRow(String s) {   					
+		if(!firstColNames.contains(s)) {
 			int col = myTable1.model.getColumnCount();
 			String[] rowData = new String[col];
 			rowData[0] = s;
@@ -359,8 +340,14 @@ public class LocationsPanel extends JPanel {
 			
 			databaseTable1.updateUI();
 			databaseTable2.updateUI();
-			textLocation.setText("");
+			textLocation.setText("");	
+			data1 = myTable1.model.data;
+			data2 = myTable2.model.data;
+			firstColNames.add(s);
 		}
+		else
+			JOptionPane.showMessageDialog(null,"You cannot have two waste streams with"
+					+ "the same name!" + s); 			
     }
     
     // delete row data from the table
@@ -374,6 +361,7 @@ public class LocationsPanel extends JPanel {
 				myTable1.model.mySetValueAt(myTable1.model.getNewSum(i), myTable1.model.getRowCount()-1, i);
 				myTable2.model.mySetValueAt(myTable2.model.getNewSum(i), myTable2.model.getRowCount()-1, i);
 			}
+			
 			databaseTable1.updateUI();
 			databaseTable2.updateUI();
 		}

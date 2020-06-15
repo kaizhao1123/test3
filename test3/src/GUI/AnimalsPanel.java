@@ -18,6 +18,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -349,20 +350,24 @@ public class AnimalsPanel extends JPanel {
 	            	  jTable.getCellEditor().stopCellEditing(); 
 				if (locationPanel == null) {					
 					getOutput();
-					panelManager.storeAnimalPanelOutput(animalPanelOutput);
-					locationPanel = new LocationsPanel(panelManager);
-					locationPanel.setParent(parent);
-					pane.add("location", locationPanel);
+					if(!animalPanelOutput.isEmpty()) {
+						panelManager.storeAnimalPanelOutput(animalPanelOutput);
+						locationPanel = new LocationsPanel(panelManager);
+						locationPanel.setParent(parent);
+						pane.add("location", locationPanel);
 
-					if (parent.startPanel.periodDialog.secondOption == true) {
-						locationPanel.update2();
+						if (parent.startPanel.periodDialog.secondOption == true) {
+							locationPanel.update2();
+						}
+						pane.setSelectedIndex(pane.indexOfTab("location"));
 					}
-
-				} else {
-					// get the location table and add column.
+					else
+						JOptionPane.showMessageDialog(null,"No animals selected!");
 					
+				} else {
+										
 				}
-				pane.setSelectedIndex(pane.indexOfTab("location"));
+				
 			}
 		});
 	}

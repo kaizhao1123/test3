@@ -28,9 +28,8 @@ import Model_Tables.ClimateTable.MyCellRenderer;
 public class AdditionsTable implements TableModelListener {
 
 	JTable ntable;
-	public TableModel model;
-	public String newElement = null;	// To record the new streams, the font of new element is ITALIC.
-	ArrayList<String> newElementList = new ArrayList(); // To record all new streams
+	public TableModel model;	
+	ArrayList<String> newElementList = new ArrayList(); // To record all new streams, to mark to be Font.ITALIC
 	
 	String[] columnNamess;
 	Object[][] dataa;
@@ -90,9 +89,7 @@ public class AdditionsTable implements TableModelListener {
 				
 				Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 				if (column == 0 ) {
-					newElementList.add(newElement);
-					if(model.data[row][0].toString().equals(newElement) 
-							|| newElementList.contains(model.data[row][0].toString())) {							
+					if( newElementList.contains(model.data[row][0].toString())) {							
 						setFont(new Font(getFont().getFontName(), Font.ITALIC, 12));
 					}
 					setBackground(null);							
@@ -106,6 +103,12 @@ public class AdditionsTable implements TableModelListener {
 		}
 	}
 
+	// stores the element of the newElementList.
+	public void updateElementList(String s) {
+		newElementList.add(s);
+	}
+	
+	
 	/**
 	 * set the column's width is the same as the content of the cell, 
 	 * rather than the fixed same as each other.
@@ -163,27 +166,28 @@ public class AdditionsTable implements TableModelListener {
 	// the data changing of one cell will lead to the change of the last two columns.
 	public void tableChanged(TableModelEvent e) {
 
+		//int row = ntable.rowAtPoint(ntable.getMousePosition());
+		//int col = ntable.columnAtPoint(ntable.getMousePosition());
+		
 		int col = ntable.getSelectedColumn();
 		if(col > 2) {
 			int row = ntable.getSelectedRow();
 			Object[] ele = model.data[row];
 			String s = ntable.getValueAt(row, col).toString();		
-			
+		
 			// for loop to get the data of the target beddingtype
 			for(int i = 0; i < beddingDataset.size(); i++) {
 				if(beddingDataset.get(i).name.equals(s)) {
 					bed = beddingDataset.get(i);
 					ele[4] = bed.eff_Density;
-				}	
-				else
-					bed = null;
+				}					
 			}
-		
+
 			DecimalFormat df = new DecimalFormat("0.00");
 			Double aDou = Double.parseDouble(ele[5].toString());
 			Double dDou = 0.00;
 			if(bed != null)
-				dDou = Double.parseDouble(bed.density);
+				dDou = Double.parseDouble(bed.density);			
 			Double edDou = Double.parseDouble(ele[4].toString());
 			
 			ele[6] = df.format(aDou / dDou);

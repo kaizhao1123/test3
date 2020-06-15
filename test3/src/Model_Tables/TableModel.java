@@ -48,6 +48,26 @@ public class TableModel extends AbstractTableModel {
 		data = np;
 	}
 	
+	
+	public void deleteRow(int row) {
+		int l = data.length - 1;
+		int cl = columnName.length;
+		Object[][] np = new Object[l][cl];
+
+		for (int i = 0; i < row - 1; i++) {
+			for (int j = 0; j < cl; j++) {
+				np[i][j] = data[i][j];
+			}
+		}
+		for (int i = row - 1; i < l; i++) {
+			for (int j = 0; j < cl; j++) {
+				np[i][j] = data[i + 1][j];
+			}
+		}
+		data = np;
+
+	}
+	
 	// Checks the first column of the data whether contains the target string.
 	public boolean isContained(String s) {
 		for (int i = 0; i < data.length; i++) {

@@ -9,12 +9,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -25,6 +27,7 @@ import javax.swing.table.TableColumn;
 import Controller.PanelManager;
 import Model_Entity.BeddingInfo;
 import Model_Tables.AdditionsTable;
+
 
 /**
  * This class is to create the additions panel. The purpose of this class is to
@@ -48,9 +51,10 @@ public class AdditionsPanel extends JPanel {
 	 * declare the data structures used in this panel
 	 */
 
-	ArrayList<String> streamName;
-	ArrayList<BeddingInfo> dataset;
-	ArrayList<String> beddingType;
+	ArrayList<String> streamNames;	// the first column's data
+	ArrayList<BeddingInfo> dataset;	// all beddingInfos
+	ArrayList<String> beddingType;	// used for showing in the JCombobox
+	
 
 	/************************************************************
 	 * declare the elements of this panel
@@ -72,7 +76,8 @@ public class AdditionsPanel extends JPanel {
 			"<html> Amout <br> (lbs/day) </html>", "<html> LV Amt <br> (cu.ft/day) </html>",
 			"<html> Cv Amt <br> (cu.ft/day) </html>" };
 	Object data[][];
-
+	DecimalFormat df = new DecimalFormat("0.00");
+	
 	JComboBox<String> comboboxType;
 	JButton buttonAdd;
 	JButton buttonReset;
@@ -98,18 +103,20 @@ public class AdditionsPanel extends JPanel {
 		panel = this;
 		// get the bedding data
 		dataset = panelManager.allBeddingData;
+		
+		// get the beddingType data
 		beddingType = new ArrayList<>();
 		for (int i = 0; i < dataset.size(); i++) {
 			beddingType.add(dataset.get(i).name);
 		}
 
 		// get the first column data of table
-		streamName = panelManager.locationPanelOutput;
+		streamNames = panelManager.locationPanelOutput;
 
 		// initial the other table data
-		data = new Object[streamName.size()][8];
-		for (int i = 0; i < streamName.size(); i++) {
-			data[i][0] = streamName.get(i);
+		data = new Object[streamNames.size()][8];
+		for (int i = 0; i < streamNames.size(); i++) {
+			data[i][0] = streamNames.get(i);
 			for (int j = 1; j < 8; j++) {
 				if (j == 3)
 					data[i][j] = "";
@@ -141,8 +148,9 @@ public class AdditionsPanel extends JPanel {
 		buttonOK = new JButton("OK");
 		myTable = new AdditionsTable();
 		databaseTable = myTable.buildMyTable(columnName, data, dataset);
+		databaseTable.enable(); // to get different mouse click count, or the mouse click count always be 1.
 		scrollPane = new JScrollPane(databaseTable);
-		scrollPane.setPreferredSize(new Dimension(660, 100));
+		scrollPane.setPreferredSize(new Dimension(670, 100));
 		TableColumn sportColumn = databaseTable.getColumnModel().getColumn(3);
 		// set the cell editor of the 3rd column to JComboBox, to show the bedding type.
 		sportColumn.setCellEditor(new DefaultCellEditor(comboboxType));
@@ -150,51 +158,150 @@ public class AdditionsPanel extends JPanel {
 		gc = new GridBagConstraints();
 	}
 
+
+	
 	// initial listeners of this panel
 	private void initalListeners() {
 
+		// adds new waste stream, the stream names cannot be duplicated.
 		buttonAdd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (databaseTable.isEditing())
 					databaseTable.getCellEditor().stopCellEditing();
 				if (textAdd != null) {
 					String s = textAdd.getText();
-					int col = myTable.model.getColumnCount();
-					String[] dataTable = new String[col];
-					dataTable[0] = s;
-					for (int i = 1; i < col; i++) {
-						if (i == 3)
-							dataTable[i] = "";
-						else
-							dataTable[i] = "0.00";
+					if(s.length() > 0) {
+						addTableRow(s);
+						myTable.updateElementList(s);
 					}
-
-					myTable.model.addRow(dataTable);
-					// data = myTable.model.data;
-					myTable.newElement = s;
-					databaseTable.updateUI();
-					textAdd.setText("");
+										
 				}
 			}
 		});
-
+		
+		// Resets back the original effective densities if some EFF changed.
+		buttonReset.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				if (databaseTable != null) {
+					if (databaseTable.isEditing())
+						databaseTable.getCellEditor().stopCellEditing();
+					for(int i = 0; i < databaseTable.getRowCount(); i++) {
+						Object[] ele = myTable.model.data[i];
+						String s = ele[3].toString();
+						BeddingInfo bed = null;
+						for(int j = 0; j < dataset.size(); j++) {
+							if(dataset.get(j).name.equals(s)){
+								bed = dataset.get(j);
+								ele[4] = bed.eff_Density;
+							}
+						}
+						
+						Double aDou = Double.parseDouble(ele[5].toString());
+						Double dDou = 0.00;
+						if(bed != null)
+							dDou = Double.parseDouble(bed.density);			
+						Double edDou = Double.parseDouble(ele[4].toString());
+						
+						ele[6] = df.format(aDou / dDou);
+						ele[7] = df.format(aDou / edDou);
+					}					
+					databaseTable.updateUI();
+					
+				}
+			}
+		});
+		
 		/*
-		 * when click cell in the "wash water" column, open washWaterDialog, to enter
-		 * the data; when click cell in the "flush water" column, open flushWaterDialog,
-		 * to enter the data;
+		 * when click cell in the "wash water" column, open washWaterDialog, or double click 
+		 * the cell to enter the data directly;
+		 * when click cell in the "flush water" column, open flushWaterDialog, or double click
+		 * the cell to enter the data directly;
 		 * 
-		 */		
+		 */	
 		databaseTable.addMouseListener(new MouseAdapter() {
-			public void mouseClicked(MouseEvent e) {				
-				int col = databaseTable.getSelectedColumn();				
-				if (col == 1) {
-					washDialog = new WashWaterDialog(myTable, databaseTable);					
-				} else if (col == 2) {
-					flushDialog = new FlushWaterDialog(myTable, databaseTable);
-				}				
+			public void mouseClicked(MouseEvent e) {	
+				int row = databaseTable.rowAtPoint(e.getPoint()); 
+	            int col = databaseTable.columnAtPoint(e.getPoint()); 
+	            if(col == 1) {
+	            	if(e.getClickCount() == 2) {
+	            		if (databaseTable.getCellEditor() != null)
+							databaseTable.getCellEditor().stopCellEditing();
+	            		if(washDialog != null) {
+	            			washDialog.setDefaultCloseOperation(washDialog.DISPOSE_ON_CLOSE);
+							washDialog.setVisible(false);
+	            		}	            			
+	            		if(flushDialog != null) {
+	            			flushDialog.setDefaultCloseOperation(flushDialog.DISPOSE_ON_CLOSE);
+	            			flushDialog.setVisible(false);
+	            		}	            		
+
+						databaseTable.enable(true);
+						databaseTable.editCellAt(row, col);
+	            	}
+	            	else if(e.getClickCount() == 1) {
+	            		if (databaseTable.getCellEditor() != null)
+							databaseTable.getCellEditor().stopCellEditing();
+	            		if(washDialog != null) {
+	            			washDialog.setDefaultCloseOperation(washDialog.DISPOSE_ON_CLOSE);
+							washDialog.setVisible(false);
+	            		}	            			
+	            		if(flushDialog != null) {
+	            			flushDialog.setDefaultCloseOperation(flushDialog.DISPOSE_ON_CLOSE);
+	            			flushDialog.setVisible(false);
+	            		}
+	            		washDialog = new WashWaterDialog(myTable, databaseTable);
+	            		databaseTable.enable(false);
+	            	}	            	
+	            }
+	            else if(col == 2) {
+	            	if(e.getClickCount() == 2) {
+	            		if (databaseTable.getCellEditor() != null)
+							databaseTable.getCellEditor().stopCellEditing();
+	            		if(washDialog != null) {
+	            			washDialog.setDefaultCloseOperation(washDialog.DISPOSE_ON_CLOSE);
+							washDialog.setVisible(false);
+	            		}	            			
+	            		if(flushDialog != null) {
+	            			flushDialog.setDefaultCloseOperation(flushDialog.DISPOSE_ON_CLOSE);
+	            			flushDialog.setVisible(false);
+	            		}	            		
+						databaseTable.enable(true);
+						databaseTable.editCellAt(row, col);
+	            	}
+	            	else if(e.getClickCount() == 1) {
+	            		if (databaseTable.getCellEditor() != null)
+							databaseTable.getCellEditor().stopCellEditing();
+	            		if(washDialog != null) {
+	            			washDialog.setDefaultCloseOperation(washDialog.DISPOSE_ON_CLOSE);
+							washDialog.setVisible(false);
+	            		}	            			
+	            		if(flushDialog != null) {
+	            			flushDialog.setDefaultCloseOperation(flushDialog.DISPOSE_ON_CLOSE);
+	            			flushDialog.setVisible(false);
+	            		}
+	            		
+	            		flushDialog = new FlushWaterDialog(myTable, databaseTable);
+	            		databaseTable.enable(false);
+	            	}	            	
+	            }
+	            else {
+	            	if(washDialog != null) {
+            			washDialog.setDefaultCloseOperation(washDialog.DISPOSE_ON_CLOSE);
+						washDialog.setVisible(false);
+            		}	            			
+            		if(flushDialog != null) {
+            			flushDialog.setDefaultCloseOperation(flushDialog.DISPOSE_ON_CLOSE);
+            			flushDialog.setVisible(false);
+            		}
+            		databaseTable.enable(true);
+	            }
+	            	            				
 				databaseTable.repaint();
 			}
 		});
+		
+		
 
 		buttonOK.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -269,7 +376,46 @@ public class AdditionsPanel extends JPanel {
 		add(buttonOK, gc);
 
 	}
+	
+	/**
+	 * adds the row data, with the limitation that the stream name can't be duplicated.
+	 * it is also associated with locationsPanel: the change of row count of the locationsPanel affect this table.
+	 * @param s
+	 */
+	public void addTableRow(String s) {
+		if(!streamNames.contains(s)) {
+			int col = myTable.model.getColumnCount();
+			String[] dataTable = new String[col];
+			dataTable[0] = s;
+			for (int i = 1; i < col; i++) {
+				if (i == 3)
+					dataTable[i] = "";
+				else
+					dataTable[i] = "0.00";
+			}
 
+			myTable.model.addRow(dataTable);
+
+			databaseTable.updateUI();
+			textAdd.setText("");
+			streamNames.add(s);
+		}
+		else
+			JOptionPane.showMessageDialog(null,"You cannot have two waste streams with"
+					+ "the same name!" + s);		
+	}
+	
+	// associated with locationsPanel: the change of row count of the locationsPanel affect this table.
+	public void deleteTableRow(String s) {
+		int rowIndex = 0;
+		for(int i = 0; i < myTable.model.data.length; i++) {
+			if(myTable.model.data[i][0].toString().equals(s))
+				rowIndex = i;
+		}
+		myTable.model.deleteRow(rowIndex + 1);
+		streamNames.remove(s);
+		databaseTable.updateUI();
+	}
 
 	public void setParent(MainFrame frame) {
 		this.parent = frame;
