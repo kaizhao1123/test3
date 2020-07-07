@@ -2,19 +2,18 @@ package Model_Tables;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
+import java.awt.Font;
 import java.util.Enumeration;
 
+import javax.swing.JLabel;
 import javax.swing.JTable;
+import javax.swing.border.Border;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
-
-import Model_Entity.BeddingInfo;
-
 
 public class MgmtTrainTable_2 implements TableModelListener {
 
@@ -23,115 +22,106 @@ public class MgmtTrainTable_2 implements TableModelListener {
 
 	String[] columnNamess;
 	Object[][] dataa;
-	Color cc = Color.lightGray;
-
+	// the default color of the table. The cell with this color can be editable.
+	Color defaultColor = Color.lightGray;
+	// the color of the "total" row. The cell with this color can't be editable.
+	// Color newColor = Color.cyan;
+	MyCellRenderer tcr;
 
 	public JTable buildMyTable(String[] s, Object[][] o) {
-		
+
 		columnNamess = s;
 		dataa = o;
 
-		
-		
 		model = new TableModel(columnNamess, dataa);
 		model.addTableModelListener(this);
 		ntable = new JTable(model);
+		ntable.getTableHeader().setReorderingAllowed(false); // fix the header
+		setCellRenderer();
+		ntable.setBackground(defaultColor);
 
-		int rowcount = ntable.getRowCount();
-		//int colcount = ntable.getColumnCount();
-		setColor(0,rowcount,1,5,Color.cyan);
-		FitTableColumns(ntable);
+		FitTableColumns(ntable);		
 		ntable.setVisible(true);
-	
 		return ntable;
 	}
 
-	public void setColor(int row_start, int row_end, int col_start, int col_end, Color ncolor) {
-		try {
-			DefaultTableCellRenderer tcr = new DefaultTableCellRenderer() {
-				public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-						boolean hasFocus, int row, int column) {
-					Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-					if (row >= row_start && row <= row_end && column >= col_start && column <= col_end) {
-						setBackground(ncolor);
-					} else if (column == 0) {
-						setBackground(null);
-					} else
-						setBackground(cc);
+	/**
+	 * Sets up cellRenderers of all cells following the column.
+	 */
+	public void setCellRenderer() {
+		tcr = new MyCellRenderer();		
+		for (int i = 0; i < ntable.getColumnCount(); i++) {
+			ntable.getColumnModel().getColumn(i).setCellRenderer(tcr);
+		}		
+	}
 
-					return c;
-				}
-			};
+	/**
+	 * Define special cellRenderer based on the requirement of the table. 
+	 * it only set the content of the cell stay in the center, and set font.
+	 * @author Kai Zhao
+	 *
+	 */
+	class MyCellRenderer extends DefaultTableCellRenderer {
 
-			for (int i = 0; i < col_end; i++) {
-				ntable.setDefaultRenderer(ntable.getColumnClass(i), tcr);
+		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
+				int row, int column) {
+
+			Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+			super.setHorizontalAlignment(CENTER);
+			c.setFont(new Font(c.getFont().getName(), Font.BOLD, 12));
+			return c;
+		}
+	}
+
+	public void FitTableColumns(JTable jt) {
+
+		JTableHeader header = jt.getTableHeader();
+
+		int rowCount = jt.getRowCount();
+
+		Enumeration columns = jt.getColumnModel().getColumns();
+
+		while (columns.hasMoreElements()) {
+
+			TableColumn column = (TableColumn) columns.nextElement();
+
+			int col = header.getColumnModel().getColumnIndex(
+
+					column.getIdentifier());
+
+			int width = (int) jt.getTableHeader().getDefaultRenderer()
+
+					.getTableCellRendererComponent(jt,
+
+							column.getIdentifier(), false, false, -1, col)
+
+					.getPreferredSize().getWidth();
+
+			for (int row = 0; row < rowCount; row++) {
+
+				int preferedWidth = (int) jt.getCellRenderer(row, col)
+
+						.getTableCellRendererComponent(jt,
+
+								jt.getValueAt(row, col), false, false,
+
+								row, col)
+						.getPreferredSize().getWidth();
+
+				width = Math.max(width, preferedWidth);
+
 			}
 
-		} catch (Exception ex) {
-			ex.printStackTrace();
+			header.setResizingColumn(column);
+
+			column.setWidth(width + jt.getIntercellSpacing().width + 10);
+
 		}
 
 	}
 
-	public void FitTableColumns(JTable jt) {              
-
-        JTableHeader header = jt.getTableHeader();
-
-        int rowCount = jt.getRowCount();
-
-        Enumeration columns = jt.getColumnModel().getColumns();
-
-        while (columns.hasMoreElements()) {
-
-            TableColumn column = (TableColumn) columns.nextElement();
-
-            int col = header.getColumnModel().getColumnIndex(
-
-                    column.getIdentifier());
-
-            int width = (int) jt.getTableHeader().getDefaultRenderer()
-
-                    .getTableCellRendererComponent(jt,
-
-                            column.getIdentifier(), false, false, -1, col)
-
-                    .getPreferredSize().getWidth();
-
-            for (int row = 0; row < rowCount; row++){
-
-                int preferedWidth = (int) jt.getCellRenderer(row, col)
-
-                        .getTableCellRendererComponent(jt,
-
-                                jt.getValueAt(row, col), false, false,
-
-                                row, col).getPreferredSize().getWidth();
-
-                width = Math.max(width, preferedWidth);
-
-            }
-
-            header.setResizingColumn(column);
-
-            column.setWidth(width + jt.getIntercellSpacing().width + 10);
-
-        }
-
-    }
-	
-	
 	@Override
 	public void tableChanged(TableModelEvent e) {
-		// int col = e.getColumn();
-		int col = ntable.getSelectedColumn();
-		//String colName = ntable.getColumnName(col);
-		int row = ntable.getSelectedRow();
-		Object[] ele = model.data[row];
-		String s = ntable.getValueAt(row, col).toString();		
 		
-	
-		
-		ntable.repaint();
 	}
 }
-

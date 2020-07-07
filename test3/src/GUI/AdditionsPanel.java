@@ -12,6 +12,7 @@ import java.awt.event.MouseEvent;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
+import javax.swing.BorderFactory;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -22,6 +23,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.border.Border;
 import javax.swing.table.TableColumn;
 
 import Controller.PanelManager;
@@ -151,6 +153,9 @@ public class AdditionsPanel extends JPanel {
 		databaseTable.enable(); // to get different mouse click count, or the mouse click count always be 1.
 		scrollPane = new JScrollPane(databaseTable);
 		scrollPane.setPreferredSize(new Dimension(670, 100));
+		Border border = BorderFactory.createEmptyBorder(0, 0, 0, 0);
+		scrollPane.setViewportBorder(border);
+		scrollPane.setBorder(border);
 		TableColumn sportColumn = databaseTable.getColumnModel().getColumn(3);
 		// set the cell editor of the 3rd column to JComboBox, to show the bedding type.
 		sportColumn.setCellEditor(new DefaultCellEditor(comboboxType));
@@ -394,9 +399,15 @@ public class AdditionsPanel extends JPanel {
 					dataTable[i] = "0.00";
 			}
 
-			myTable.model.addRow(dataTable);
+			myTable.model.insertRow(dataTable, myTable.model.getRowCount()-1);
 
 			databaseTable.updateUI();
+			
+			System.out.print(myTable.model.data.length);
+			System.out.print("---");
+			System.out.print(databaseTable.getColumnCount());
+			
+			
 			textAdd.setText("");
 			streamNames.add(s);
 		}
@@ -412,7 +423,7 @@ public class AdditionsPanel extends JPanel {
 			if(myTable.model.data[i][0].toString().equals(s))
 				rowIndex = i;
 		}
-		myTable.model.deleteRow(rowIndex + 1);
+		myTable.model.deleteRow(rowIndex);
 		streamNames.remove(s);
 		databaseTable.updateUI();
 	}

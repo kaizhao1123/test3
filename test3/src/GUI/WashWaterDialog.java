@@ -5,11 +5,13 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.border.Border;
 
 import Model_Tables.AdditionsTable;
 import Model_Tables.WashWaterTable;
@@ -41,7 +43,10 @@ public class WashWaterDialog extends JDialog{
 		myTable = new WashWaterTable();
     	JTable databaseTable = myTable.buildMyTable(columnName,data);
     	scrollPane = new JScrollPane(databaseTable);	
-        scrollPane.setPreferredSize(new Dimension(400,100));				
+        scrollPane.setPreferredSize(new Dimension(400,100));
+        Border border = BorderFactory.createEmptyBorder(0, 0, 0, 0);
+		scrollPane.setViewportBorder(border);
+		scrollPane.setBorder(border);
 		panel.add(scrollPane);
 		
 		buttonHelp = new JButton ("Help");

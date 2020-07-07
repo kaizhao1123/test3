@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -23,6 +24,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.border.Border;
 
 import Controller.PanelManager;
 import Model_Entity.AnimalInfo;
@@ -247,6 +249,9 @@ public class AnimalsPanel extends JPanel {
 		jTable.getTableHeader().setPreferredSize(new Dimension(10, 35));
 		tableScrollPane = new JScrollPane(jTable);
 		tableScrollPane.setPreferredSize(new Dimension(800, 120));
+		Border border = BorderFactory.createEmptyBorder(0, 0, 0, 0);
+		tableScrollPane.setViewportBorder(border);
+		tableScrollPane.setBorder(border);
 		
 		// initial gridBagConstraints
 		gc = new GridBagConstraints();
@@ -521,14 +526,14 @@ public class AnimalsPanel extends JPanel {
 	// delete the selected row from the table
 	private void deleteTableRow(String item) {
 		if (animalsTable.model.isContained(item)) {
-			int row = animalsTable.model.rowOfElement(item);
+			int rowIndex = animalsTable.model.rowIndexOfElement(item);
 			String itemName = null;	// to store the animal name before the model deleting.
-			if(Double.parseDouble(animalsTable.model.data[row-1][2].toString()) > 0 ) {
+			if(Double.parseDouble(animalsTable.model.data[rowIndex][2].toString()) > 0 ) {
 				itemName = item;
 			}
 			
 			// delete the item data from the table
-			animalsTable.model.deleteRow(row);
+			animalsTable.model.deleteRow(rowIndex);
 			
 			// set special value of the "total" row in column 1,3,4,5,6
 			animalsTable.model.mySetValueAt(" ", animalsTable.model.getRowCount() - 1, 1);

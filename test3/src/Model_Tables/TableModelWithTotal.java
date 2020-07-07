@@ -89,10 +89,10 @@ public class TableModelWithTotal extends AbstractTableModel {
 	}
 
 	/**
-	 * deletes a row data from the model's data, except the "total" row
+	 * deletes a row data from the model's data, except the "total" row.
 	 * @param s the row data will be added into the model
 	 */
-	public void deleteRow(int row) {
+	public void deleteRow(int rowIndex) {
 		int l = data.length - 1;
 		int cl = columnName.length;
 		
@@ -100,7 +100,7 @@ public class TableModelWithTotal extends AbstractTableModel {
 		Object[][] np = new Object[l][cl];
 		
 		//2. copy the rows before the target row of the original "data" into the new "data"
-		for (int i = 0; i < row-1; i++) {
+		for (int i = 0; i < rowIndex; i++) {
 			for (int j = 0; j < columnName.length; j++) {
 				np[i][j] = data[i][j];
 			}
@@ -110,7 +110,7 @@ public class TableModelWithTotal extends AbstractTableModel {
 		 *  Because "getNewSum" is based on the old data, so we have to need the step4 to change the value of the
 		 * "total" row after copying the old "data" to the new "data"
 		 */
-		for (int i = row - 1; i < l; i++) {
+		for (int i = rowIndex; i < l; i++) {
 			for (int j = 0; j < columnName.length; j++) {
 				np[i][j] = data[i + 1][j];
 			}
@@ -140,14 +140,14 @@ public class TableModelWithTotal extends AbstractTableModel {
 	}
 	
 	// delete the target column from the model, and delete the last row "total"
-	public void deleteColumn(int col) {
+	public void deleteColumn(int colIndex) {
 		int rl = data.length;
 		int cl = data[0].length - 1;
 		Object[][] np = new Object[rl-1][cl];
 		for(int i = 0; i < rl-1; i++) {
-			for(int j = 0; j < col; j++)
+			for(int j = 0; j < colIndex; j++)
 				np[i][j] = data[i][j];
-			for(int k = col; k < cl; k++) {
+			for(int k = colIndex; k < cl; k++) {
 				np[i][k] = data[i][k+1];
 			}
 		 }
@@ -163,11 +163,11 @@ public class TableModelWithTotal extends AbstractTableModel {
 		return false;
 	}
 
-	// Gets the row number of the target string
-	public int rowOfElement(String s) {
+	// Gets the row index of the target string
+	public int rowIndexOfElement(String s) {
 		for (int i = 0; i < data.length; i++) {
 			if (data[i][0] == s)
-				return i+1;
+				return i;
 		}
 		return -1;
 	}

@@ -30,10 +30,10 @@ public class TableModel extends AbstractTableModel {
 	}
 
 	/**
-	 * adds one row data into the model's data
+	 * adds one row data into the model's last row.
 	 * @param s	the row data
 	 */
-	public void addRow(String[] s) {
+	/*public void addRow(String[] s) {
 		int l = data.length + 1;
 		int cl = columnName.length;
 		Object[][] np = new Object[l][cl];
@@ -46,20 +46,53 @@ public class TableModel extends AbstractTableModel {
 			np[l - 1][i] = s[i];
 		}
 		data = np;
+	}*/
+	
+	
+	/**
+	 * insert one row into the table after the target index. i.g., 
+	 * the index of the inserted row is the target index +1.
+	 * @param s	the row data
+	 * @param index	the target index.
+	 */
+	public void insertRow(String[] s, int index) {
+		int l = data.length + 1;
+		int cl = columnName.length;
+		Object[][] np = new Object[l][cl];
+	
+		// copy the rows before index (include index) into new Object[][]
+		for (int i = 0; i < index+1 ; i++) {
+			for (int j = 0; j < columnName.length; j++) {
+				np[i][j] = data[i][j];
+			}
+		}
+		// add the target row data into the target index + 1
+		for (int j = 0; j < s.length; j++) {
+			np[index+1][j] = s[j];
+		}
+		// copy the origin rows after the index into new Object[][]
+		for (int i = index+1; i < l-1 ; i++) {
+			for (int j = 0; j < columnName.length; j++) {
+				np[i + 1][j] = data[i][j];
+			}
+		}	
+		data = np;
 	}
 	
-	
-	public void deleteRow(int row) {
+	// delete the row data from the target index.
+	public void deleteRow(int rowIndex) {
 		int l = data.length - 1;
 		int cl = columnName.length;
 		Object[][] np = new Object[l][cl];
 
-		for (int i = 0; i < row - 1; i++) {
+		// copy the rows before index into new Object[][]
+		for (int i = 0; i < rowIndex; i++) {
 			for (int j = 0; j < cl; j++) {
 				np[i][j] = data[i][j];
 			}
 		}
-		for (int i = row - 1; i < l; i++) {
+		// copy the origin rows after the index into new Object[][]
+		for (int i = rowIndex; i < l; i++) {
 			for (int j = 0; j < cl; j++) {
 				np[i][j] = data[i + 1][j];
 			}
@@ -78,10 +111,10 @@ public class TableModel extends AbstractTableModel {
 	}
 
 	// gets the row location of the target string.
-	public int rowOfElement(String s) {
+	public int rowIndexOfElement(String s) {
 		for (int i = 0; i < data.length; i++) {
 			if (data[i][0] == s)
-				return i + 1;
+				return i;
 		}
 		return -1;
 	}
@@ -121,8 +154,9 @@ public class TableModel extends AbstractTableModel {
 		String colName = columnName[columnIndex].toString();
 		String s1 = "<html> LV Amt <br> (cu.ft/day) </html>";
 		String s2 = "<html> Cv Amt <br> (cu.ft/day) </html>";
+		String s3 = "Step 3";
 		
-		if (columnIndex == 0 || colName == s1 || colName == s2) {
+		if (columnIndex == 0 || colName == s1 || colName == s2 || colName == s3) {
 			return false;
 		}
 		return true;

@@ -11,6 +11,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -19,6 +20,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.border.Border;
 
 import Controller.PanelManager;
 import Model_Entity.AnimalInfo;
@@ -121,12 +123,17 @@ public class LocationsPanel extends JPanel {
         databaseTable1 = myTable1.buildMyTable(columnName, data1); 
         scrollPane1 = new JScrollPane(databaseTable1);	
         scrollPane1.setPreferredSize(new Dimension(480,100));
+        Border border = BorderFactory.createEmptyBorder(0, 0, 0, 0);
+		scrollPane1.setViewportBorder(border);
+		scrollPane1.setBorder(border);
       
         
         myTable2 = new LocationsTable();
         databaseTable2 = myTable2.buildMyTable(columnName, data2); 
         scrollPane2 = new JScrollPane(databaseTable2);	
-        scrollPane2.setPreferredSize(new Dimension(480,100));
+        scrollPane2.setPreferredSize(new Dimension(480,100));       
+		scrollPane2.setViewportBorder(border);
+		scrollPane2.setBorder(border);
             
         buttonAdd = new JButton("Add Location"); 
         buttonAdd.setPreferredSize(new Dimension(150,25));
@@ -354,8 +361,8 @@ public class LocationsPanel extends JPanel {
     private void deleteTableRow() {	   
 		if(rowIndex != data1.length - 1 &&
 		   rowIndex != data2.length - 1) {
-			myTable1.model.deleteRow(rowIndex+1);
-			myTable2.model.deleteRow(rowIndex+1);
+			myTable1.model.deleteRow(rowIndex);
+			myTable2.model.deleteRow(rowIndex);
 			
 			for(int i = 1; i < myTable1.model.getColumnCount(); i++) {
 				myTable1.model.mySetValueAt(myTable1.model.getNewSum(i), myTable1.model.getRowCount()-1, i);
@@ -384,21 +391,21 @@ public class LocationsPanel extends JPanel {
     
     // delete the column data from the table
     public void deleteTableColumn(String s) {
-    	int col = 1;
+    	int colIndex = 1;
     	for (int i = 0; i < columnName.length; i++) {
     		if (columnName[i] == s)
-    			col = i;
+    			colIndex = i;
     	}  	
     	String[] ncolumnName = new String[columnName.length-1];
-    	for(int i = 0; i < col; i++) {
+    	for(int i = 0; i < colIndex; i++) {
     		ncolumnName[i] = columnName[i];
     	}
-    	for(int i = col; i < columnName.length-1; i++) {
+    	for(int i = colIndex; i < columnName.length-1; i++) {
     		ncolumnName[i] = columnName[i+1];
     	}   	
     	columnName = ncolumnName;   	   	
-    	myTable1.model.deleteColumn(col);
-    	myTable2.model.deleteColumn(col);
+    	myTable1.model.deleteColumn(colIndex);
+    	myTable2.model.deleteColumn(colIndex);
     	updateTable(myTable1, myTable2);   	
     }
     

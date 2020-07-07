@@ -21,6 +21,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -151,6 +152,9 @@ public class RunoffPanel extends JPanel {
 		customerTable.setRowHeight(20);
 		scrollPane = new JScrollPane(databaseTable);
 		scrollPane.setPreferredSize(new Dimension(310, 283));
+		Border border = BorderFactory.createEmptyBorder(0, 0, 0, 0);
+		scrollPane.setViewportBorder(border);
+		scrollPane.setBorder(border);
 
 		label_5 = new JLabel("25-Yr 24-Hr Storm Runoff:");
 		text_1 = new JTextField("0.00");

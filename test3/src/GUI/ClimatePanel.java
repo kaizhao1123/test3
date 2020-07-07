@@ -33,6 +33,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -743,6 +744,9 @@ public class ClimatePanel extends JPanel {
 
 		scrollPane = new JScrollPane(jTable_database);
 		scrollPane.setPreferredSize(new Dimension(210, 250));
+		Border border = BorderFactory.createEmptyBorder(0, 0, 0, 0);
+		scrollPane.setViewportBorder(border);
+		scrollPane.setBorder(border);
 		
 		jtab.add(scrollPane, BorderLayout.CENTER);
 		secondRight.add(jtab, gbcTwoRight); // add the table into the second right.
