@@ -404,7 +404,11 @@ public class MgmtTrainPanel extends JPanel {
 
 					if (!cur.equals(n)) {
 						countMap.put(n, countMap.get(n) + 1);
-						if (cur != " ") {
+						String c1 = getName(cur);
+						String n1 = getName(n);
+						if (cur != " " && (c1.equals(n1))) {
+							exchangeNewItems(cur, n);
+						} else if (cur != " " && !(c1.equals(n1))) {
 							removeOneItem(cur);
 						}
 					} else {
