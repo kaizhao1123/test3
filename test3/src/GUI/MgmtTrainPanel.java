@@ -322,50 +322,15 @@ public class MgmtTrainPanel extends JPanel {
 						String cur = myTable1.model.data[row][1].toString();
 
 						if (isContain(sepComponents, getName(cur))) {
+
 							int rowInTable2 = firstKey(indexMap, row);
 							int extraRowInTable2 = rowInTable2 + 1;
-							
-							String valueInSecondCol_1 = myTable2.model.data[rowInTable2][1].toString();
-							String subValueInSecondCol_1 = getName(valueInSecondCol_1);
-							int numInSecondCol_1 = Character.getNumericValue(valueInSecondCol_1.charAt(valueInSecondCol_1.length() - 1));
-							
-							String valueInSecondCol_2 = myTable2.model.data[extraRowInTable2][1].toString();
-							String subValueInSecondCol_2 = getName(valueInSecondCol_2);
-							int numInSecondCol_2 = Character.getNumericValue(valueInSecondCol_2.charAt(valueInSecondCol_2.length() - 1));
-							
-							String valueInFirstCol_1 = myTable2.model.data[rowInTable2][0].toString();
-							String subValueInFirstCol_1 = getName(valueInFirstCol_1);
-							int numInFirstCol_1 = Character.getNumericValue(valueInFirstCol_1.charAt(valueInFirstCol_1.length() - 1));
-							
-							String valueInFirstCol_2 = myTable2.model.data[extraRowInTable2][0].toString();
-							String subValueInFirstCol_2 = getName(valueInFirstCol_2);
-							int numInFirstCol_2 = Character.getNumericValue(valueInFirstCol_2.charAt(valueInFirstCol_2.length() - 1));
-
-							// remove the item in the column "step 3"
-							if(subValueInSecondCol_1.equals(subValueInSecondCol_2) && numInSecondCol_1 < numInSecondCol_2) {
-								removeItem(valueInSecondCol_2);
-								removeItem(valueInSecondCol_1);
-							}
-							else {
-								removeItem(valueInSecondCol_1);
-								removeItem(valueInSecondCol_2);
-							}
-							// remove the item in the column "step 2"
-							if(subValueInFirstCol_1.equals(subValueInFirstCol_2) && numInFirstCol_1 < numInFirstCol_2) {
-								removeItem(valueInFirstCol_2);
-								removeItem(valueInFirstCol_1);
-							}
-							else {
-								removeItem(valueInFirstCol_1);
-								removeItem(valueInFirstCol_2);
-							}
-
+							removeTwoRowsItems(rowInTable2);
 							removeTableRow(extraRowInTable2);
-							
-							myTable2.model.mySetValueAt(" ", rowInTable2, 0);
-							myTable2.model.mySetValueAt(" ", rowInTable2, 1);
 						} else if (!isContain(sepComponents, getName(cur))) {
-							removeItem(cur);
+							int rowInTable2 = firstKey(indexMap,row);
+							removeOneRowItems(rowInTable2);
+							removeOneItem(cur);
 						}
 					}
 					myTable1.updateMyCellRender(" ");
@@ -377,11 +342,16 @@ public class MgmtTrainPanel extends JPanel {
 					int row = jTable2.getSelectedRow();
 					int col = jTable2.getSelectedColumn();
 					if (!myTable2.model.data[row][col].toString().equals(" ")) {
-						String cur = myTable2.model.data[row][col].toString();
-						removeItem(cur);
+						if(col == 0)						
+							removeOneRowItems(row);
+						else {
+							String cur = myTable2.model.data[row][col].toString();
+							removeOneItem(cur);
+							myTable2.model.mySetValueAt(" ", row, col);
+						}
 					}
-					myTable1.updateMyCellRender(" ");
-					myTable2.model.mySetValueAt(" ", row, col);
+					jTable1.clearSelection();
+					myTable1.updateMyCellRender(" ");					
 					jTable2.repaint();
 				}
 
@@ -391,13 +361,13 @@ public class MgmtTrainPanel extends JPanel {
 	}
 
 	/**
-	 * creates new items after the separator line of the popupMenu, under this
+	 * creates special items after the separator line of the popupMenu, under this
 	 * format: name + " #" + NO. 
 	 * @param n  new value of the cell, under this format: name + " #" + NO.
 	 * @param jt the target table
 	 * @return
 	 */
-	private JMenuItem createNewItem(String n, JTable jt) {
+	private JMenuItem createSpecialItem(String n, JTable jt) {
 		JMenuItem item = new JMenuItem();
 		item.setText(n);
 		item.addActionListener(new java.awt.event.ActionListener() {
@@ -416,7 +386,7 @@ public class MgmtTrainPanel extends JPanel {
 						if (cur != " " && (c1.equals(n1))) {
 							exchangeNewItems(cur, n);
 						} else if (cur != " " && !(c1.equals(n1))) {
-							removeItem(cur);
+							removeOneItem(cur);
 						}
 
 					} else {
@@ -435,7 +405,7 @@ public class MgmtTrainPanel extends JPanel {
 					if (!cur.equals(n)) {
 						countMap.put(n, countMap.get(n) + 1);
 						if (cur != " ") {
-							removeItem(cur);
+							removeOneItem(cur);
 						}
 					} else {
 						System.out.print("==");
@@ -528,51 +498,15 @@ public class MgmtTrainPanel extends JPanel {
 						if (isContain(sepComponents, getName(cur))) {
 							int rowInTable2 = firstKey(indexMap, row);
 							int extraRowInTable2 = rowInTable2 + 1;
-							
-							String valueInSecondCol_1 = myTable2.model.data[rowInTable2][1].toString();
-							String subValueInSecondCol_1 = getName(valueInSecondCol_1);
-							int numInSecondCol_1 = Character.getNumericValue(valueInSecondCol_1.charAt(valueInSecondCol_1.length() - 1));
-							
-							String valueInSecondCol_2 = myTable2.model.data[extraRowInTable2][1].toString();
-							String subValueInSecondCol_2 = getName(valueInSecondCol_2);
-							int numInSecondCol_2 = Character.getNumericValue(valueInSecondCol_2.charAt(valueInSecondCol_2.length() - 1));
-							
-							String valueInFirstCol_1 = myTable2.model.data[rowInTable2][0].toString();
-							String subValueInFirstCol_1 = getName(valueInFirstCol_1);
-							int numInFirstCol_1 = Character.getNumericValue(valueInFirstCol_1.charAt(valueInFirstCol_1.length() - 1));
-							
-							String valueInFirstCol_2 = myTable2.model.data[extraRowInTable2][0].toString();
-							String subValueInFirstCol_2 = getName(valueInFirstCol_2);
-							int numInFirstCol_2 = Character.getNumericValue(valueInFirstCol_2.charAt(valueInFirstCol_2.length() - 1));
-
-							// remove the item in the column "step 3"
-							if(subValueInSecondCol_1.equals(subValueInSecondCol_2) && numInSecondCol_1 < numInSecondCol_2) {
-								removeItem(valueInSecondCol_2);
-								removeItem(valueInSecondCol_1);
-							}
-							else {
-								removeItem(valueInSecondCol_1);
-								removeItem(valueInSecondCol_2);
-							}
-							// remove the item in the column "step 2"
-							if(subValueInFirstCol_1.equals(subValueInFirstCol_2) && numInFirstCol_1 < numInFirstCol_2) {
-								removeItem(valueInFirstCol_2);
-								removeItem(valueInFirstCol_1);
-							}
-							else {
-								removeItem(valueInFirstCol_1);
-								removeItem(valueInFirstCol_2);
-							}
-
+							removeTwoRowsItems(rowInTable2);					
 							removeTableRow(extraRowInTable2);
-							
-							myTable2.model.mySetValueAt(" ", rowInTable2, 0);
-							myTable2.model.mySetValueAt(" ", rowInTable2, 1);
 						} else if (!isContain(sepComponents, getName(cur))) {
 							String c1 = getName(cur);
 							String s1 = getName(s);
 							if (!c1.equals(s1)) {
-								removeItem(cur);							
+								int rowInTable2 = firstKey(indexMap,row);
+								removeOneRowItems(rowInTable2);
+								removeOneItem(cur);							
 							}								
 						}
 
@@ -597,7 +531,7 @@ public class MgmtTrainPanel extends JPanel {
 								else
 									map.put(s, map.get(s) + 1);
 								value = s + " #" + map.get(s).toString();
-								addItem(value);
+								addOneItem(value);
 								myTable1.updateMyCellRender(value);
 								myTable1.model.mySetValueAt(value, row, col);
 							}														
@@ -611,8 +545,13 @@ public class MgmtTrainPanel extends JPanel {
 					int col = jTable2.getSelectedColumn();
 					// remove old item
 					if (!myTable2.model.data[row][col].toString().equals(" ")) {
-						String cur = myTable2.model.data[row][col].toString();
-						removeItem(cur);						
+						if(col == 0)
+							removeOneRowItems(row);
+						else {
+							String cur = myTable2.model.data[row][col].toString();
+							removeOneItem(cur);
+							myTable2.model.mySetValueAt(" ", row, col);
+						}					
 					}
 					// add separator line
 					if (resultComponents.size() == 0) {
@@ -629,7 +568,7 @@ public class MgmtTrainPanel extends JPanel {
 					else
 						map.put(s, map.get(s) + 1);
 					String value = s + " #" + map.get(s).toString();
-					addItem(value);
+					addOneItem(value);
 					myTable2.model.mySetValueAt(value, row, col);
 				}
 			}
@@ -730,7 +669,7 @@ public class MgmtTrainPanel extends JPanel {
 							if (resultComponents.size() != 0)
 								popupMenu_liqu.addSeparator();
 							for (int i = 0; i < liquidComponents.size(); i++) {
-								popupMenu_liqu.add(createNewItem(liquidComponents.get(i), jTable2));
+								popupMenu_liqu.add(createSpecialItem(liquidComponents.get(i), jTable2));
 							}
 							popupMenu_liqu.show(jTable2, e.getX(), e.getY());
 
@@ -744,7 +683,7 @@ public class MgmtTrainPanel extends JPanel {
 							if (resultComponents.size() != 0)
 								popupMenu_term.addSeparator();
 							for (int i = 0; i < terminalComponents.size(); i++) {
-								popupMenu_term.add(createNewItem(terminalComponents.get(i), jTable2));
+								popupMenu_term.add(createSpecialItem(terminalComponents.get(i), jTable2));
 							}
 							popupMenu_term.show(jTable2, e.getX(), e.getY());
 
@@ -760,9 +699,21 @@ public class MgmtTrainPanel extends JPanel {
 							}
 							if (resultComponents.size() != 0)
 								popupMenu_nosep.addSeparator();
-							for (int i = 0; i < resultComponents.size(); i++) {
-								popupMenu_nosep.add(createNewItem(resultComponents.get(i), jTable2));
-							}							
+							for (int j = 0; j < resultComponents.size(); j++) {
+								JMenuItem item = createSpecialItem(resultComponents.get(j), jTable2);
+								// the storages in the same separator can't be the same.
+								if(indexMap.get(row).equals(indexMap.get(row+1))) {
+									String v = myTable2.model.data[row+1][0].toString();
+									if(resultComponents.get(j).equals(v))
+										item.setEnabled(false);
+								}
+								if(indexMap.get(row).equals(indexMap.get(row-1))) {
+									String v = myTable2.model.data[row-1][0].toString();
+									if(resultComponents.get(j).equals(v))
+										item.setEnabled(false);
+								}							
+								popupMenu_nosep.add(item);
+							}														
 							popupMenu_nosep.show(jTable2, e.getX(), e.getY());
 						}
 					}
@@ -778,9 +729,21 @@ public class MgmtTrainPanel extends JPanel {
 							popupMenu_liqu.add(createNormalItem("Storage Tank", jTable2));
 							if (resultComponents.size() != 0)
 								popupMenu_liqu.addSeparator();
-							for (int i = 0; i < liquidComponents.size(); i++) {
-								popupMenu_liqu.add(createNewItem(liquidComponents.get(i), jTable2));
-							}
+							for (int j = 0; j < liquidComponents.size(); j++) {
+								JMenuItem item = createSpecialItem(liquidComponents.get(j), jTable2);
+								// the storages in the same separator can't be the same.
+								if(indexMap.get(row).equals(indexMap.get(row+1))) {
+									String v = myTable2.model.data[row+1][1].toString();
+									if(liquidComponents.get(j).equals(v))
+										item.setEnabled(false);
+								}
+								if(indexMap.get(row).equals(indexMap.get(row-1))) {
+									String v = myTable2.model.data[row-1][1].toString();
+									if(liquidComponents.get(j).equals(v))
+										item.setEnabled(false);
+								}							
+								popupMenu_liqu.add(item);
+							}		
 							popupMenu_liqu.show(jTable2, e.getX(), e.getY());
 
 						} else if (valueInTable2.equals("Dry Stack(Uncovered)")) {
@@ -792,9 +755,21 @@ public class MgmtTrainPanel extends JPanel {
 							popupMenu_term.add(createNormalItem("Anaerobic Lagoon", jTable2));
 							if (resultComponents.size() != 0)
 								popupMenu_term.addSeparator();
-							for (int i = 0; i < terminalComponents.size(); i++) {
-								popupMenu_term.add(createNewItem(terminalComponents.get(i), jTable2));
-							}
+							for (int j = 0; j < terminalComponents.size(); j++) {
+								JMenuItem item = createSpecialItem(terminalComponents.get(j), jTable2);
+								// the storages in the same separator can't be the same.
+								if(indexMap.get(row).equals(indexMap.get(row+1))) {
+									String v = myTable2.model.data[row+1][1].toString();
+									if(terminalComponents.get(j).equals(v))
+										item.setEnabled(false);
+								}
+								if(indexMap.get(row).equals(indexMap.get(row-1))) {
+									String v = myTable2.model.data[row-1][1].toString();
+									if(terminalComponents.get(j).equals(v))
+										item.setEnabled(false);
+								}							
+								popupMenu_term.add(item);
+							}		
 							popupMenu_term.show(jTable2, e.getX(), e.getY());
 						}
 					}
@@ -836,8 +811,8 @@ public class MgmtTrainPanel extends JPanel {
 		return -1;
 	}
 
-	// remove item from the jTable
-	private void removeItem(String s) {
+	// remove one item from the jTable
+	private void removeOneItem(String s) {
 		try {
 			if (countMap.get(s) > 0)
 				countMap.put(s, countMap.get(s) - 1);
@@ -856,9 +831,70 @@ public class MgmtTrainPanel extends JPanel {
 
 		}
 	}
+	/**
+	 * remove one row item from the jTable2. i.g., one in jTable2 corresponding to one row in jTable1.
+	 * @param rowIndex
+	 */
+	private void removeOneRowItems(int rowIndex) {
+		String itemInTable2_1 = myTable2.model.data[rowIndex][0].toString();
+		String itemInTable2_2 = myTable2.model.data[rowIndex][1].toString();
+		removeOneItem(itemInTable2_2);
+		removeOneItem(itemInTable2_1);
+		myTable2.model.mySetValueAt(" ", rowIndex, 1);
+		myTable2.model.mySetValueAt(" ", rowIndex, 0);
+	}
 	
-	// add item into the jTable
-	private void addItem(String value) {		
+	/**
+	 *  remove two rows items from the jTable2. i.g., two rows in jTable2 corresponding to one row in jTable1.
+	 * @param rowIndex	the row index of jTable2. i.g., the 1st row of the two rows.
+	 */
+	private void removeTwoRowsItems(int rowIndex) {
+		
+		int extraRowInTable2 = rowIndex + 1;
+		
+		// get the value of column "step 3"
+		String valueInSecondCol_1 = myTable2.model.data[rowIndex][1].toString();
+		String subValueInSecondCol_1 = getName(valueInSecondCol_1);
+		int numInSecondCol_1 = Character.getNumericValue(valueInSecondCol_1.charAt(valueInSecondCol_1.length() - 1));
+		
+		String valueInSecondCol_2 = myTable2.model.data[extraRowInTable2][1].toString();
+		String subValueInSecondCol_2 = getName(valueInSecondCol_2);
+		int numInSecondCol_2 = Character.getNumericValue(valueInSecondCol_2.charAt(valueInSecondCol_2.length() - 1));
+		
+		// get the value of column "step 2"
+		String valueInFirstCol_1 = myTable2.model.data[rowIndex][0].toString();
+		String subValueInFirstCol_1 = getName(valueInFirstCol_1);
+		int numInFirstCol_1 = Character.getNumericValue(valueInFirstCol_1.charAt(valueInFirstCol_1.length() - 1));
+		
+		String valueInFirstCol_2 = myTable2.model.data[extraRowInTable2][0].toString();
+		String subValueInFirstCol_2 = getName(valueInFirstCol_2);
+		int numInFirstCol_2 = Character.getNumericValue(valueInFirstCol_2.charAt(valueInFirstCol_2.length() - 1));
+
+		// remove the item in the column "step 3"
+		if(subValueInSecondCol_1.equals(subValueInSecondCol_2) && numInSecondCol_1 < numInSecondCol_2) {
+			removeOneItem(valueInSecondCol_2);
+			removeOneItem(valueInSecondCol_1);
+		}
+		else {
+			removeOneItem(valueInSecondCol_1);
+			removeOneItem(valueInSecondCol_2);
+		}
+		// remove the item in the column "step 2"
+		if(subValueInFirstCol_1.equals(subValueInFirstCol_2) && numInFirstCol_1 < numInFirstCol_2) {
+			removeOneItem(valueInFirstCol_2);
+			removeOneItem(valueInFirstCol_1);
+		}
+		else {
+			removeOneItem(valueInFirstCol_1);
+			removeOneItem(valueInFirstCol_2);
+		}
+		
+		myTable2.model.mySetValueAt(" ", rowIndex, 1);
+		myTable2.model.mySetValueAt(" ", rowIndex, 0);
+	}
+	
+	// add one item into the jTable
+	private void addOneItem(String value) {		
 		if (!countMap.containsKey(value))
 			countMap.put(value, 1);
 		else
@@ -936,9 +972,9 @@ public class MgmtTrainPanel extends JPanel {
 				int num = Character.getNumericValue(v.charAt(v.length() - 1));
 				if (sv.equals(s1) && num > num1) {
 					String value = sv + " #" + (num - 1);
-					myTable2.model.mySetValueAt(value, i, j);
-					jTable2.repaint();
+					myTable2.model.mySetValueAt(value, i, j);					
 				}
+				jTable2.repaint();
 			}
 		}
 
@@ -1099,13 +1135,13 @@ public class MgmtTrainPanel extends JPanel {
 	private void updatePopupMenus(String type, String text) {
 
 		if (type.equals("add")) {
-			popupMenu_full.add(createNewItem(text, jTable1));
-			popupMenu_runoff.add(createNewItem(text, jTable1));
-			popupMenu_nosep.add(createNewItem(text, jTable2));
+			popupMenu_full.add(createSpecialItem(text, jTable1));
+			popupMenu_runoff.add(createSpecialItem(text, jTable1));
+			popupMenu_nosep.add(createSpecialItem(text, jTable2));
 			if (isTerminalComponent(text))
-				popupMenu_term.add(createNewItem(text, jTable2));
+				popupMenu_term.add(createSpecialItem(text, jTable2));
 			if (isLiquidComponent(text))
-				popupMenu_liqu.add(createNewItem(text, jTable2));
+				popupMenu_liqu.add(createSpecialItem(text, jTable2));
 		}
 		if (type.equals("delete")) {
 
