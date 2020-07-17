@@ -27,7 +27,10 @@ import javax.swing.border.Border;
 import javax.swing.table.TableColumn;
 
 import Controller.PanelManager;
+import Model_Entity.AdditionsPanelOutputElement;
+import Model_Entity.AnimalPanelOutputElement;
 import Model_Entity.BeddingInfo;
+import Model_Entity.LocationPanelOutputElement;
 import Model_Tables.AdditionsTable;
 
 
@@ -56,7 +59,8 @@ public class AdditionsPanel extends JPanel {
 	ArrayList<String> streamNames;	// the first column's data
 	ArrayList<BeddingInfo> dataset;	// all beddingInfos
 	ArrayList<String> beddingType;	// used for showing in the JCombobox
-	
+	// store the output of panel: the name, and part of data of each animal(manure and ts).
+	ArrayList<AdditionsPanelOutputElement> additionsPanelOutput; 
 
 	/************************************************************
 	 * declare the elements of this panel
@@ -112,8 +116,8 @@ public class AdditionsPanel extends JPanel {
 			beddingType.add(dataset.get(i).name);
 		}
 
-		// get the first column data of table
-		streamNames = panelManager.locationPanelOutput;
+		// get the initialized elements in the first column of table
+		streamNames = panelManager.getLocationElements();
 
 		// initial the other table data
 		data = new Object[streamNames.size()][8];
@@ -316,7 +320,8 @@ public class AdditionsPanel extends JPanel {
 					databaseTable.getCellEditor().stopCellEditing();
 				try {
 					if (runoffPanel == null) {
-						// panelManager.storeClimatePanelOutput(Output);
+						getOutput();
+						panelManager.storeAdditionsPanelOutput(additionsPanelOutput);
 						runoffPanel = new RunoffPanel(panelManager);
 						runoffPanel.setParent(parent);
 						pane.add("runoff", runoffPanel);
@@ -382,6 +387,21 @@ public class AdditionsPanel extends JPanel {
 
 	}
 	
+	// gets the output of this panel
+	private void getOutput() {
+		additionsPanelOutput = new ArrayList<>();
+		for(int i = 0; i < databaseTable.getRowCount(); i++) {
+			String name = myTable.model.data[i][0].toString();
+			String[] data = new String[3];
+			data[0] = myTable.model.data[i][1].toString(); // wash water
+			data[1] = myTable.model.data[i][2].toString(); // flush water
+			data[2] = myTable.model.data[i][7].toString(); // CV
+			AdditionsPanelOutputElement additionsElement = new AdditionsPanelOutputElement(name, data);
+			additionsPanelOutput.add(additionsElement);
+							
+		}				
+	}
+	
 	/**
 	 * adds the row data, with the limitation that the stream name can't be duplicated.
 	 * it is also associated with locationsPanel: the change of row count of the locationsPanel affect this table.
@@ -403,9 +423,9 @@ public class AdditionsPanel extends JPanel {
 
 			databaseTable.updateUI();
 			
-			System.out.print(myTable.model.data.length);
-			System.out.print("---");
-			System.out.print(databaseTable.getColumnCount());
+			//System.out.print(myTable.model.data.length);
+			//System.out.print("---");
+			//System.out.print(databaseTable.getColumnCount());
 			
 			
 			textAdd.setText("");

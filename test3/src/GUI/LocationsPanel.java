@@ -24,7 +24,8 @@ import javax.swing.border.Border;
 
 import Controller.PanelManager;
 import Model_Entity.AnimalInfo;
-import Model_Entity.AnimalPanelTableInfo;
+import Model_Entity.AnimalPanelOutputElement;
+import Model_Entity.LocationPanelOutputElement;
 import Model_Tables.ClimateTable;
 import Model_Tables.LocationsTable;
 
@@ -56,11 +57,11 @@ public class LocationsPanel extends JPanel {
 	Object data1[][];   // for table1
 	Object data2[][];	// for table2
 	// the input data from the output of animalPanel, to generate the column names;
-	ArrayList<AnimalInfo> animalsList;	
-	ArrayList<String> firstColNames; // the first column's name;
+	//ArrayList<AnimalInfo> animalsList;	
+	ArrayList<String> elementsInFirstCol; // the first column's name;
 	int rowIndex;  //  the row index of selected to delete
 	String deleteName; // the location name to be delete.
-    ArrayList<String> locationPanelOutput;	   // to store the output of location panel
+    ArrayList<LocationPanelOutputElement> locationPanelOutput;	   // to store the output of location panel
 	
 	/***********************************************************
 	 * declare the elements used in this panel
@@ -104,10 +105,10 @@ public class LocationsPanel extends JPanel {
  	// initials the data structures, mainly to get the input data.
     private void initialData() {
 		
-    	// get the column of the table		
-		columnName = panelManager.getColumnNames();
-		// initial the firstColNames;
-		firstColNames = new ArrayList<>();
+    	// get the column names of the table		
+		columnName = panelManager.getLocationColumnNames();
+		// initial the elementsInFirstCol;
+		elementsInFirstCol = new ArrayList<>();
     }
     // initials the elements of this panel
     private void initialElements() {		
@@ -181,7 +182,7 @@ public class LocationsPanel extends JPanel {
 					additionsPanel.deleteTableRow(deleteName);
 				}
 				deleteTableRow();
-				firstColNames.remove(deleteName);
+				elementsInFirstCol.remove(deleteName);
 				data1 = myTable1.model.data;
 				data2 = myTable2.model.data;															
 				
@@ -289,7 +290,13 @@ public class LocationsPanel extends JPanel {
 	private void getOutput() {
 		locationPanelOutput = new ArrayList<>();
 		for(int i = 0; i < myTable1.model.data.length-1; i++) {
-			locationPanelOutput.add(myTable1.model.data[i][0].toString());
+			String name = myTable1.model.data[i][0].toString();
+			String[] data = new String[columnName.length-1];
+			for(int j = 0; j < columnName.length-1; j++) {
+				data[j] = myTable1.model.data[i][j+1].toString();
+			}
+			LocationPanelOutputElement locationElement = new LocationPanelOutputElement(name, data);
+			locationPanelOutput.add(locationElement);
 		}
 	}
     
@@ -335,7 +342,7 @@ public class LocationsPanel extends JPanel {
     
     // adds row data into the table
     private void addTableRow(String s) {   					
-		if(!firstColNames.contains(s)) {
+		if(!elementsInFirstCol.contains(s)) {
 			int col = myTable1.model.getColumnCount();
 			String[] rowData = new String[col];
 			rowData[0] = s;
@@ -350,7 +357,7 @@ public class LocationsPanel extends JPanel {
 			textLocation.setText("");	
 			data1 = myTable1.model.data;
 			data2 = myTable2.model.data;
-			firstColNames.add(s);
+			elementsInFirstCol.add(s);
 		}
 		else
 			JOptionPane.showMessageDialog(null,"You cannot have two waste streams with"

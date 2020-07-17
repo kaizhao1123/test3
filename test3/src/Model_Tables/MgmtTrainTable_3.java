@@ -2,6 +2,7 @@ package Model_Tables;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
 import java.util.Enumeration;
 
 import javax.swing.JTable;
@@ -11,14 +12,17 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 
+
 public class MgmtTrainTable_3 implements TableModelListener {
 
 	JTable ntable;
-	TableModel model;
+	public TableModel model;
 
 	String[] columnNamess;
 	Object[][] dataa;
-	Color cc = Color.lightGray;
+	// the default color of the table. The cell with this color can be editable.
+	Color defaultColor = Color.cyan;
+	MyCellRenderer tcr;
 
 	public JTable buildMyTable(String[] s, Object[][] o) {
 		
@@ -29,49 +33,46 @@ public class MgmtTrainTable_3 implements TableModelListener {
 		model.addTableModelListener(this);
 		ntable = new JTable(model);
 
-		int rowcount = ntable.getRowCount();
-		//int colcount = ntable.getColumnCount();
-		setColor(0,rowcount,1,5,Color.cyan);
-		FitTableColumns(ntable);
+		setCellRenderer();
+		ntable.setBackground(defaultColor);
 		
-		//TableColumn column = ntable.getColumnModel().getColumn(2);
-       // column.setWidth(150);
-        
+		FitTableColumns(ntable);       
 		ntable.setVisible(true);
-		
-		
-		
 		
 		return ntable;
 	}
 
-	public void setColor(int row_start, int row_end, int col_start, int col_end, Color ncolor) {
-		try {
-			DefaultTableCellRenderer tcr = new DefaultTableCellRenderer() {
-				public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-						boolean hasFocus, int row, int column) {
-					Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+	/**
+	 * Sets up cellRenderers of all cells following the column.
+	 */
+	public void setCellRenderer() {
+		tcr = new MyCellRenderer();		
+		for (int i = 0; i < ntable.getColumnCount(); i++) {
+			ntable.getColumnModel().getColumn(i).setCellRenderer(tcr);
+		}		
+	}
 
-					if (row >= row_start && row <= row_end && column >= col_start && column <= col_end) {
-						setBackground(ncolor);
-						// cc = ncolor;
-					} else if (column == 0) {
-						setBackground(null);
-					} else
-						setBackground(cc);
+	/**
+	 * Define special cellRenderer based on the requirement of the table. 
+	 * it only set the content of the cell stay in the center, and set font.
+	 * @author Kai Zhao
+	 *
+	 */
+	class MyCellRenderer extends DefaultTableCellRenderer {
 
-					return c;
-				}
-			};
+		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
+				int row, int column) {
 
-			for (int i = 0; i < col_end; i++) {
-				ntable.setDefaultRenderer(ntable.getColumnClass(i), tcr);
+			Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+			if(column == 0) {
+				super.setHorizontalAlignment(LEFT);
 			}
-
-		} catch (Exception ex) {
-			ex.printStackTrace();
+			else {
+				super.setHorizontalAlignment(RIGHT);				
+			}
+			c.setFont(new Font(c.getFont().getName(), Font.BOLD, 12));
+			return c;
 		}
-
 	}
 
 	public void FitTableColumns(JTable jt) {              

@@ -3,7 +3,6 @@ package Model_Tables;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -63,7 +62,6 @@ public class MgmtTrainTable_1 implements TableModelListener {
 	class MyCellRender implements TableCellRenderer {
 
 		JPanel panel;
-		//JLabel label_2;
 		GridBagConstraints gbc;
 		String s;
 		MyCellRender(String str){
@@ -72,37 +70,26 @@ public class MgmtTrainTable_1 implements TableModelListener {
 
 		private void initialPanel_1(String str) {
 			panel = new JPanel();
-			//panel.setPreferredSize(new Dimension(285,80));
-			//panel.setSize(145, 80);
 			panel.setLayout(new GridBagLayout());
 			gbc = new GridBagConstraints();
 
 			JLabel label_1;
-			JLabel label_3;
 			JLabel label_2;
+			JLabel label_3;
 			JLabel label_4;
-			JLabel label_5;
-			JLabel label_6;
 
 			label_1 = new JLabel();			
 			label_1.setPreferredSize(new Dimension(210,20));
 			label_2 = new JLabel();
 			label_2.setPreferredSize(new Dimension(210,20));
 			label_3 = new JLabel();
-			//label_3.setSize(new Dimension(5, 20));
+			label_3.setPreferredSize(new Dimension(65,20));
 			label_4 = new JLabel();
-			//label_4.setPreferredSize(new Dimension(80,20));
-			label_5 = new JLabel();
-			label_5.setPreferredSize(new Dimension(65,20));
-			label_6 = new JLabel();
-			label_6.setPreferredSize(new Dimension(65,20));
+			label_4.setPreferredSize(new Dimension(65,20));
 			label_1.setText("Solid-Liquid Separator                ");
 			label_2.setText(str);
-			// Static Inclined Screen
-			//label_3.setText("|");
-			//label_4.setText("|");
-			label_5.setText("|---Liquids-->");
-			label_6.setText("|---Solids-->");
+			label_3.setText("|---Liquids-->");
+			label_4.setText("|---Solids-->");
 
 			gbc.anchor = GridBagConstraints.NORTHWEST;
 			gbc.insets = new Insets(2, 0, 2, 0);
@@ -111,89 +98,74 @@ public class MgmtTrainTable_1 implements TableModelListener {
 			gbc.gridwidth = 2;
 			panel.add(label_1, gbc);
 
-			//gbc.insets = new Insets(2, 0, 2, 0);
-			//gbc.gridx = 1;
-			//panel.add(label_3, gbc);
 			gbc.gridwidth = 1;
 			gbc.insets = new Insets(2, 0, 2, 0);
 			gbc.gridx = 2;
-			panel.add(label_5, gbc);
-			
-			
+			panel.add(label_3, gbc);
+						
 			gbc.gridx = 0;
 			gbc.gridy = 1;
 			gbc.gridwidth = 2;
 			panel.add(label_2, gbc);
-
-			//gbc.insets = new Insets(2, 0, 2, 0);
-			//gbc.gridx = 1;
-			//panel.add(label_4, gbc);
 			
 			gbc.insets = new Insets(2, 0, 2, 0);
 			gbc.gridx = 2;
 			gbc.gridwidth = 1;
-			panel.add(label_6, gbc);
+			panel.add(label_4, gbc);
 		}
 
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
 				int row, int column) {
+			
 			if (column == 1) {
 				int rrrr = ntable.getSelectedRow();
-				// int rrrr = ntable.rowAtPoint(ntable.getMousePosition());
-				
 				
 				if(row == rrrr) {
 					if(isContain(sepComponents, s)) {
 						initialPanel_1(s);
-						//model.data[row][column] = s;
-						//System.out.print(row);
-						//System.out.print("a");
 					}
 					else {
-						panel = new JPanel();
-						panel.setLayout(new GridBagLayout());
-						gbc = new GridBagConstraints();
+						if(value != null) {
+							String cur = getName(value.toString());
+							if(!isContain(sepComponents, cur )) {
+								panel = new JPanel();
+								panel.setLayout(new GridBagLayout());
+								gbc = new GridBagConstraints();
 
-						JLabel label = new JLabel();
-						label.setText(model.data[rrrr][column].toString());
-						panel.add(label, gbc);
-						//model.data[row][column] = s;
-						//System.out.print(row);
-						//System.out.print("b");
-					}
-					
+								JLabel label = new JLabel();
+								label.setText(value.toString());
+								panel.add(label, gbc);
+							}
+							else
+								initialPanel_1(cur);
+						}	
+					}					
 				}
 				else{
-					if(isContain(sepComponents, value.toString())) {
-						initialPanel_1(value.toString());
-						//model.data[row][column] = value;
-						//System.out.print(row);
-						//System.out.print("c");
+					if(value != null) {
+						String cur = getName(value.toString());
+						
+						if(isContain(sepComponents, cur)) {
+							initialPanel_1(cur);
+						}
+						else {
+							panel = new JPanel();
+							panel.setLayout(new GridBagLayout());
+							gbc = new GridBagConstraints();
 
+							JLabel label = new JLabel();
+							label.setText(value.toString());
+							panel.add(label, gbc);
+
+						}			
 					}
-					else {
-						panel = new JPanel();
-						panel.setLayout(new GridBagLayout());
-						gbc = new GridBagConstraints();
-
-						JLabel label = new JLabel();
-						label.setText(value.toString());
-						//model.data[row][column] = value;
-						panel.add(label, gbc);
-						//System.out.print(row);
-						//System.out.print("d");
-					}
-
-					
 				}
 				panel.setBackground(defaultColor);
 				return panel;
 			}
-			return null;
-			
+			return null;			
 		}
 	}
-
 	
 	// check whether String[] contains the target String
 	private boolean isContain(String[] list, String s) {
@@ -204,6 +176,20 @@ public class MgmtTrainTable_1 implements TableModelListener {
 		return false;			
 	}
 	
+	/**
+	 *  gets the pure name, that is, the string without "#" and "number".
+	 * @param s	the target string, with the format: "name" + " #" + No.
+	 * @return the string, i.g.,"name".
+	 */	
+	private String getName(String s) {
+		if (s == null)
+			return " ";
+		int index = s.indexOf('#');
+		if (index > 0)
+			return s.substring(0, index - 1);
+		else
+			return s;
+	}
 	
 	public void FitTableColumns(JTable jt) {
 
@@ -252,13 +238,11 @@ public class MgmtTrainTable_1 implements TableModelListener {
 
 	}
 
-	
-	
 	@Override
 	public void tableChanged(TableModelEvent e) {
 		// int col = e.getColumn();
-		int col = ntable.getSelectedColumn();
-		String colName = ntable.getColumnName(col);
+		//int col = ntable.getSelectedColumn();
+		//String colName = ntable.getColumnName(col);
 
 		//ntable.repaint();
 	}

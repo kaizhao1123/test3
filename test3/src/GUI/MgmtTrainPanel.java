@@ -6,8 +6,11 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -27,26 +30,31 @@ import javax.swing.JTable;
 import javax.swing.border.Border;
 
 import Controller.PanelManager;
+import Model_Entity.AdditionsPanelOutputElement;
 import Model_Tables.MgmtTrainTable_1;
 import Model_Tables.MgmtTrainTable_2;
 import Model_Tables.MgmtTrainTable_3;
 
+import Model_Entity.AnimalPanelOutputElement;
+import Model_Entity.LocationPanelOutputElement;
+import Model_Entity.SeparatorInfo;
+
 public class MgmtTrainPanel extends JPanel {
-	
+
 	MainFrame parent;
 	JTabbedPane pane;
 	PanelManager panelManager;
 
+	DecimalFormat df = new DecimalFormat("0.00");
 	String[] columnName_1 = { "Waste Stream", "Step 1" }; // jTable1's column names
 	String[] columnName_2 = { "Step 2", "Step 3" }; // jTable2's column names
 	String[] columnName_3 = { "Component Name", "Manure", "Wash Water", "Flush Water", "Bedding",
 			"Total Waste Volume" }; // jtable3's column
 
-	String[] firstColumn = { "a", "b", "c", "Runoff" }; // jTable1's first column's content
-
+	ArrayList<String> elementsInFirstColumn; // the elements of the first column of jTable1
 	Object[][] tableData_1;
 	Object[][] tableData_2;
-	Object[][] tableData_3 = { { "", "", "", "", "", "", "" } };
+	Object[][] tableData_3;
 
 	MgmtTrainTable_1 myTable1;
 	JTable jTable1;
@@ -74,7 +82,7 @@ public class MgmtTrainPanel extends JPanel {
 	JPopupMenu popupMenu_runoff; // popupMenu with some components, used for "runoff"
 
 	String[] components = { "Storage Pond", "Storage Tank", "Dry Stack(Uncovered)", "Dry Stack(covered)",
-			"Anaerobic Lagoon", "Anaerobic Lagoon(Ext.)" };
+			"Anaerobic Lagoon", "Anaerobic Lagoon(Ext)" };
 	String[] sepComponents = { "Decanter Centrifuge 16-30 gpm", "Screw Press", "Settling Basin",
 			"Static Inclined Screen", "Static Inclined Screen 12 Mesh", "Static Inclined Screen 36 Mesh",
 			"Vibrating Screen", "Vibrating Screen 16 Mesh", "Vibrating Screen 18 Mesh", "Vibrating Screen 24 Mesh",
@@ -83,12 +91,12 @@ public class MgmtTrainPanel extends JPanel {
 	// records the storage component and its number, such as: <Storage Tank, 1>.
 	HashMap<String, Integer> map = new HashMap<>();
 	/*
-	 * records the storage component with its number and its count, 
-	 * e.g., <Storage Tank #1, 1>.
-	 */ 
+	 * records the storage component with its number and its count, e.g., <Storage
+	 * Tank #1, 1>.
+	 */
 	HashMap<String, Integer> countMap = new HashMap<>();
 	/*
-	 * records the index of table2 corresponding index of table1,  used for recording 
+	 * records the index of table2 corresponding index of table1, used for recording
 	 * when merge and split row. e.g., <index of table2, index of table1>.
 	 */
 	HashMap<Integer, Integer> indexMap = new HashMap<>();
@@ -102,8 +110,8 @@ public class MgmtTrainPanel extends JPanel {
 	// stores the liquid storage components in the resultComponents: tank and pond
 	ArrayList<String> liquidComponents;
 	/*
-	 *  stores the terminal storage components in the resultComponents: tank, pond,
-	 *  covered dry stack, and anaerobic lagoon.
+	 * stores the terminal storage components in the resultComponents: tank, pond,
+	 * covered dry stack, and anaerobic lagoon.
 	 */
 	ArrayList<String> terminalComponents;
 
@@ -124,20 +132,25 @@ public class MgmtTrainPanel extends JPanel {
 	}
 
 	private void initialData() {
+
 		// initial jTable1
-		tableData_1 = new Object[firstColumn.length][2];
-		for (int i = 0; i < firstColumn.length; i++) {
-			tableData_1[i][0] = firstColumn[i];
+		elementsInFirstColumn = panelManager.getAllStreams();
+		tableData_1 = new Object[elementsInFirstColumn.size()][2];
+		for (int i = 0; i < elementsInFirstColumn.size(); i++) {
+			tableData_1[i][0] = elementsInFirstColumn.get(i);
 			tableData_1[i][1] = " ";
 			indexMap.put(i, i); // initial indexMap by the way.
 		}
 
 		// initial jTable2
-		tableData_2 = new Object[firstColumn.length][2];
-		for (int i = 0; i < firstColumn.length; i++) {
+		tableData_2 = new Object[elementsInFirstColumn.size()][2];
+		for (int i = 0; i < elementsInFirstColumn.size(); i++) {
 			tableData_2[i][0] = " ";
 			tableData_2[i][1] = " ";
 		}
+
+		// initial jTable3
+		tableData_3 = null;
 
 		resultComponents = new ArrayList<>();
 		liquidComponents = new ArrayList<>();
@@ -145,11 +158,10 @@ public class MgmtTrainPanel extends JPanel {
 	}
 
 	/**
-	 * initial elements in this panel. 
-	 * there are two JscrollPanes to show tables, the first scrollPane shows a 
-	 * child panel, which includes two child Jscrollpanes, show jTable1 and jTable2
-	 * respectively. The 2nd scrollPane shows jTable3.
-	 * in addition, initial all popupMenus.
+	 * initial elements in this panel. there are two JscrollPanes to show tables,
+	 * the first scrollPane shows a child panel, which includes two child
+	 * Jscrollpanes, show jTable1 and jTable2 respectively. The 2nd scrollPane shows
+	 * jTable3. in addition, initial all popupMenus.
 	 */
 	private void initialElements() {
 		label = new JLabel("Component Volumens(cu.ft/day)");
@@ -164,8 +176,7 @@ public class MgmtTrainPanel extends JPanel {
 		jTable1.setRowSelectionAllowed(false);
 		myTable1.updateMyCellRender(" ");
 		subScrollPane_1 = new JScrollPane(jTable1);
-		subScrollPane_1.setPreferredSize(new Dimension(350, 220));
-		subScrollPane_1.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+		subScrollPane_1.setPreferredSize(new Dimension(350, 223));
 		subScrollPane_1.setViewportBorder(border);
 		subScrollPane_1.setBorder(border);
 
@@ -176,13 +187,14 @@ public class MgmtTrainPanel extends JPanel {
 		jTable2.getColumnModel().getColumn(1).setWidth(115);
 		jTable2.setRowSelectionAllowed(false);
 		subScrollPane_2 = new JScrollPane(jTable2);
-		subScrollPane_2.setPreferredSize(new Dimension(275, 220));
-		subScrollPane_2.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+		subScrollPane_2.setPreferredSize(new Dimension(275, 223));
 		subScrollPane_2.setViewportBorder(border);
 		subScrollPane_2.setBorder(border);
+		subScrollPane_2.setVerticalScrollBar(subScrollPane_1.getVerticalScrollBar());
 
 		panel_1 = new JPanel();
 		panel_1.setLayout(new GridBagLayout());
+		panel_1.setPreferredSize(new Dimension(630, 226));
 		subgc = new GridBagConstraints();
 
 		subgc.insets = new Insets(0, 0, 0, 0);
@@ -196,15 +208,19 @@ public class MgmtTrainPanel extends JPanel {
 
 		panel_1.setVisible(true);
 		scrollPane_1 = new JScrollPane(panel_1);
-		scrollPane_1.setPreferredSize(new Dimension(630, 223));
-		//scrollPane_1.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-		scrollPane_1.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollPane_1.setPreferredSize(new Dimension(630, 226));
 		scrollPane_1.setViewportBorder(border);
 		scrollPane_1.setBorder(border);
 
 		// initial scrollPane_2
 		myTable3 = new MgmtTrainTable_3();
 		jTable3 = myTable3.buildMyTable(columnName_3, tableData_3);
+		jTable3.getColumnModel().getColumn(0).setWidth(160);
+		jTable3.getColumnModel().getColumn(1).setWidth(85);
+		jTable3.getColumnModel().getColumn(2).setWidth(85);
+		jTable3.getColumnModel().getColumn(3).setWidth(85);
+		jTable3.getColumnModel().getColumn(4).setWidth(85);
+		jTable3.getColumnModel().getColumn(5).setWidth(130);
 		jTable3.enable(false);
 		jTable3.setRowHeight(25);
 
@@ -233,7 +249,7 @@ public class MgmtTrainPanel extends JPanel {
 		separatorMenu = new JMenu("Solid-Liquid Separator");
 		initialPopupMenu();
 	}
-	
+
 	// initial listeners
 	private void initialActionListeners() {
 		jTable1.addMouseListener(new MouseAdapter() {
@@ -246,9 +262,9 @@ public class MgmtTrainPanel extends JPanel {
 						popupMenu_runoff.show(jTable1, e.getX(), e.getY());
 					} else
 						popupMenu_full.show(jTable1, e.getX(), e.getY());
-					myTable1.updateMyCellRender(tableData_1[row][col].toString());
 				}
-				jTable1.repaint();				
+				myTable1.updateMyCellRender(" ");
+				jTable1.repaint();
 			}
 		});
 
@@ -262,12 +278,11 @@ public class MgmtTrainPanel extends JPanel {
 
 				if (col == 0) {
 					if (!valueInTable1.equals(" ") && !isTerminalComponent(valueInTable1)) {
-						if (valueInTable1.equals("Anaerobic Lagoon(Ext.)")) {
+						if (valueInTable1.equals("Anaerobic Lagoon(Ext)")) {
 							popupMenu_liqu.show(jTable2, e.getX(), e.getY());
 						} else if (valueInTable1.equals("Dry Stack(Uncovered)")) {
 							popupMenu_term.show(jTable2, e.getX(), e.getY());
-						}
-						else {
+						} else {
 							popupMenu_nosep.show(jTable2, e.getX(), e.getY());
 						}
 					}
@@ -278,7 +293,26 @@ public class MgmtTrainPanel extends JPanel {
 				jTable2.repaint();
 			}
 		});
-
+		
+		buttonHelp.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
+		
+		buttonOK.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
 	}
 
 	// initial layout
@@ -320,20 +354,17 @@ public class MgmtTrainPanel extends JPanel {
 					int row = jTable1.getSelectedRow();
 					if (!myTable1.model.data[row][1].toString().equals(" ")) {
 						String cur = myTable1.model.data[row][1].toString();
-
 						if (isContain(sepComponents, getName(cur))) {
-
 							int rowInTable2 = firstKey(indexMap, row);
 							int extraRowInTable2 = rowInTable2 + 1;
 							removeTwoRowsItems(rowInTable2);
-							removeTableRow(extraRowInTable2);
+							removeRowInTable2(extraRowInTable2);
 						} else if (!isContain(sepComponents, getName(cur))) {
-							int rowInTable2 = firstKey(indexMap,row);
+							int rowInTable2 = firstKey(indexMap, row);
 							removeOneRowItems(rowInTable2);
 							removeOneItem(cur);
 						}
 					}
-					myTable1.updateMyCellRender(" ");
 					myTable1.model.mySetValueAt(" ", row, 1);
 					jTable1.repaint();
 				}
@@ -342,7 +373,7 @@ public class MgmtTrainPanel extends JPanel {
 					int row = jTable2.getSelectedRow();
 					int col = jTable2.getSelectedColumn();
 					if (!myTable2.model.data[row][col].toString().equals(" ")) {
-						if(col == 0)						
+						if(col == 0)
 							removeOneRowItems(row);
 						else {
 							String cur = myTable2.model.data[row][col].toString();
@@ -351,10 +382,10 @@ public class MgmtTrainPanel extends JPanel {
 						}
 					}
 					jTable1.clearSelection();
-					myTable1.updateMyCellRender(" ");					
+					//myTable1.updateMyCellRender(" ");
 					jTable2.repaint();
 				}
-
+				updateJtable3();
 			}
 		});
 		return nullItem;
@@ -362,7 +393,7 @@ public class MgmtTrainPanel extends JPanel {
 
 	/**
 	 * creates special items after the separator line of the popupMenu, under this
-	 * format: name + " #" + NO. 
+	 * format: name + " #" + NO.
 	 * @param n  new value of the cell, under this format: name + " #" + NO.
 	 * @param jt the target table
 	 * @return
@@ -417,6 +448,7 @@ public class MgmtTrainPanel extends JPanel {
 					myTable2.model.mySetValueAt(n, row, col);
 					jTable2.repaint();
 				}
+				updateJtable3();
 			}
 		});
 		return item;
@@ -424,6 +456,7 @@ public class MgmtTrainPanel extends JPanel {
 
 	/**
 	 * creates normal item when initializing the popupMenu.
+	 * 
 	 * @param s the source of the item name.
 	 * @return
 	 */
@@ -439,7 +472,7 @@ public class MgmtTrainPanel extends JPanel {
 					int col = jTable1.getSelectedColumn();
 					String cur = myTable1.model.data[row][1].toString();
 					String value;
-					
+
 					/*
 					 * At the beginning, each cell is " ", that is, before we choose the menuItem,
 					 * the current value is " ", what to do is add items into the two maps, and add
@@ -463,10 +496,9 @@ public class MgmtTrainPanel extends JPanel {
 							countMap.put(value, countMap.get(value) + 1);
 
 						if (isContain(sepComponents, s)) {
-							myTable1.updateMyCellRender(s);
 							myTable1.model.mySetValueAt(s, row, col);
 							myTable2.model.mySetValueAt(" ", row, col);
-							insertTableRow(firstKey(indexMap, row));
+							insertRowInTable2(firstKey(indexMap, row));
 						} else if (!isContain(sepComponents, s)) {
 							// add separator line
 							if (resultComponents.size() == 0) {
@@ -482,50 +514,48 @@ public class MgmtTrainPanel extends JPanel {
 							updateTerminalComponents();
 							// update all popupMenus
 							updatePopupMenus("add", value);
-							// update cellRender of jTable1 and value of this cell.
-							myTable1.updateMyCellRender(value);
+							// update value of this cell.
 							myTable1.model.mySetValueAt(value, row, col);
 						}
 					}
 
 					/*
 					 * Already have chosen one item, but need to change to another one. that is, the
-					 * current value of the cell is not null. 
+					 * current value of the cell is not null.
 					 */
 					else {
 						/*
-						 *  check whether the cur item is in sepComponents or not. if yes, need
-						 *  to remove a row from table2; if no, check whether both cur and target items
-						 *  belong to the same category or not, if no, remove the cur item from jTable1,
-						 *  otherwise, do nothing.
-						 */						
+						 * check whether the cur item is in sepComponents or not. if yes, need to remove
+						 * a row from table2; if no, check whether both cur and target items belong to
+						 * the same category or not, if no, remove the cur item from jTable1, otherwise,
+						 * do nothing.
+						 */
 						if (isContain(sepComponents, getName(cur))) {
 							int rowInTable2 = firstKey(indexMap, row);
 							int extraRowInTable2 = rowInTable2 + 1;
-							removeTwoRowsItems(rowInTable2);					
-							removeTableRow(extraRowInTable2);
+							removeTwoRowsItems(rowInTable2);
+							removeRowInTable2(extraRowInTable2);
 						} else if (!isContain(sepComponents, getName(cur))) {
 							String c1 = getName(cur);
 							String s1 = getName(s);
 							if (!c1.equals(s1)) {
-								int rowInTable2 = firstKey(indexMap,row);
+								int rowInTable2 = firstKey(indexMap, row);
 								removeOneRowItems(rowInTable2);
-								removeOneItem(cur);							
-							}								
+								removeOneItem(cur);
+							}
 						}
 
 						/*
-						 *  check whether the target item is in sepComponents or not. if yes, need
-						 *  to insert a row into table2; if no, check whether cur item is equal to the
-						 *  target item or not, if no, add into 1st map and change value, otherwise, 
-						 *  do nothing.
-						 */						
-						
+						 * check whether the target item is in sepComponents or not. if yes, need to
+						 * insert a row into table2; if no, check whether cur item is equal to the
+						 * target item or not, if no, add into 1st map and change value, otherwise, do
+						 * nothing.
+						 */
+
 						if (isContain(sepComponents, s)) {
-							myTable1.updateMyCellRender(s);
 							myTable1.model.mySetValueAt(s, row, col);
 							myTable2.model.mySetValueAt(" ", row, col);
-							insertTableRow(firstKey(indexMap, row));
+							insertRowInTable2(firstKey(indexMap, row));
 						} else if (!isContain(sepComponents, s)) {
 							String c1 = getName(cur);
 							String s1 = getName(s);
@@ -536,14 +566,14 @@ public class MgmtTrainPanel extends JPanel {
 									map.put(s, map.get(s) + 1);
 								value = s + " #" + map.get(s).toString();
 								addOneItem(value);
-								myTable1.updateMyCellRender(value);
 								myTable1.model.mySetValueAt(value, row, col);
-							}														
+							}
 						}
 					}
 				}
 
-				// jt == jTable2, which is similar with jTable1, without checking separatorMenu items.
+				// jt == jTable2, which is similar with jTable1, without checking separatorMenu
+				// items.
 				else if (jt == jTable2) {
 					int row = jTable2.getSelectedRow();
 					int col = jTable2.getSelectedColumn();
@@ -555,7 +585,7 @@ public class MgmtTrainPanel extends JPanel {
 							String cur = myTable2.model.data[row][col].toString();
 							removeOneItem(cur);
 							myTable2.model.mySetValueAt(" ", row, col);
-						}					
+						}
 					}
 					// add separator line
 					if (resultComponents.size() == 0) {
@@ -575,58 +605,10 @@ public class MgmtTrainPanel extends JPanel {
 					addOneItem(value);
 					myTable2.model.mySetValueAt(value, row, col);
 				}
+				updateJtable3();
 			}
 		});
 		return item;
-
-	}
-
-	/**
-	 * Inserts a new row into the target index. It is used for the separator menu.
-	 * After insert the row, rebuild the jTable and add listener into the new
-	 * jTable.
-	 * 
-	 * @param name
-	 * @param s
-	 * @param rowIndex
-	 */
-	public void insertTableRow(int rowIndex) {
-
-		// update indexMap
-		for (int i = jTable2.getRowCount(); i > rowIndex; i--) {
-			indexMap.put(i, indexMap.get(i - 1));
-		}
-
-		// gets the row data, which will be inserted into jtable2.
-		int col = myTable2.model.getColumnCount();
-		String[] rowData = new String[col];
-		for (int i = 0; i < col; i++) {
-			rowData[i] = " ";
-		}
-
-		// insert row data into the table2 model.
-		myTable2.model.insertRow(rowData, rowIndex);
-
-		updateTable2();
-		subScrollPane_2.setViewportView(jTable2);
-		subScrollPane_1.setViewportView(jTable1);
-		scrollPane_1.setViewportView(panel_1);
-	}
-
-	// remove the target row of the jTable2.
-	public void removeTableRow(int rowIndex) {
-		// update indexMap
-		for (int i = rowIndex; i < jTable2.getRowCount() - 1; i++) {
-			indexMap.put(i, indexMap.get(i + 1));
-		}
-		indexMap.remove(jTable2.getRowCount() - 1);
-
-		// update jTable2
-		myTable2.model.deleteRow(rowIndex);
-		updateTable2();
-		subScrollPane_2.setViewportView(jTable2);
-		subScrollPane_1.setViewportView(jTable1);
-		scrollPane_1.setViewportView(panel_1);
 	}
 
 	// update jTable2 through creating a new table with listener.
@@ -664,7 +646,7 @@ public class MgmtTrainPanel extends JPanel {
 				// update different popupMenus according to the row data in jTable1, through creating new ones.
 				if (col == 0) {
 					if (!valueInTable1.equals(" ") && !isTerminalComponent(valueInTable1)) {
-						if (valueInTable1.equals("Anaerobic Lagoon(Ext.)")) {
+						if (valueInTable1.equals("Anaerobic Lagoon(Ext)")) {
 							popupMenu_liqu = new JPopupMenu();
 							JMenuItem nullItem = createNullItem(jTable2);
 							popupMenu_liqu.add(nullItem);
@@ -694,7 +676,7 @@ public class MgmtTrainPanel extends JPanel {
 						}
 						// if the value in jTable1 belongs to the sepComponents.
 						else {
-							
+
 							popupMenu_nosep = new JPopupMenu();
 							JMenuItem nullItem2 = createNullItem(jTable2);
 							popupMenu_nosep.add(nullItem2);
@@ -706,18 +688,18 @@ public class MgmtTrainPanel extends JPanel {
 							for (int j = 0; j < resultComponents.size(); j++) {
 								JMenuItem item = createSpecialItem(resultComponents.get(j), jTable2);
 								// the storages in the same separator can't be the same.
-								if(indexMap.get(row).equals(indexMap.get(row+1))) {
-									String v = myTable2.model.data[row+1][0].toString();
-									if(resultComponents.get(j).equals(v))
+								if (indexMap.get(row).equals(indexMap.get(row + 1))) {
+									String v = myTable2.model.data[row + 1][0].toString();
+									if (resultComponents.get(j).equals(v))
 										item.setEnabled(false);
 								}
-								if(indexMap.get(row).equals(indexMap.get(row-1))) {
-									String v = myTable2.model.data[row-1][0].toString();
-									if(resultComponents.get(j).equals(v))
+								if (indexMap.get(row).equals(indexMap.get(row - 1))) {
+									String v = myTable2.model.data[row - 1][0].toString();
+									if (resultComponents.get(j).equals(v))
 										item.setEnabled(false);
-								}							
+								}
 								popupMenu_nosep.add(item);
-							}														
+							}
 							popupMenu_nosep.show(jTable2, e.getX(), e.getY());
 						}
 					}
@@ -725,7 +707,7 @@ public class MgmtTrainPanel extends JPanel {
 
 				if (col == 1) {
 					if (!valueInTable2.equals(" ") && !isTerminalComponent(valueInTable2)) {
-						if (valueInTable2.equals("Anaerobic Lagoon(Ext.)")) {
+						if (valueInTable2.equals("Anaerobic Lagoon(Ext)")) {
 							popupMenu_liqu = new JPopupMenu();
 							JMenuItem nullItem = createNullItem(jTable2);
 							popupMenu_liqu.add(nullItem);
@@ -736,18 +718,20 @@ public class MgmtTrainPanel extends JPanel {
 							for (int j = 0; j < liquidComponents.size(); j++) {
 								JMenuItem item = createSpecialItem(liquidComponents.get(j), jTable2);
 								// the storages in the same separator can't be the same.
-								if(indexMap.get(row).equals(indexMap.get(row+1))) {
-									String v = myTable2.model.data[row+1][1].toString();
-									if(liquidComponents.get(j).equals(v))
+								if(indexMap.get(row).equals(indexMap.get(row + 1))) {
+									String v1 = myTable2.model.data[row + 1][1].toString();
+									String v0 = myTable2.model.data[row + 1][0].toString();
+									if(liquidComponents.get(j).equals(v0) || liquidComponents.get(j).equals(v1))
 										item.setEnabled(false);
 								}
-								if(indexMap.get(row).equals(indexMap.get(row-1))) {
-									String v = myTable2.model.data[row-1][1].toString();
-									if(liquidComponents.get(j).equals(v))
+								if(indexMap.get(row).equals(indexMap.get(row - 1))) {
+									String v0 = myTable2.model.data[row - 1][0].toString();
+									String v1 = myTable2.model.data[row - 1][1].toString();
+									if(liquidComponents.get(j).equals(v0) || liquidComponents.get(j).equals(v1))
 										item.setEnabled(false);
-								}							
+								}
 								popupMenu_liqu.add(item);
-							}		
+							}
 							popupMenu_liqu.show(jTable2, e.getX(), e.getY());
 
 						} else if (valueInTable2.equals("Dry Stack(Uncovered)")) {
@@ -762,18 +746,20 @@ public class MgmtTrainPanel extends JPanel {
 							for (int j = 0; j < terminalComponents.size(); j++) {
 								JMenuItem item = createSpecialItem(terminalComponents.get(j), jTable2);
 								// the storages in the same separator can't be the same.
-								if(indexMap.get(row).equals(indexMap.get(row+1))) {
-									String v = myTable2.model.data[row+1][1].toString();
-									if(terminalComponents.get(j).equals(v))
+								if (indexMap.get(row).equals(indexMap.get(row + 1))) {
+									String v0 = myTable2.model.data[row + 1][0].toString();
+									String v1 = myTable2.model.data[row + 1][1].toString();
+									if (terminalComponents.get(j).equals(v0) || terminalComponents.get(j).equals(v1))
 										item.setEnabled(false);
 								}
-								if(indexMap.get(row).equals(indexMap.get(row-1))) {
-									String v = myTable2.model.data[row-1][1].toString();
-									if(terminalComponents.get(j).equals(v))
+								if (indexMap.get(row).equals(indexMap.get(row - 1))) {
+									String v0 = myTable2.model.data[row - 1][0].toString();
+									String v1 = myTable2.model.data[row - 1][1].toString();
+									if (terminalComponents.get(j).equals(v0) || terminalComponents.get(j).equals(v1))
 										item.setEnabled(false);
-								}							
+								}
 								popupMenu_term.add(item);
-							}		
+							}
 							popupMenu_term.show(jTable2, e.getX(), e.getY());
 						}
 					}
@@ -781,38 +767,194 @@ public class MgmtTrainPanel extends JPanel {
 				jTable2.repaint();
 			}
 		});
-
 	}
-
-	/**
-	 *  gets the pure name, i.g., the string without "#" and "number".
-	 * @param s	the target string, with the format: "name" + " #" + No.
-	 * @return the string, i.g.,"name".
-	 */	
-	private String getName(String s) {
-		if (s == null)
-			return " ";
-		int index = s.indexOf('#');
-		if (index > 0)
-			return s.substring(0, index - 1);
-		else
-			return s;
-	}
-
-	// gets the index of the menuItem in the popupMenu
-	private int getIndex(String s, Component[] list) {
-		if (list == null || s == null)
-			return -1;
-		for (int i = 0; i < list.length; i++) {
-			try {
-				JMenuItem item = (JMenuItem) list[i];
-				if (item.getText().equals(s))
-					return i;
-			} catch (Exception e) {
-
-			}
+	
+	// update jTable3
+	public void updateJtable3() {
+		if(tableData_3 != null) {
+			tableData_3 = null;
+			myTable3 = new MgmtTrainTable_3();
+			jTable3 = myTable3.buildMyTable(columnName_3, tableData_3);
+			jTable3.getColumnModel().getColumn(0).setWidth(160);
+			jTable3.getColumnModel().getColumn(1).setWidth(85);
+			jTable3.getColumnModel().getColumn(2).setWidth(85);
+			jTable3.getColumnModel().getColumn(3).setWidth(85);
+			jTable3.getColumnModel().getColumn(4).setWidth(85);
+			jTable3.getColumnModel().getColumn(5).setWidth(130);
+			jTable3.enable(false);
+			jTable3.setRowHeight(25);
 		}
-		return -1;
+
+		// go through the whole resultComponents
+		for(int i = 0; i < resultComponents.size(); i++) {
+			String ele = resultComponents.get(i);
+			String[] rowData = new String[6];
+			rowData[0] = ele;
+			double v1 = 0.0;
+			double v2 = 0.0;
+			double v3 = 0.0;
+			double v4 = 0.0;
+			double v5 = 0.0;
+			// for special components: "Anaerobic Lagoon(Ext)", which will show "N/A".
+			if(getName(ele).equals("Anaerobic Lagoon(Ext)")) {
+				for(int j = 1; j < 6; j++) {
+					rowData[j] = "N/A";
+				}
+			}
+			/*
+			 * for other components, needs to calculate the data, to be precise, accumulate
+			 * data. go through column of jTable1 and columns of Jtable2 to get the target
+			 * component.
+			 */
+			else {
+				// jTable1
+				for(int j = 0; j < jTable1.getRowCount(); j++) {
+					if(myTable1.model.data[j][1].toString().equals(ele)) {
+						String streamName = myTable1.model.data[j][0].toString();
+						String tempV2 = getAdditionElement(panelManager.additionsPanelOutput, streamName).data[0];
+						String tempV3 = getAdditionElement(panelManager.additionsPanelOutput, streamName).data[1];
+						String tempV4 = getAdditionElement(panelManager.additionsPanelOutput, streamName).data[2];
+						if(getLocationElement(panelManager.locationPanelOutput, streamName) == null) {
+							v1 += 0.0;
+						} 
+						else {
+							/*
+							 * go through each column of location panel with the target row. the data in the
+							 * 1st column is the stream name, i.g., name the length of animalpaneloutput is
+							 * the data length of locationpaneloutput element.
+							 */
+							double val = 0.0;
+							for(int subj = 0; subj < panelManager.animalPanelOutput.size(); subj++) {
+								AnimalPanelOutputElement animalElement = panelManager.animalPanelOutput.get(subj);
+								String manure = animalElement.data[0];
+								String locationRatio = getLocationElement(panelManager.locationPanelOutput,
+										streamName).data[subj];
+								double dManure = Double.parseDouble(manure);
+								double dFactor = Double.parseDouble(locationRatio);
+								val += (dManure * dFactor / 100);
+							}
+							v1 += val;
+						}
+						v2 += (Double.parseDouble(tempV2) / 7.48);
+						v3 += (Double.parseDouble(tempV3) / 7.48);
+						v4 += Double.parseDouble(tempV4);
+						v5 = (v1 + v2 + v3 + v4);
+
+					}
+				}
+				// jTable2
+				for(int k = 0; k < jTable2.getRowCount(); k++) {
+
+					int rowInTable1 = indexMap.get(k);
+					int rowInTable2 = firstKey(indexMap, rowInTable1);
+					String streamName = myTable1.model.data[rowInTable1][0].toString();
+					String separatorName = myTable1.model.data[rowInTable1][1].toString();
+					String separatorRatio = "1";
+					String valueInCol_1 = myTable2.model.data[k][0].toString(); // step 2
+					String valueInCol_2 = myTable2.model.data[k][1].toString(); // step 3
+					String tempV2 = getAdditionElement(panelManager.additionsPanelOutput, streamName).data[0]; // wash
+																												// water
+					String tempV3 = getAdditionElement(panelManager.additionsPanelOutput, streamName).data[1]; // flush
+																												// water
+					String tempV4 = getAdditionElement(panelManager.additionsPanelOutput, streamName).data[2]; // bedding
+																												// value
+					SeparatorInfo sepEle = getSeparatorElement(panelManager.allSeparatorData, separatorName);
+					if (sepEle != null)
+						separatorRatio = getSeparatorElement(panelManager.allSeparatorData, separatorName).efficiency;
+					/*
+					 * the 1st column of jTable2, the prior condition is one of following: 1. choose
+					 * separator in jTable1 leads to the exist of data in jtable2; 2. choose
+					 * "uncovered" or "(ext)".
+					 */
+					if (valueInCol_1.equals(ele)
+							|| (valueInCol_2.equals(ele) && getName(valueInCol_1).equals("Anaerobic Lagoon(Ext)"))) {
+						/*
+						 * the 1st row of the separator(i.g.,liquid) or noSeparator( "uncovered" or
+						 * "(ext)" ). 1. it is the same as jTable1 except v4, which based on the type of
+						 * separator. 2. it is the same as jTable1.
+						 */
+						if (k == rowInTable2) {
+							if (getLocationElement(panelManager.locationPanelOutput, streamName) == null) {
+								v1 += 0.0;
+							} else {
+								/*
+								 * go through each column of location panel with the target row. the data in the
+								 * 1st column is the stream name, i.g., name the length of animalpaneloutput is
+								 * the data length of locationpaneloutput element.
+								 */
+								double val = 0.0;
+								for (int subj = 0; subj < panelManager.animalPanelOutput.size(); subj++) {
+									AnimalPanelOutputElement animalElement = panelManager.animalPanelOutput.get(subj);
+									String manure = animalElement.data[0];
+									String locationRatio = getLocationElement(panelManager.locationPanelOutput,
+											streamName).data[subj];
+									double dManure = Double.parseDouble(manure);
+									double dFactor = Double.parseDouble(locationRatio);
+									val += (dManure * dFactor / 100);
+								}
+								v1 += val;
+							}
+							v2 += (Double.parseDouble(tempV2) / 7.48);
+							v3 += (Double.parseDouble(tempV3) / 7.48);
+							if (!isContain(sepComponents, separatorName)) // the 2nd condition.
+								v4 += Double.parseDouble(tempV4);
+							else
+								v4 += (Double.parseDouble(tempV4) * (1 - Double.parseDouble(separatorRatio)));
+							v5 = (v1 + v2 + v3 + v4);
+						}
+						/*
+						 * the 2nd row of the separator(i.g., valid). it is the same as jTable1 except
+						 * v1 and v4, which based on the type of separator.
+						 */
+						else {
+							if (getLocationElement(panelManager.locationPanelOutput, streamName) == null) {
+								v1 += 0.0;
+							} else {
+								/*
+								 * go through each column of location panel with the target row. the data in the
+								 * 1st column is the stream name, i.g., name the length of animalpaneloutput is
+								 * the data length of locationpaneloutput element.
+								 */
+								double val = 0.0;
+								for (int subj = 0; subj < panelManager.animalPanelOutput.size(); subj++) {
+									AnimalPanelOutputElement animalElement = panelManager.animalPanelOutput.get(subj);
+									String manure = animalElement.data[1]; // solid(TS)
+									String locationRatio = getLocationElement(panelManager.locationPanelOutput,
+											streamName).data[subj];
+									double dManure = Double.parseDouble(manure);
+									double dFactor = Double.parseDouble(locationRatio);
+									val += (dManure * dFactor / 100);
+								}
+								v1 += (val * Double.parseDouble(separatorRatio) / 110);
+							}
+							v2 += 0.0;
+							v3 += 0.0;
+							v4 += (Double.parseDouble(tempV4) * Double.parseDouble(separatorRatio));
+							v5 = (v1 + v2 + v3 + v4);
+						}
+					} else if (valueInCol_2.equals(ele) && getName(valueInCol_1).equals("Dry Stack(Uncovered)")) {
+						v1 += 0.0;
+						v2 += 0.0;
+						v3 += 0.0;
+						v4 += 0.0;
+						v5 = (v1 + v2 + v3 + v4);
+					}
+				}
+
+				rowData[1] = df.format(v1);
+				rowData[2] = df.format(v2);
+				rowData[3] = df.format(v3);
+				rowData[4] = df.format(v4);
+				rowData[5] = df.format(v5);
+			}
+			if (jTable3.getRowCount() == 0)
+				myTable3.model.insertRow(rowData, 0);
+			else
+				myTable3.model.insertRow(rowData, jTable3.getRowCount() - 1);
+		}
+		// jTable3.updateUI();
+		tableData_3 = myTable3.model.data;
+		scrollPane_2.setViewportView(jTable3);
 	}
 
 	// remove one item from the jTable
@@ -822,7 +964,7 @@ public class MgmtTrainPanel extends JPanel {
 				countMap.put(s, countMap.get(s) - 1);
 			if (countMap.get(s) == 0) {
 				String pureName = getName(s);
-				
+
 				updateResultComponents(s);
 				updateLiquidComponents();
 				updateTerminalComponents();
@@ -835,8 +977,11 @@ public class MgmtTrainPanel extends JPanel {
 
 		}
 	}
+
 	/**
-	 * remove one row item from the jTable2. i.g., one in jTable2 corresponding to one row in jTable1.
+	 * remove one row item from the jTable2. i.g., one in jTable2 corresponding to
+	 * one row in jTable1.
+	 * 
 	 * @param rowIndex
 	 */
 	private void removeOneRowItems(int rowIndex) {
@@ -847,29 +992,31 @@ public class MgmtTrainPanel extends JPanel {
 		myTable2.model.mySetValueAt(" ", rowIndex, 1);
 		myTable2.model.mySetValueAt(" ", rowIndex, 0);
 	}
-	
+
 	/**
-	 *  remove two rows items from the jTable2. i.g., two rows in jTable2 corresponding to one row in jTable1.
-	 * @param rowIndex	the row index of jTable2. i.g., the 1st row of the two rows.
+	 * remove two rows items from the jTable2. i.g., two rows in jTable2
+	 * corresponding to one row in jTable1.
+	 * 
+	 * @param rowIndex the row index of jTable2. i.g., the 1st row of the two rows.
 	 */
 	private void removeTwoRowsItems(int rowIndex) {
-		
+
 		int extraRowInTable2 = rowIndex + 1;
-		
+
 		// get the value of column "step 3"
 		String valueInSecondCol_1 = myTable2.model.data[rowIndex][1].toString();
 		String subValueInSecondCol_1 = getName(valueInSecondCol_1);
 		int numInSecondCol_1 = Character.getNumericValue(valueInSecondCol_1.charAt(valueInSecondCol_1.length() - 1));
-		
+
 		String valueInSecondCol_2 = myTable2.model.data[extraRowInTable2][1].toString();
 		String subValueInSecondCol_2 = getName(valueInSecondCol_2);
 		int numInSecondCol_2 = Character.getNumericValue(valueInSecondCol_2.charAt(valueInSecondCol_2.length() - 1));
-		
+
 		// get the value of column "step 2"
 		String valueInFirstCol_1 = myTable2.model.data[rowIndex][0].toString();
 		String subValueInFirstCol_1 = getName(valueInFirstCol_1);
 		int numInFirstCol_1 = Character.getNumericValue(valueInFirstCol_1.charAt(valueInFirstCol_1.length() - 1));
-		
+
 		String valueInFirstCol_2 = myTable2.model.data[extraRowInTable2][0].toString();
 		String subValueInFirstCol_2 = getName(valueInFirstCol_2);
 		int numInFirstCol_2 = Character.getNumericValue(valueInFirstCol_2.charAt(valueInFirstCol_2.length() - 1));
@@ -878,7 +1025,7 @@ public class MgmtTrainPanel extends JPanel {
 		if(subValueInSecondCol_1.equals(subValueInSecondCol_2) && numInSecondCol_1 < numInSecondCol_2) {
 			removeOneItem(valueInSecondCol_2);
 			removeOneItem(valueInSecondCol_1);
-		}
+		} 
 		else {
 			removeOneItem(valueInSecondCol_1);
 			removeOneItem(valueInSecondCol_2);
@@ -887,18 +1034,18 @@ public class MgmtTrainPanel extends JPanel {
 		if(subValueInFirstCol_1.equals(subValueInFirstCol_2) && numInFirstCol_1 < numInFirstCol_2) {
 			removeOneItem(valueInFirstCol_2);
 			removeOneItem(valueInFirstCol_1);
-		}
+		} 
 		else {
 			removeOneItem(valueInFirstCol_1);
 			removeOneItem(valueInFirstCol_2);
 		}
-		
+
 		myTable2.model.mySetValueAt(" ", rowIndex, 1);
 		myTable2.model.mySetValueAt(" ", rowIndex, 0);
 	}
-	
+
 	// add one item into the jTable
-	private void addOneItem(String value) {		
+	private void addOneItem(String value) {
 		if (!countMap.containsKey(value))
 			countMap.put(value, 1);
 		else
@@ -911,11 +1058,75 @@ public class MgmtTrainPanel extends JPanel {
 	}
 
 	/**
-	 * update resultComponents when remove a item from the jTable.
-	 * here delete the latest item, e.g., there are A1,A2,A3, when delete A1
-	 * from the jTable, in fact, delete A3 from result. Because after delete A1, 
-	 * we need to change A2 to A1, change A3 to A2. The easy way is to delete A3
-	 * directly.
+	 * Inserts a new row into the target index. It is used for the separator menu.
+	 * After insert the row, rebuild the jTable and add listener into the new
+	 * jTable.
+	 * 
+	 * @param name
+	 * @param s
+	 * @param rowIndex
+	 */
+	public void insertRowInTable2(int rowIndex) {
+
+		// update indexMap
+		for (int i = jTable2.getRowCount(); i > rowIndex; i--) {
+			indexMap.put(i, indexMap.get(i - 1));
+		}
+
+		// gets the row data, which will be inserted into jtable2.
+		int col = myTable2.model.getColumnCount();
+		String[] rowData = new String[col];
+		for (int i = 0; i < col; i++) {
+			rowData[i] = " ";
+		}
+
+		// insert row data into the table2 model.
+		myTable2.model.insertRow(rowData, rowIndex);
+
+		updateTable2();
+		subScrollPane_2.setViewportView(jTable2);
+		subScrollPane_1.setViewportView(jTable1);
+		scrollPane_1.setViewportView(panel_1);
+	}
+
+	// remove the target row of the jTable2.
+	public void removeRowInTable2(int rowIndex) {
+		// update indexMap
+		for (int i = rowIndex; i < jTable2.getRowCount() - 1; i++) {
+			indexMap.put(i, indexMap.get(i + 1));
+		}
+		indexMap.remove(jTable2.getRowCount() - 1);
+
+		// update jTable2
+		myTable2.model.deleteRow(rowIndex);
+		updateTable2();
+		subScrollPane_2.setViewportView(jTable2);
+		subScrollPane_1.setViewportView(jTable1);
+		scrollPane_1.setViewportView(panel_1);
+	}
+
+	// remove the target row of the jTable1, following the remove of jTable2.
+	public void removeRowInTable1(int rowIndex, int rowIndex2) {
+		// update indexMap
+		// int rowIndexInTable2 = firstKey(indexMap, rowIndex);
+		for (int i = rowIndex2; i < jTable2.getRowCount(); i++) {
+			indexMap.put(i, indexMap.get(i) - 1);
+		}
+
+		// update jTable1
+		myTable1.model.deleteRow(rowIndex);
+		jTable1.repaint();
+		subScrollPane_2.setViewportView(jTable2);
+		subScrollPane_1.setViewportView(jTable1);
+		scrollPane_1.setViewportView(panel_1);
+	}
+	
+	/**
+	 * update resultComponents when remove a item from the jTable. here delete the
+	 * latest item, e.g., there are A1,A2,A3, when delete A1 from the jTable, in
+	 * fact, delete A3 from result. Because after delete A1, we need to change A2 to
+	 * A1, change A3 to A2. The easy way is to delete A3 directly.
+	 * 
 	 * @param s
 	 */
 	private void updateResultComponents(String s) {
@@ -930,9 +1141,9 @@ public class MgmtTrainPanel extends JPanel {
 	}
 
 	/**
-	 * update other items of the tables when delete the target item, e.g.,
-	 * there are pond#1 and pond#2, when delete the pond#1, all pond#2 need 
-	 * to be changed to pand#1.
+	 * update other items of the tables when delete the target item, e.g., there are
+	 * pond#1 and pond#2, when delete the pond#1, all pond#2 need to be changed to
+	 * pand#1.
 	 * @param s the target item to delete
 	 */
 	private void updateOtherItems(String s) {
@@ -963,7 +1174,6 @@ public class MgmtTrainPanel extends JPanel {
 			int num = Character.getNumericValue(v.charAt(v.length() - 1));
 			if (sv.equals(s1) && num > num1) {
 				String value = sv + " #" + (num - 1);
-				myTable1.updateMyCellRender(value);
 				myTable1.model.mySetValueAt(value, i, 1);
 			}
 			jTable1.repaint();
@@ -976,7 +1186,7 @@ public class MgmtTrainPanel extends JPanel {
 				int num = Character.getNumericValue(v.charAt(v.length() - 1));
 				if (sv.equals(s1) && num > num1) {
 					String value = sv + " #" + (num - 1);
-					myTable2.model.mySetValueAt(value, i, j);					
+					myTable2.model.mySetValueAt(value, i, j);
 				}
 				jTable2.repaint();
 			}
@@ -985,9 +1195,10 @@ public class MgmtTrainPanel extends JPanel {
 	}
 
 	/**
-	 * update the items of jTable1 and jTable2, when exchange two new items. 
-	 * e.g., there are pond#1 and pond#2, when "pond #1" change to "pond #2", 
-	 * pond#2 needs to be changed to pond#1. 
+	 * update the items of jTable1 and jTable2, when exchange two new items. e.g.,
+	 * there are pond#1 and pond#2, when "pond #1" change to "pond #2", pond#2 needs
+	 * to be changed to pond#1.
+	 * 
 	 * @param s the old item, the form is name + " #" + No.
 	 * @param t the target item, the form is name + " #" + No.
 	 */
@@ -1022,72 +1233,6 @@ public class MgmtTrainPanel extends JPanel {
 				jTable2.repaint();
 			}
 		}
-	}
-
-	// check whether String[] contains the target String
-	private boolean isContain(String[] list, String s) {
-		for (int i = 0; i < list.length; i++) {
-			if (list[i].equals(s))
-				return true;
-		}
-		return false;
-	}
-
-	/**
-	 * get the first key of the target value in a many-to-one hashmap.
-	 * Mainly used to locate the index of the row in jTable2.
-	 * @param map	the hashmap, e.g., the indexMap
-	 * @param value	the value, e.g., the row in jTable1.
-	 * @return
-	 */
-	private int firstKey(HashMap<Integer, Integer> map, int value) {
-		Set<Integer> keys = new HashSet<Integer>();
-		for (Integer key : map.keySet()) {
-			if (map.get(key).equals(value))
-				keys.add(key);
-		}
-		return Collections.min(keys);
-	}
-
-	// check whether the components belongs to the terminal components
-	private boolean isTerminalComponent(String s) {
-		String s1 = getName(s);
-		if (s1.equals("Storage Pond") || s1.equals("Storage Tank") || s1.equals("Anaerobic Lagoon")
-				|| s1.equals("Dry Stack(covered)"))
-			return true;
-		return false;
-	}
-
-	// check whether the components belongs to the liquid components
-	private boolean isLiquidComponent(String s) {
-		String s1 = getName(s);
-		if (s1.equals("Storage Pond") || s1.equals("Storage Tank"))
-			return true;
-		return false;
-	}
-
-	// update the TerminalComponents
-	private ArrayList<String> updateTerminalComponents() {
-		terminalComponents.clear();
-		for (int i = 0; i < resultComponents.size(); i++) {
-			String v = resultComponents.get(i);
-			if (isTerminalComponent(getName(v))) {
-				terminalComponents.add(v);
-			}
-		}
-		return terminalComponents;
-	}
-
-	// update the LiquidComponents
-	private ArrayList<String> updateLiquidComponents() {
-		liquidComponents.clear();
-		for (int i = 0; i < resultComponents.size(); i++) {
-			String v = resultComponents.get(i);
-			if (getName(v).equals("Storage Pond") || getName(v).equals("Storage Tank")) {
-				liquidComponents.add(v);
-			}
-		}
-		return liquidComponents;
 	}
 
 	// initial all popupMenus which will be used.
@@ -1184,7 +1329,199 @@ public class MgmtTrainPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * gets the pure name, i.g., the string without "#" and "number".
+	 * 
+	 * @param s the target string, with the format: "name" + " #" + No.
+	 * @return the string, i.g.,"name".
+	 */
+	private String getName(String s) {
+		if (s == null)
+			return " ";
+		int index = s.indexOf('#');
+		if (index > 0)
+			return s.substring(0, index - 1);
+		else
+			return s;
+	}
 
+	// gets the index of the menuItem in the popupMenu
+	private int getIndex(String s, Component[] list) {
+		if (list == null || s == null)
+			return -1;
+		for (int i = 0; i < list.length; i++) {
+			try {
+				JMenuItem item = (JMenuItem) list[i];
+				if (item.getText().equals(s))
+					return i;
+			} catch (Exception e) {
+
+			}
+		}
+		return -1;
+	}
+
+	// check whether String[] contains the target String
+	private boolean isContain(String[] list, String s) {
+		for (int i = 0; i < list.length; i++) {
+			if (list[i].equals(s))
+				return true;
+		}
+		return false;
+	}
+
+	/**
+	 * get the first key of the target value in a many-to-one hashmap. Mainly used
+	 * to locate the index of the row in jTable2.
+	 * 
+	 * @param map   the hashmap, e.g., the indexMap
+	 * @param value the value, e.g., the row in jTable1.
+	 * @return
+	 */
+	private int firstKey(HashMap<Integer, Integer> map, int value) {
+		Set<Integer> keys = new HashSet<Integer>();
+		for (Integer key : map.keySet()) {
+			if (map.get(key).equals(value))
+				keys.add(key);
+		}
+		return Collections.min(keys);
+	}
+
+	// check whether the components belongs to the terminal components
+	private boolean isTerminalComponent(String s) {
+		String s1 = getName(s);
+		if (s1.equals("Storage Pond") || s1.equals("Storage Tank") || s1.equals("Anaerobic Lagoon")
+				|| s1.equals("Dry Stack(covered)"))
+			return true;
+		return false;
+	}
+
+	// check whether the components belongs to the liquid components
+	private boolean isLiquidComponent(String s) {
+		String s1 = getName(s);
+		if (s1.equals("Storage Pond") || s1.equals("Storage Tank"))
+			return true;
+		return false;
+	}
+
+	// update the TerminalComponents
+	private ArrayList<String> updateTerminalComponents() {
+		terminalComponents.clear();
+		for (int i = 0; i < resultComponents.size(); i++) {
+			String v = resultComponents.get(i);
+			if (isTerminalComponent(getName(v))) {
+				terminalComponents.add(v);
+			}
+		}
+		return terminalComponents;
+	}
+
+	// update the LiquidComponents
+	private ArrayList<String> updateLiquidComponents() {
+		liquidComponents.clear();
+		for (int i = 0; i < resultComponents.size(); i++) {
+			String v = resultComponents.get(i);
+			if (getName(v).equals("Storage Pond") || getName(v).equals("Storage Tank")) {
+				liquidComponents.add(v);
+			}
+		}
+		return liquidComponents;
+	}
+	
+	// find the target element of the AdditionsPanelOutput
+	private AdditionsPanelOutputElement getAdditionElement(ArrayList<AdditionsPanelOutputElement> list, String name) {
+		for (int i = 0; i < list.size(); i++) {
+			if (list.get(i).name.equals(name))
+				return list.get(i);
+		}
+		return null;
+	}
+
+	// find the target element of the AnimalPanelOutput
+	private AnimalPanelOutputElement getAnimalElement(ArrayList<AnimalPanelOutputElement> list, String name) {
+		for (int i = 0; i < list.size(); i++) {
+			if (list.get(i).name.equals(name))
+				return list.get(i);
+		}
+		return null;
+	}
+
+	// find the target element of the LocationPanelOutput
+	private LocationPanelOutputElement getLocationElement(ArrayList<LocationPanelOutputElement> list, String name) {
+		for (int i = 0; i < list.size(); i++) {
+			if (list.get(i).name.equals(name))
+				return list.get(i);
+		}
+		return null;
+	}
+
+	// find the target element of the Separator
+	private SeparatorInfo getSeparatorElement(ArrayList<SeparatorInfo> list, String name) {
+		for (int i = 0; i < list.size(); i++) {
+			if (list.get(i).name.equals(name))
+				return list.get(i);
+		}
+		return null;
+	}
+
+	/**
+	 *  delete target stream name from jtable1 and jtable2.
+	 *  when animalPanel, locationPanel, additionsPanel and runoffPanel change, mgmtTrainPanel will be changed.
+	 * @param s	the stream name
+	 */
+	public void deleteRow(String s) {
+		int rowInTable1 = -1;
+		for (int i = 0; i < jTable1.getRowCount(); i++) {
+			if (myTable1.model.data[i][0].toString().equals(s))
+				rowInTable1 = i;
+		}
+		if (rowInTable1 > -1) {
+			int rowInTable2 = firstKey(indexMap, rowInTable1);
+			String v = myTable1.model.data[rowInTable1][1].toString();
+			if (isContain(sepComponents, v)) {
+				int rowExtraInTable2 = rowInTable2 + 1;
+				removeTwoRowsItems(rowInTable2);
+				removeOneItem(v);
+				removeRowInTable2(rowExtraInTable2);
+				removeRowInTable2(rowInTable2);
+				removeRowInTable1(rowInTable1, rowInTable2);
+			} else if (!(isContain(sepComponents, v))) {
+				removeOneRowItems(rowInTable2);
+				removeOneItem(v);
+				removeRowInTable2(rowInTable2);
+				removeRowInTable1(rowInTable1, rowInTable2);
+			}
+		}
+	}
+
+	/**
+	 *  add new stream name into jTable1 and jTable2.
+	 *  when animalPanel, locationPanel, additionsPanel and runoffPanel change, mgmtTrainPanel will be changed.
+	 * @param s stream name
+	 * @param rowIndex	
+	 */
+	public void addRow(String s, int rowIndex) {
+		
+		String[] newData_1 = new String[2];		
+		newData_1[0] = s;
+		newData_1[0] = " ";
+		String[] newData_2 = new String[2];		
+		newData_2[0] = " ";
+		newData_2[1] = " ";
+		
+		int rowInTable2 = firstKey(indexMap, rowIndex);
+		myTable1.model.insertRow(newData_1, rowIndex);
+		myTable1.model.mySetValueAt(s, rowIndex+1, 0);
+		myTable1.model.mySetValueAt(" ", rowIndex+1, 1);
+		myTable2.model.insertRow(newData_2, rowInTable2);		
+		indexMap.put(jTable2.getRowCount(), jTable1.getRowCount());
+		
+		updateTable2();
+		jTable1.updateUI();
+		subScrollPane_2.setViewportView(jTable2);
+		subScrollPane_1.setViewportView(jTable1);
+		scrollPane_1.setViewportView(panel_1);
+	}
 
 	public void setParent(MainFrame frame) {
 		this.parent = frame;

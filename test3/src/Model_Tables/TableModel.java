@@ -56,27 +56,39 @@ public class TableModel extends AbstractTableModel {
 	 * @param index	the target index.
 	 */
 	public void insertRow(String[] s, int index) {
-		int l = data.length + 1;
+		int l;
 		int cl = columnName.length;
-		Object[][] np = new Object[l][cl];
-	
-		// copy the rows before index (include index) into new Object[][]
-		for (int i = 0; i < index+1 ; i++) {
-			for (int j = 0; j < columnName.length; j++) {
-				np[i][j] = data[i][j];
+		if(data == null) {
+			l = 1;
+			Object[][] np = new Object[l][cl];
+			for(int j = 0; j < columnName.length; j++) {
+				np[0][j] = s[j];
 			}
-		}
-		// add the target row data into the target index + 1
-		for (int j = 0; j < s.length; j++) {
-			np[index+1][j] = s[j];
-		}
-		// copy the origin rows after the index into new Object[][]
-		for (int i = index+1; i < l-1 ; i++) {
-			for (int j = 0; j < columnName.length; j++) {
-				np[i + 1][j] = data[i][j];
+			data = np;
+		}					
+		else {
+			l = data.length + 1;			
+			Object[][] np = new Object[l][cl];
+		
+			// copy the rows before index (include index) into new Object[][]
+			for (int i = 0; i < index+1 ; i++) {
+				for (int j = 0; j < columnName.length; j++) {
+					np[i][j] = data[i][j];
+				}
 			}
-		}	
-		data = np;
+			// add the target row data into the target index + 1
+			for (int j = 0; j < s.length; j++) {
+				np[index+1][j] = s[j];
+			}
+			// copy the origin rows after the index into new Object[][]
+			for (int i = index+1; i < l-1 ; i++) {
+				for (int j = 0; j < columnName.length; j++) {
+					np[i + 1][j] = data[i][j];
+				}
+			}	
+			data = np;
+		}
+		
 	}
 	
 	// delete the row data from the target index.
@@ -142,10 +154,10 @@ public class TableModel extends AbstractTableModel {
 		return columnName[col];
 	}
 
-	@Override
+	/*@Override
 	public Class<?> getColumnClass(int c) {
 		return getValueAt(0, c).getClass();
-	}
+	}*/
 
 	@Override
 	// set some special columns to be not editable.

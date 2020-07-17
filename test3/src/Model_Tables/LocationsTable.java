@@ -76,7 +76,7 @@ public class LocationsTable implements TableModelListener {
 				if (column == 0 ) {
 					setBackground(null);							
 				}				
-				else if( (column == 1 ||  column == 2) && row < rowCount-1 ) {
+				else if( (column > 0) && row < rowCount-1 ) {
 					setBackground(defaultColor);										
 				} 						
 				else 

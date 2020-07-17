@@ -28,7 +28,7 @@ import javax.swing.border.Border;
 
 import Controller.PanelManager;
 import Model_Entity.AnimalInfo;
-import Model_Entity.AnimalPanelTableInfo;
+import Model_Entity.AnimalPanelOutputElement;
 import Model_Tables.AnimalsTable;
 /**
  * The purpose of this class is to build the animal panel.
@@ -64,8 +64,8 @@ public class AnimalsPanel extends JPanel {
 	// the animals showed in the table, including all selected and new build animals
 	ArrayList<AnimalInfo> animalInTable; 			
 	
-	// store the output of panel: the name, the quantity and the weight of each animal
-	ArrayList<AnimalPanelTableInfo> animalPanelOutput;  
+	// store the output of panel: the name, and part of data of each animal(manure and ts).
+	ArrayList<AnimalPanelOutputElement> animalPanelOutput;  
 	
 	// the header of table
 	String[]  columnNamess = { "<html> Animal  </html>", 
@@ -445,12 +445,17 @@ public class AnimalsPanel extends JPanel {
 	private void getOutput() {
 		animalPanelOutput = new ArrayList<>();
 		for(int i = 0; i < animalInTable.size(); i++) {
-			AnimalInfo ani = animalInTable.get(i);
-			String quantity = animalsTable.model.data[i][2].toString();
-			String weight = animalsTable.model.data[i][3].toString();
-			AnimalPanelTableInfo ele = new AnimalPanelTableInfo(ani,quantity,weight);
-			if(Double.parseDouble(quantity) > 0)
+			String quantity = animalsTable.model.data[i][2].toString();						
+			if(Double.parseDouble(quantity) > 0) {
+				String name = animalsTable.model.data[i][0].toString();
+				String[] data = new String[2];
+				String manure = animalsTable.model.data[i][7].toString();
+				String ts = animalsTable.model.data[i][9].toString();
+				data[0] = manure;
+				data[1] = ts;
+				AnimalPanelOutputElement ele = new AnimalPanelOutputElement(name, data);
 				animalPanelOutput.add(ele);
+			}				
 		}				
 	}
 	

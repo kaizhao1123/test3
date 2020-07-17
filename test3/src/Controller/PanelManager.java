@@ -12,10 +12,13 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import Model_Entity.AdditionsPanelOutputElement;
 import Model_Entity.AnimalInfo;
 import Model_Entity.BeddingInfo;
 import Model_Entity.ClimateInfo;
-import Model_Entity.AnimalPanelTableInfo;
+import Model_Entity.LocationPanelOutputElement;
+import Model_Entity.SeparatorInfo;
+import Model_Entity.AnimalPanelOutputElement;
 
 
 public class PanelManager {
@@ -26,12 +29,14 @@ public class PanelManager {
 	public ArrayList<ClimateInfo> allClimateData = new ArrayList<>();
 	public ArrayList<AnimalInfo> allAnimalData = new ArrayList<>();
 	public ArrayList<BeddingInfo> allBeddingData = new ArrayList<>();
+	public ArrayList<SeparatorInfo> allSeparatorData = new ArrayList<>();
 		
 	// the output data structures of each panel
 	public String[] startPanelOutput = new String[2];
 	public ArrayList<String> climatePanelOutout;
-	public ArrayList<AnimalPanelTableInfo> animalPanelOutput;
-	public ArrayList<String> locationPanelOutput;
+	public ArrayList<AnimalPanelOutputElement> animalPanelOutput;
+	public ArrayList<LocationPanelOutputElement> locationPanelOutput;
+	public ArrayList<AdditionsPanelOutputElement> additionsPanelOutput;
 	public ArrayList<String> runoffPanelOutput;
 	
 	/**
@@ -46,6 +51,7 @@ public class PanelManager {
 	 * @see readCLimateDataset()
 	 * @see readAnimalDataset()
 	 * @see readBeddingDataset()
+	 * @see readSeparatorDataset()
 	 */
 	public PanelManager(String path) throws IOException {
 		InputStream fis = new FileInputStream(path);		
@@ -57,6 +63,7 @@ public class PanelManager {
 		readClimateDataset("Climate");
 		readAnimalDataset("Animal");
 		readBeddingDataset("Bedding");
+		readSeparatorDataset("Separator");
 	}
 	
 	/**
@@ -141,6 +148,29 @@ public class PanelManager {
     	}  		
 	}
 	
+	/**
+	 * gets the separator data from the sheet of the excel file.
+	 * Read each row of the "separator" sheet of the excel file, and store
+	 * into the ArrayList: allSeparatorData.
+	 * @param sheetName
+	 */
+	public void readSeparatorDataset(String sheetName){
+		try {    		
+    	    Sheet sheet = workbook.getSheet(sheetName);	     
+    	    Row row;   	      	     
+    	    for(int i = 1; i < sheet.getLastRowNum(); i++ ) {
+    	    	row = sheet.getRow(i); 	
+    	    	SeparatorInfo element;
+    	    	String name = row.getCell(0).toString();
+	    		String efficiency = row.getCell(1).toString();
+   	    	
+    	    	element = new SeparatorInfo(name, efficiency);
+    	    	allSeparatorData.add(element);   	    	 
+    	     }	    	        	    
+    	}catch(Exception e) {
+    		 e.printStackTrace();
+    	}  		
+	}
 	
 	
 	/*************************************************************
@@ -223,7 +253,7 @@ public class PanelManager {
 	}
 	
 	// To store the output data
-	public void storeAnimalPanelOutput(ArrayList<AnimalPanelTableInfo> o) {
+	public void storeAnimalPanelOutput(ArrayList<AnimalPanelOutputElement> o) {
 		animalPanelOutput = o;
 	}
 	
@@ -244,14 +274,14 @@ public class PanelManager {
 	 * Gets the column names from the animalPanelOutput, that is, the valid animal names.
 	 * @return
 	 */
-	public String[] getColumnNames() {
+	public String[] getLocationColumnNames() {
 
 		int size = animalPanelOutput.size() + 1;
 		String[] name = new String[size];
 		name[0] = "Location";
 		int index = 1;
-		for(AnimalPanelTableInfo ele : animalPanelOutput) {
-			name[index] = ele.aniInfo.name;
+		for(AnimalPanelOutputElement ele : animalPanelOutput) {
+			name[index] = ele.name;
 			index ++;
 		}
 		return name;
@@ -263,16 +293,16 @@ public class PanelManager {
 	 * @param list	the list of column names
 	 * @return	the column number
 	 */
-	public int getColumn(String s, String[] list) {
+	/*public int getColumn(String s, String[] list) {
 		for(int i = 0; i < list.length; i++) {
 			if(s.equals(list[i]))
 				return i+1;
 		}
 		return -1;
-	}
+	}*/
 
 	// To store the output data
-	public void storeLocationPanelOutput(ArrayList<String> o) {
+	public void storeLocationPanelOutput(ArrayList<LocationPanelOutputElement> o) {
 		locationPanelOutput = o;
 	}
 	
@@ -282,7 +312,20 @@ public class PanelManager {
 	 * 				Manage Addition panel
 	 */
 	
+	// get the element of the 1st column, from the locationPanelOutput
+	public ArrayList<String> getLocationElements(){
+		ArrayList<String> res = new ArrayList<>();
+		for(int i = 0; i < locationPanelOutput.size(); i++) {
+			res.add(locationPanelOutput.get(i).name);
+		}
+		return res;
+	}
 	
+	
+	// To store the output data
+	public void storeAdditionsPanelOutput(ArrayList<AdditionsPanelOutputElement> o) {
+		additionsPanelOutput = o;
+	}
 	
 	
 	/***************************************************************
@@ -320,5 +363,18 @@ public class PanelManager {
 	 * 				Manage management panel
 	 */
 	
+	// get all stream names of the 1st column, from the additionsPanelOutput
+	public ArrayList<String> getAllStreams(){
+		ArrayList<String> res = new ArrayList<>();
+		for(int i = 0; i < additionsPanelOutput.size(); i++) {
+			res.add(additionsPanelOutput.get(i).name);
+		}
+		return res;
+	}
 	
+	
+	// To store the output data
+	//public void storeMgmtPanelOutput(ArrayList<AdditionsPanelOutputElement> o) {
+	//	additionsPanelOutput = o;
+	//}
 }
