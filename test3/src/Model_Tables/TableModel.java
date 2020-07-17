@@ -28,26 +28,6 @@ public class TableModel extends AbstractTableModel {
 		columnName = s;
 		data = o;
 	}
-
-	/**
-	 * adds one row data into the model's last row.
-	 * @param s	the row data
-	 */
-	/*public void addRow(String[] s) {
-		int l = data.length + 1;
-		int cl = columnName.length;
-		Object[][] np = new Object[l][cl];
-		for (int i = 0; i < data.length; i++) {
-			for (int j = 0; j < columnName.length; j++) {
-				np[i][j] = data[i][j];
-			}
-		}
-		for (int i = 0; i < s.length; i++) {
-			np[l - 1][i] = s[i];
-		}
-		data = np;
-	}*/
-	
 	
 	/**
 	 * insert one row into the table after the target index. i.g., 

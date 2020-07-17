@@ -857,9 +857,8 @@ public class MgmtTrainPanel extends JPanel {
 					String tempV3 = getAdditionElement(panelManager.additionsPanelOutput, streamName).data[1]; // flush
 																												// water
 					String tempV4 = getAdditionElement(panelManager.additionsPanelOutput, streamName).data[2]; // bedding
-																												// value
-					SeparatorInfo sepEle = getSeparatorElement(panelManager.allSeparatorData, separatorName);
-					if (sepEle != null)
+																												// value					
+					if (isContain(sepComponents, separatorName))
 						separatorRatio = getSeparatorElement(panelManager.allSeparatorData, separatorName).efficiency;
 					/*
 					 * the 1st column of jTable2, the prior condition is one of following: 1. choose
@@ -925,7 +924,7 @@ public class MgmtTrainPanel extends JPanel {
 									double dFactor = Double.parseDouble(locationRatio);
 									val += (dManure * dFactor / 100);
 								}
-								v1 += (val * Double.parseDouble(separatorRatio) / 110);
+								v1 += (val * Double.parseDouble(separatorRatio) / 55);
 							}
 							v2 += 0.0;
 							v3 += 0.0;

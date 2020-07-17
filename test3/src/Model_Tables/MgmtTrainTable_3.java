@@ -128,10 +128,10 @@ public class MgmtTrainTable_3 implements TableModelListener {
 	@Override
 	public void tableChanged(TableModelEvent e) {
 		// int col = e.getColumn();
-		int col = ntable.getSelectedColumn();
-		String colName = ntable.getColumnName(col);
+		//int col = ntable.getSelectedColumn();
+		//String colName = ntable.getColumnName(col);
 
 		
-		ntable.repaint();
+		//ntable.repaint();
 	}
 }

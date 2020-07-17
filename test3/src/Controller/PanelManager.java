@@ -259,16 +259,7 @@ public class PanelManager {
 	
 	/*************************************************************
 	 * 				Manage location panel
-	 */
-	
-	/*
-	public ArrayList<AnimalInfo> getDataFromAnimalPanel(){
-		ArrayList<AnimalInfo> list = new ArrayList<>();
-		for(AnimalPanelTableInfo ele : animalPanelOutput) {
-			list.add(ele.aniInfo);
-		}				
-		return list;
-	}*/
+	 */	
 	
 	/**
 	 * Gets the column names from the animalPanelOutput, that is, the valid animal names.
