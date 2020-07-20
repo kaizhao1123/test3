@@ -3,6 +3,7 @@ package GUI;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -19,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -43,6 +45,8 @@ public class MgmtTrainPanel extends JPanel {
 
 	MainFrame parent;
 	JTabbedPane pane;
+	OperatingPeriodDialog periodDialog;
+	JPanel panel;
 	PanelManager panelManager;
 
 	DecimalFormat df = new DecimalFormat("0.00");
@@ -52,16 +56,21 @@ public class MgmtTrainPanel extends JPanel {
 			"Total Waste Volume" }; // jtable3's column
 
 	ArrayList<String> elementsInFirstColumn; // the elements of the first column of jTable1
-	Object[][] tableData_1;
-	Object[][] tableData_2;
-	Object[][] tableData_3;
+	Object[][] tableData_1;			//to show the first 2 columns in above screen
+	Object[][] tableData_2;			//to show the last 2 columns in above screen
+	Object[][] tableData_3;			//to show in bottom screen
+	Object[][] tableData_4;			//to show in bottom screen alternatively.
 
+	Boolean twoPeriod = false;
+	
 	MgmtTrainTable_1 myTable1;
 	JTable jTable1;
 	MgmtTrainTable_2 myTable2;
 	JTable jTable2;
 	MgmtTrainTable_3 myTable3;
 	JTable jTable3;
+	MgmtTrainTable_3 myTable4;
+	JTable jTable4;
 
 	JScrollPane subScrollPane_1; // contains jTable1.
 	JScrollPane subScrollPane_2; // contains jTable2.
@@ -71,6 +80,10 @@ public class MgmtTrainPanel extends JPanel {
 	JScrollPane scrollPane_2; // contains jtable3.
 
 	JLabel label;
+	String firstPeriod;
+	String secondPeriod;
+	String[] periods;
+	JComboBox operationPeriod;
 	JButton buttonHelp;
 	JButton buttonOK;
 
@@ -149,9 +162,12 @@ public class MgmtTrainPanel extends JPanel {
 			tableData_2[i][1] = " ";
 		}
 
-		// initial jTable3
+		// initial jTable3, jTable4.
 		tableData_3 = null;
+		tableData_4 = null;
 
+		
+		periods = new String[2];
 		resultComponents = new ArrayList<>();
 		liquidComponents = new ArrayList<>();
 		terminalComponents = new ArrayList<>();
@@ -164,7 +180,9 @@ public class MgmtTrainPanel extends JPanel {
 	 * jTable3. in addition, initial all popupMenus.
 	 */
 	private void initialElements() {
-		label = new JLabel("Component Volumens(cu.ft/day)");
+		panel = this;
+		label = new JLabel("<HTML> <U>Component Volumens(cu.ft/day)</U></HTML>");
+		label.setFont(new Font(label.getFont().getName(), Font.BOLD, 13));
 		Border border = BorderFactory.createEmptyBorder(0, 0, 0, 0);
 
 		// initial scrollPane_1
@@ -211,7 +229,7 @@ public class MgmtTrainPanel extends JPanel {
 		scrollPane_1.setPreferredSize(new Dimension(630, 226));
 		scrollPane_1.setViewportBorder(border);
 		scrollPane_1.setBorder(border);
-
+				   	
 		// initial scrollPane_2
 		myTable3 = new MgmtTrainTable_3();
 		jTable3 = myTable3.buildMyTable(columnName_3, tableData_3);
@@ -223,6 +241,18 @@ public class MgmtTrainPanel extends JPanel {
 		jTable3.getColumnModel().getColumn(5).setWidth(130);
 		jTable3.enable(false);
 		jTable3.setRowHeight(25);
+		
+		myTable4 = new MgmtTrainTable_3();
+		jTable4 = myTable4.buildMyTable(columnName_3, tableData_4);
+		jTable4.getColumnModel().getColumn(0).setWidth(160);
+		jTable4.getColumnModel().getColumn(1).setWidth(85);
+		jTable4.getColumnModel().getColumn(2).setWidth(85);
+		jTable4.getColumnModel().getColumn(3).setWidth(85);
+		jTable4.getColumnModel().getColumn(4).setWidth(85);
+		jTable4.getColumnModel().getColumn(5).setWidth(130);
+		jTable4.enable(false);
+		jTable4.setRowHeight(25);
+		
 
 		scrollPane_2 = new JScrollPane(jTable3);
 		scrollPane_2.setPreferredSize(new Dimension(630, 100));
@@ -324,20 +354,77 @@ public class MgmtTrainPanel extends JPanel {
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.gridheight = 1;
+		gbc.gridwidth = 2;
 		add(scrollPane_1, gbc);
 
 		gbc.gridy = 2;
+		gbc.gridwidth = 1;
 		add(label, gbc);
 
 		gbc.gridy = 3;
+		gbc.gridwidth = 2;
 		add(scrollPane_2, gbc);
 
-		gbc.anchor = GridBagConstraints.EAST;
-		gbc.gridheight = 1;
+		gbc.anchor = GridBagConstraints.EAST;		
+		gbc.gridx = 1;
 		gbc.gridy = 4;
+		gbc.gridheight = 1;
+		gbc.gridwidth = 1;
 		add(panel_2, gbc);
 	}
 
+	// Corresponding the first option of periodDialog, that is, only table1 will be shown
+	public void update1() {
+		twoPeriod = false;
+    	label.setText("<HTML> <U>Component Volumens(cu.ft/day)</U></HTML>");    	
+    	panel.remove(operationPeriod);
+    	scrollPane_2.setViewportView(jTable3);
+    	panel.updateUI();
+    }
+	// Corresponding the second option of periodDialog, that is, both table will be shown.
+    public void update2() {
+    	twoPeriod = true;
+    	periodDialog = parent.startPanel.periodDialog;
+    	firstPeriod = periodDialog.firstOperatingPeriod;
+    	secondPeriod = periodDialog.secondOperatingPeriod;
+    	
+    	periods[0] = firstPeriod;
+    	periods[1] = secondPeriod;
+    	label.setText("<HTML> <U>Component Volumens(cu.ft/day) for Operating Period: </U></HTML>");
+    	operationPeriod = new JComboBox<>(periods);
+    	operationPeriod.setPreferredSize(new Dimension(160,25));
+    	operationPeriod.setSelectedIndex(0);
+    	scrollPane_2.setViewportView(jTable3);
+    	/*operationPeriod.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					operationPeriod.setPrototypeDisplayValue(operationPeriod.getSelectedItem());
+			    	if(operationPeriod.getSelectedItem().toString().equals(firstPeriod)) {
+						System.out.print("t3");
+						scrollPane_2.setViewportView(jTable3);
+					}			
+					else {
+						System.out.print("t4");
+						scrollPane_2.setViewportView(jTable4);
+					} 
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});*/
+  	
+    	
+    	
+		gc.anchor = GridBagConstraints.NORTHWEST;
+        //gc.insets = new Insets(5,5,5,5);
+		gc.gridx = 1;
+    	gc.gridy = 2;
+    	gc.gridwidth = 1;
+		panel.add(operationPeriod,gc);
+		panel.updateUI();
+    }
+	
 	/**
 	 * creates menuItem with name "None(Clear)" in the target jTable.
 	 * @param jt the target jTable
@@ -385,7 +472,12 @@ public class MgmtTrainPanel extends JPanel {
 					//myTable1.updateMyCellRender(" ");
 					jTable2.repaint();
 				}
-				updateJtable3();
+				updateBottomJtables("jTable3");
+				updateBottomJtables("jTable4");
+				if(twoPeriod.equals(false))
+					scrollPane_2.setViewportView(jTable3);
+				else
+					scrollPane_2.setViewportView(jTable4);
 			}
 		});
 		return nullItem;
@@ -448,7 +540,12 @@ public class MgmtTrainPanel extends JPanel {
 					myTable2.model.mySetValueAt(n, row, col);
 					jTable2.repaint();
 				}
-				updateJtable3();
+				updateBottomJtables("jTable3");
+				updateBottomJtables("jTable4");
+				if(twoPeriod.equals(false))
+					scrollPane_2.setViewportView(jTable3);
+				else
+					scrollPane_2.setViewportView(jTable4);
 			}
 		});
 		return item;
@@ -605,7 +702,12 @@ public class MgmtTrainPanel extends JPanel {
 					addOneItem(value);
 					myTable2.model.mySetValueAt(value, row, col);
 				}
-				updateJtable3();
+				updateBottomJtables("jTable3");
+				updateBottomJtables("jTable4");
+				if(twoPeriod.equals(false))
+					scrollPane_2.setViewportView(jTable3);
+				else
+					scrollPane_2.setViewportView(jTable4);
 			}
 		});
 		return item;
@@ -769,20 +871,39 @@ public class MgmtTrainPanel extends JPanel {
 		});
 	}
 	
-	// update jTable3
-	public void updateJtable3() {
-		if(tableData_3 != null) {
-			tableData_3 = null;
-			myTable3 = new MgmtTrainTable_3();
-			jTable3 = myTable3.buildMyTable(columnName_3, tableData_3);
-			jTable3.getColumnModel().getColumn(0).setWidth(160);
-			jTable3.getColumnModel().getColumn(1).setWidth(85);
-			jTable3.getColumnModel().getColumn(2).setWidth(85);
-			jTable3.getColumnModel().getColumn(3).setWidth(85);
-			jTable3.getColumnModel().getColumn(4).setWidth(85);
-			jTable3.getColumnModel().getColumn(5).setWidth(130);
-			jTable3.enable(false);
-			jTable3.setRowHeight(25);
+	// update jTable3 or Jtable4
+	public void updateBottomJtables(String name) {
+		
+		if(name.equals("jTable3")) {
+			if(tableData_3 != null) {
+				tableData_3 = null;
+				myTable3 = new MgmtTrainTable_3();
+				jTable3 = myTable3.buildMyTable(columnName_3, tableData_3);
+				jTable3.getColumnModel().getColumn(0).setWidth(160);
+				jTable3.getColumnModel().getColumn(1).setWidth(85);
+				jTable3.getColumnModel().getColumn(2).setWidth(85);
+				jTable3.getColumnModel().getColumn(3).setWidth(85);
+				jTable3.getColumnModel().getColumn(4).setWidth(85);
+				jTable3.getColumnModel().getColumn(5).setWidth(130);
+				jTable3.enable(false);
+				jTable3.setRowHeight(25);
+			}		
+		}
+		
+		if(name.equals("jTable4")) {
+			if(tableData_4 != null) {
+				tableData_4 = null;
+				myTable4 = new MgmtTrainTable_3();
+				jTable4 = myTable4.buildMyTable(columnName_3, tableData_4);
+				jTable4.getColumnModel().getColumn(0).setWidth(160);
+				jTable4.getColumnModel().getColumn(1).setWidth(85);
+				jTable4.getColumnModel().getColumn(2).setWidth(85);
+				jTable4.getColumnModel().getColumn(3).setWidth(85);
+				jTable4.getColumnModel().getColumn(4).setWidth(85);
+				jTable4.getColumnModel().getColumn(5).setWidth(130);
+				jTable4.enable(false);
+				jTable4.setRowHeight(25);
+			}		
 		}
 
 		// go through the whole resultComponents
@@ -811,10 +932,19 @@ public class MgmtTrainPanel extends JPanel {
 				for(int j = 0; j < jTable1.getRowCount(); j++) {
 					if(myTable1.model.data[j][1].toString().equals(ele)) {
 						String streamName = myTable1.model.data[j][0].toString();
-						String tempV2 = getAdditionElement(panelManager.additionsPanelOutput, streamName).data[0];
-						String tempV3 = getAdditionElement(panelManager.additionsPanelOutput, streamName).data[1];
-						String tempV4 = getAdditionElement(panelManager.additionsPanelOutput, streamName).data[2];
-						if(getLocationElement(panelManager.locationPanelOutput, streamName) == null) {
+						String tempV2, tempV3, tempV4;
+						if(name.equals("jTable3")) {
+							tempV2 = getAdditionElement(panelManager.additionsPanelOutput.get(0), streamName).data[0];
+							tempV3 = getAdditionElement(panelManager.additionsPanelOutput.get(0), streamName).data[1];
+							tempV4 = getAdditionElement(panelManager.additionsPanelOutput.get(0), streamName).data[2];
+						}
+						else {
+							tempV2 = getAdditionElement(panelManager.additionsPanelOutput.get(1), streamName).data[0];
+							tempV3 = getAdditionElement(panelManager.additionsPanelOutput.get(1), streamName).data[1];
+							tempV4 = getAdditionElement(panelManager.additionsPanelOutput.get(1), streamName).data[2];
+						}
+						
+						if(getLocationElement(panelManager.locationsPanelOutput.get(0), streamName) == null) {
 							v1 += 0.0;
 						} 
 						else {
@@ -824,11 +954,16 @@ public class MgmtTrainPanel extends JPanel {
 							 * the data length of locationpaneloutput element.
 							 */
 							double val = 0.0;
-							for(int subj = 0; subj < panelManager.animalPanelOutput.size(); subj++) {
-								AnimalPanelOutputElement animalElement = panelManager.animalPanelOutput.get(subj);
+							for(int subj = 0; subj < panelManager.animalsPanelOutput.size(); subj++) {
+								AnimalPanelOutputElement animalElement = panelManager.animalsPanelOutput.get(subj);
 								String manure = animalElement.data[0];
-								String locationRatio = getLocationElement(panelManager.locationPanelOutput,
+								String locationRatio;
+								if(name.equals("jTable3"))
+									locationRatio = getLocationElement(panelManager.locationsPanelOutput.get(0),
 										streamName).data[subj];
+								else
+									locationRatio = getLocationElement(panelManager.locationsPanelOutput.get(1),
+											streamName).data[subj];
 								double dManure = Double.parseDouble(manure);
 								double dFactor = Double.parseDouble(locationRatio);
 								val += (dManure * dFactor / 100);
@@ -852,12 +987,21 @@ public class MgmtTrainPanel extends JPanel {
 					String separatorRatio = "1";
 					String valueInCol_1 = myTable2.model.data[k][0].toString(); // step 2
 					String valueInCol_2 = myTable2.model.data[k][1].toString(); // step 3
-					String tempV2 = getAdditionElement(panelManager.additionsPanelOutput, streamName).data[0]; // wash
-																												// water
-					String tempV3 = getAdditionElement(panelManager.additionsPanelOutput, streamName).data[1]; // flush
-																												// water
-					String tempV4 = getAdditionElement(panelManager.additionsPanelOutput, streamName).data[2]; // bedding
-																												// value					
+					
+					//String tempV2 = getAdditionElement(panelManager.additionsPanelOutput.get(0), streamName).data[0]; // wash water
+					//String tempV3 = getAdditionElement(panelManager.additionsPanelOutput.get(0), streamName).data[1]; // flush water
+					//String tempV4 = getAdditionElement(panelManager.additionsPanelOutput.get(0), streamName).data[2]; // bedding value					
+					String tempV2, tempV3, tempV4;
+					if(name.equals("jTable3")) {
+						tempV2 = getAdditionElement(panelManager.additionsPanelOutput.get(0), streamName).data[0];	// wash water
+						tempV3 = getAdditionElement(panelManager.additionsPanelOutput.get(0), streamName).data[1];	// flush water
+						tempV4 = getAdditionElement(panelManager.additionsPanelOutput.get(0), streamName).data[2];	// bedding value
+					}
+					else {
+						tempV2 = getAdditionElement(panelManager.additionsPanelOutput.get(1), streamName).data[0];
+						tempV3 = getAdditionElement(panelManager.additionsPanelOutput.get(1), streamName).data[1];
+						tempV4 = getAdditionElement(panelManager.additionsPanelOutput.get(1), streamName).data[2];
+					}
 					if (isContain(sepComponents, separatorName))
 						separatorRatio = getSeparatorElement(panelManager.allSeparatorData, separatorName).efficiency;
 					/*
@@ -873,7 +1017,7 @@ public class MgmtTrainPanel extends JPanel {
 						 * separator. 2. it is the same as jTable1.
 						 */
 						if (k == rowInTable2) {
-							if (getLocationElement(panelManager.locationPanelOutput, streamName) == null) {
+							if (getLocationElement(panelManager.locationsPanelOutput.get(0), streamName) == null) {
 								v1 += 0.0;
 							} else {
 								/*
@@ -882,11 +1026,16 @@ public class MgmtTrainPanel extends JPanel {
 								 * the data length of locationpaneloutput element.
 								 */
 								double val = 0.0;
-								for (int subj = 0; subj < panelManager.animalPanelOutput.size(); subj++) {
-									AnimalPanelOutputElement animalElement = panelManager.animalPanelOutput.get(subj);
+								for (int subj = 0; subj < panelManager.animalsPanelOutput.size(); subj++) {
+									AnimalPanelOutputElement animalElement = panelManager.animalsPanelOutput.get(subj);
 									String manure = animalElement.data[0];
-									String locationRatio = getLocationElement(panelManager.locationPanelOutput,
+									String locationRatio;
+									if(name.equals("jTable3"))
+										locationRatio = getLocationElement(panelManager.locationsPanelOutput.get(0),
 											streamName).data[subj];
+									else
+										locationRatio = getLocationElement(panelManager.locationsPanelOutput.get(1),
+												streamName).data[subj];
 									double dManure = Double.parseDouble(manure);
 									double dFactor = Double.parseDouble(locationRatio);
 									val += (dManure * dFactor / 100);
@@ -906,7 +1055,7 @@ public class MgmtTrainPanel extends JPanel {
 						 * v1 and v4, which based on the type of separator.
 						 */
 						else {
-							if (getLocationElement(panelManager.locationPanelOutput, streamName) == null) {
+							if (getLocationElement(panelManager.locationsPanelOutput.get(0), streamName) == null) {
 								v1 += 0.0;
 							} else {
 								/*
@@ -915,11 +1064,16 @@ public class MgmtTrainPanel extends JPanel {
 								 * the data length of locationpaneloutput element.
 								 */
 								double val = 0.0;
-								for (int subj = 0; subj < panelManager.animalPanelOutput.size(); subj++) {
-									AnimalPanelOutputElement animalElement = panelManager.animalPanelOutput.get(subj);
+								for (int subj = 0; subj < panelManager.animalsPanelOutput.size(); subj++) {
+									AnimalPanelOutputElement animalElement = panelManager.animalsPanelOutput.get(subj);
 									String manure = animalElement.data[1]; // solid(TS)
-									String locationRatio = getLocationElement(panelManager.locationPanelOutput,
+									String locationRatio;
+									if(name.equals("jTable3"))
+										locationRatio = getLocationElement(panelManager.locationsPanelOutput.get(0),
 											streamName).data[subj];
+									else
+										locationRatio = getLocationElement(panelManager.locationsPanelOutput.get(1),
+												streamName).data[subj];
 									double dManure = Double.parseDouble(manure);
 									double dFactor = Double.parseDouble(locationRatio);
 									val += (dManure * dFactor / 100);
@@ -946,14 +1100,27 @@ public class MgmtTrainPanel extends JPanel {
 				rowData[4] = df.format(v4);
 				rowData[5] = df.format(v5);
 			}
-			if (jTable3.getRowCount() == 0)
-				myTable3.model.insertRow(rowData, 0);
-			else
-				myTable3.model.insertRow(rowData, jTable3.getRowCount() - 1);
+			if(name.equals("jTable3")) {
+				if (jTable3.getRowCount() == 0)
+					myTable3.model.insertRow(rowData, 0);
+				else
+					myTable3.model.insertRow(rowData, jTable3.getRowCount() - 1);
+			}
+			else {
+				if (jTable4.getRowCount() == 0)
+					myTable4.model.insertRow(rowData, 0);
+				else
+					myTable4.model.insertRow(rowData, jTable4.getRowCount() - 1);
+			}
+					
+			
 		}
 		// jTable3.updateUI();
-		tableData_3 = myTable3.model.data;
-		scrollPane_2.setViewportView(jTable3);
+		if(name.equals("jTable3")) 
+			tableData_3 = myTable3.model.data;
+		else
+			tableData_4 = myTable4.model.data;
+		
 	}
 
 	// remove one item from the jTable

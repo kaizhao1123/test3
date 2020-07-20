@@ -46,7 +46,7 @@ public class AnimalsPanel extends JPanel {
 	MainFrame parent;
 	JTabbedPane pane;
 	PanelManager panelManager;
-	LocationsPanel locationPanel;
+	LocationsPanel locationsPanel;
 	AddAnimalDialog newAnimalDialog;
 
 	Font font = new Font("Arial Narrow", Font.PLAIN, 13);
@@ -353,18 +353,18 @@ public class AnimalsPanel extends JPanel {
 				//pane = parent.tabbedPane;
 				if (jTable.isEditing())
 	            	  jTable.getCellEditor().stopCellEditing(); 
-				if (locationPanel == null) {					
+				if (locationsPanel == null) {					
 					getOutput();
 					if(!animalPanelOutput.isEmpty()) {
 						panelManager.storeAnimalPanelOutput(animalPanelOutput);
-						locationPanel = new LocationsPanel(panelManager);
-						locationPanel.setParent(parent);
-						pane.add("location", locationPanel);
+						locationsPanel = new LocationsPanel(panelManager);
+						locationsPanel.setParent(parent);
+						pane.add("locations", locationsPanel);
 
 						if (parent.startPanel.periodDialog.secondOption == true) {
-							locationPanel.update2();
+							locationsPanel.update2();
 						}
-						pane.setSelectedIndex(pane.indexOfTab("location"));
+						pane.setSelectedIndex(pane.indexOfTab("locations"));
 					}
 					else
 						JOptionPane.showMessageDialog(null,"No animals selected!");
@@ -555,10 +555,10 @@ public class AnimalsPanel extends JPanel {
 			animalInTable.remove(a);
 			
 			// delete the corresponding column of the "location Table"
-			if(locationPanel != null) {
+			if(locationsPanel != null) {
 				if(itemName != null) {
 					//int col = panelManager.getColumn(itemName, locationPanel.columnName);
-					locationPanel.deleteTableColumn(itemName);
+					locationsPanel.deleteTableColumn(itemName);
 				}
 					
 			}

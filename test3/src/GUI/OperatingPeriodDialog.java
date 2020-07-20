@@ -44,7 +44,9 @@ import javax.swing.JTextField;
 public class OperatingPeriodDialog extends JDialog{
 	MainFrame parent;
 	JTabbedPane pane;
-	LocationsPanel locationPanel;
+	LocationsPanel locationsPanel;
+	AdditionsPanel additionsPanel;
+	MgmtTrainPanel mgmtTrainPanel;
 	
     Boolean firstOption = true;
 	Boolean secondOption = false;
@@ -111,12 +113,21 @@ public class OperatingPeriodDialog extends JDialog{
 					panel.updateUI();
 					
 					pane = parent.tabbedPane;
-					int index = pane.indexOfTab("location");  	  // it is associate with location panel.				
-					if(index >= 0) {
-						locationPanel = (LocationsPanel) pane.getComponentAt(index);
-						locationPanel.update1();
+					int locIndex = pane.indexOfTab("locations");  	  // it is associate with location panel.				
+					if(locIndex >= 0) {
+						locationsPanel = (LocationsPanel) pane.getComponentAt(locIndex);
+						locationsPanel.update1();
 					}
-			    	
+					int additionIndex = pane.indexOfTab("additions");  	  // it is associate with addition panel.				
+					if(additionIndex >= 0) {
+						additionsPanel = (AdditionsPanel) pane.getComponentAt(additionIndex);
+						additionsPanel.update1();
+					}
+					int mgmtTrainIndex = pane.indexOfTab("Mgmt Train");  	  // it is associate with mgmtTrain panel.				
+					if(mgmtTrainIndex >= 0) {
+						mgmtTrainPanel = (MgmtTrainPanel) pane.getComponentAt(mgmtTrainIndex);
+						mgmtTrainPanel.update1();
+					}
 					
 				} catch (Exception e1) {
 					// TODO Auto-generated catch block
@@ -145,10 +156,20 @@ public class OperatingPeriodDialog extends JDialog{
 					panel.updateUI();
 					
 					pane = parent.tabbedPane;
-					int index = pane.indexOfTab("location");    // it is associate with location panel.
-					if(index >= 0) {
-						locationPanel = (LocationsPanel) pane.getComponentAt(index);
-						locationPanel.update2();
+					int locIndex = pane.indexOfTab("locations");  	  // it is associate with location panel.				
+					if(locIndex >= 0) {
+						locationsPanel = (LocationsPanel) pane.getComponentAt(locIndex);
+						locationsPanel.update2();
+					}
+					int additionIndex = pane.indexOfTab("additions");  	  // it is associate with addition panel.				
+					if(additionIndex >= 0) {
+						additionsPanel = (AdditionsPanel) pane.getComponentAt(additionIndex);
+						additionsPanel.update2();
+					}
+					int mgmtTrainIndex = pane.indexOfTab("Mgmt Train");  	  // it is associate with mgmtTrain panel.				
+					if(mgmtTrainIndex >= 0) {
+						mgmtTrainPanel = (MgmtTrainPanel) pane.getComponentAt(mgmtTrainIndex);
+						mgmtTrainPanel.update2();
 					}
 				} catch (Exception e1) {
 					// TODO Auto-generated catch block
@@ -242,11 +263,24 @@ public class OperatingPeriodDialog extends JDialog{
 		// the 5th part
 		buttonOK.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e){	
-				if(locationPanel != null) {
-					if(firstOption)
-						locationPanel.update1();
-					if(secondOption)
-						locationPanel.update2();
+				if(locationsPanel != null) {
+					if(firstOption) {
+						if(locationsPanel != null)
+							locationsPanel.update1();
+						if(additionsPanel != null)
+							additionsPanel.update1();
+						if(mgmtTrainPanel != null)
+							mgmtTrainPanel.update1();
+					}						
+					if(secondOption) {
+						if(locationsPanel != null)
+							locationsPanel.update2();
+						if(additionsPanel != null)
+							additionsPanel.update2();
+						if(mgmtTrainPanel != null)
+							mgmtTrainPanel.update2();
+					}
+						
 				}
 				dispose();								
 			}							

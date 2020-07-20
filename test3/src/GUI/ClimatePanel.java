@@ -58,7 +58,7 @@ public class ClimatePanel extends JPanel {
 	JTabbedPane pane;
 	PanelManager panelManager;
 	RunoffPanel runoffPanel;
-	AnimalsPanel animalPanel = null;
+	AnimalsPanel animalsPanel = null;
 
 	/********************************************************
 	 *  declare the data structures uesd in this panel
@@ -517,12 +517,12 @@ public class ClimatePanel extends JPanel {
 				if (jTable_database.isEditing())
 	            	  jTable_database.getCellEditor().stopCellEditing(); 
 				try {					
-					if (animalPanel == null) {
+					if (animalsPanel == null) {
 						getOutput();
 						panelManager.storeClimatePanelOutput(climatePanelOutput);
-						animalPanel = new AnimalsPanel(panelManager);
-						animalPanel.setParent(parent);
-						pane.add("animal", animalPanel);
+						animalsPanel = new AnimalsPanel(panelManager);
+						animalsPanel.setParent(parent);
+						pane.add("animals", animalsPanel);
 					}
 					/*
 					 * else { pane.remove(index);
@@ -532,7 +532,7 @@ public class ClimatePanel extends JPanel {
 					 * animal = new AnimalPanel(pane,animalData,source); animal.setParent(parent);
 					 * pane.insertTab("animal", null, animal, null, index); }
 					 */
-					pane.setSelectedIndex(pane.indexOfTab("animal"));
+					pane.setSelectedIndex(pane.indexOfTab("animals"));
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}

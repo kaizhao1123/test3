@@ -53,20 +53,20 @@ public class LocationsPanel extends JPanel {
 	/***********************************************************
 	 * declare the data structures used in this panel
 	 */
-	String[] columnName;
+	public String[] columnName;
 	Object data1[][];   // for table1
-	Object data2[][];	// for table2
-	// the input data from the output of animalPanel, to generate the column names;
-	//ArrayList<AnimalInfo> animalsList;	
+	Object data2[][];	// for table2	
 	ArrayList<String> elementsInFirstCol; // the first column's name;
 	int rowIndex;  //  the row index of selected to delete
 	String deleteName; // the location name to be delete.
-    ArrayList<LocationPanelOutputElement> locationPanelOutput;	   // to store the output of location panel
+    ArrayList<LocationPanelOutputElement> outputOfTable_1;	   // to store the output of table1
+    ArrayList<LocationPanelOutputElement> outputOfTable_2;	   // to store the output of table2
+    ArrayList<ArrayList<LocationPanelOutputElement>> locationsPanelOutput; // to store the output of locationPanel
 	
 	/***********************************************************
 	 * declare the elements used in this panel
 	 */
-	JPanel panel = this;
+	JPanel panel;
 
 	JLabel label_1;
 	JLabel label_2;
@@ -84,7 +84,7 @@ public class LocationsPanel extends JPanel {
     JButton buttonHelp;
     JButton buttonOK;
     
-    Boolean twoPeriod = false;
+    //Boolean twoPeriod = false;
     String firstPeriod;
     String secondPeriod;
     
@@ -104,7 +104,7 @@ public class LocationsPanel extends JPanel {
     
  	// initials the data structures, mainly to get the input data.
     private void initialData() {
-		
+    	panel = this;
     	// get the column names of the table		
 		columnName = panelManager.getLocationColumnNames();
 		// initial the elementsInFirstCol;
@@ -115,7 +115,7 @@ public class LocationsPanel extends JPanel {
 		label_1 = new JLabel("Enter Location: ");
 		textLocation = new JTextField();
 		textLocation.setPreferredSize(new Dimension(130,25));
-		label_2 = new JLabel("Enter the Percent of Manure Each Animal Deposits in Each Location: ");
+		label_2 = new JLabel("<HTML> <U>Enter the Percent of Manure Each Animal Deposits in Each Location: </U></HTML>");
 
 		label_3 = new JLabel(" ");
 		label_4 = new JLabel(" ");
@@ -198,15 +198,18 @@ public class LocationsPanel extends JPanel {
 					databaseTable2.getCellEditor().stopCellEditing(); 
 				if (additionsPanel == null) {
 					getOutput();
-					if(locationPanelOutput.isEmpty()) {
+					if(outputOfTable_1.isEmpty()) {
 						JOptionPane.showMessageDialog(null,"No location added");
 						
 					}
 					else {
-						panelManager.storeLocationPanelOutput(locationPanelOutput);
+						panelManager.storeLocationPanelOutput(locationsPanelOutput);
 						additionsPanel = new AdditionsPanel(panelManager);
 						additionsPanel.setParent(parent);
 						pane.add("additions", additionsPanel);
+						if (parent.startPanel.periodDialog.secondOption == true) {
+							additionsPanel.update2();
+						}
 						pane.setSelectedIndex(pane.indexOfTab("additions"));
 					}										
 				} else {
@@ -288,7 +291,9 @@ public class LocationsPanel extends JPanel {
  
 	// get the output of this panel	
 	private void getOutput() {
-		locationPanelOutput = new ArrayList<>();
+		outputOfTable_1 = new ArrayList<>();
+		outputOfTable_2 = new ArrayList<>();		
+		locationsPanelOutput = new ArrayList<>();
 		for(int i = 0; i < myTable1.model.data.length-1; i++) {
 			String name = myTable1.model.data[i][0].toString();
 			String[] data = new String[columnName.length-1];
@@ -296,8 +301,19 @@ public class LocationsPanel extends JPanel {
 				data[j] = myTable1.model.data[i][j+1].toString();
 			}
 			LocationPanelOutputElement locationElement = new LocationPanelOutputElement(name, data);
-			locationPanelOutput.add(locationElement);
+			outputOfTable_1.add(locationElement);
 		}
+		for(int i = 0; i < myTable2.model.data.length-1; i++) {
+			String name = myTable2.model.data[i][0].toString();
+			String[] data = new String[columnName.length-1];
+			for(int j = 0; j < columnName.length-1; j++) {
+				data[j] = myTable2.model.data[i][j+1].toString();
+			}
+			LocationPanelOutputElement locationElement = new LocationPanelOutputElement(name, data);
+			outputOfTable_2.add(locationElement);
+		}
+		locationsPanelOutput.add(outputOfTable_1);
+		locationsPanelOutput.add(outputOfTable_2);
 	}
     
 	// Corresponding the first option of periodDialog, that is, only table1 will be shown
@@ -305,7 +321,7 @@ public class LocationsPanel extends JPanel {
     	label_3.setText(" ");
     	label_4.setText(" ");
     	panel.remove(scrollPane2);
-    	twoPeriod = false;
+    	//twoPeriod = false;
     	panel.setSize(new Dimension(500,400));
     	panel.updateUI();
     }
@@ -327,18 +343,18 @@ public class LocationsPanel extends JPanel {
 		gc.gridheight = 3;
 		gc.gridwidth = 7;
 		panel.add(scrollPane2,gc);
-		twoPeriod = true;
+		//twoPeriod = true;
 		panel.setSize(new Dimension(500,600));
 		panel.updateUI();
     }
     
     // after update2, changing of the start and end month of the period will lead to the change of the label
-    public void update3() {
+  /*  public void update3() {
     	firstPeriod = periodDialog.firstOperatingPeriod;
     	secondPeriod = periodDialog.secondOperatingPeriod;
     	label_3.setText("1st Operating Period: " + firstPeriod);
     	label_4.setText("2nd Operating Period: " + secondPeriod);
-    }
+    }*/
     
     // adds row data into the table
     private void addTableRow(String s) {   					

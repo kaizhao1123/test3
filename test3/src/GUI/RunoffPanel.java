@@ -363,6 +363,9 @@ public class RunoffPanel extends JPanel {
 						// panelManager.storeClimatePanelOutput(Output);
 						mgmtTrainPanel = new MgmtTrainPanel(panelManager);
 						mgmtTrainPanel.setParent(parent);
+						if (parent.startPanel.periodDialog.secondOption == true) {
+							mgmtTrainPanel.update2();
+						}
 						pane.add("Mgmt Train", mgmtTrainPanel);
 					}
 					/*

@@ -150,7 +150,14 @@ public class AnimalsTable implements TableModelListener {
 			return c;
 		}
 	}
-
+	// check whether String[] contains the target String
+	private boolean isContain(String[] list, String s) {
+		for(int i = 0; i < list.length; i++) {
+			if(list[i].equals(s))
+				return true;
+		}
+		return false;			
+	}
 	
 
 	@Override
@@ -194,10 +201,11 @@ public class AnimalsTable implements TableModelListener {
 		 */
 		if(Double.parseDouble(ele[2].toString()) > 0.00) {			
 			try {
-				int index = pane.indexOfTab("location"); 				
+				int index = pane.indexOfTab("locations"); 				
 				if(index >= 0) {
-					locationsPanel = (LocationsPanel) pane.getComponentAt(index);																	
-					locationsPanel.addTableColumn(ele[0].toString());
+					locationsPanel = (LocationsPanel) pane.getComponentAt(index);
+					if(!isContain(locationsPanel.columnName, ele[0].toString()))
+						locationsPanel.addTableColumn(ele[0].toString());
 				}
 			}catch(Exception ef) {
 				
@@ -206,7 +214,7 @@ public class AnimalsTable implements TableModelListener {
 		}
 		if(Double.parseDouble(ele[2].toString()) <= 0.00) {
 			try {
-				int index = pane.indexOfTab("location"); 				
+				int index = pane.indexOfTab("locations"); 				
 				if(index >= 0) {
 					locationsPanel = (LocationsPanel) pane.getComponentAt(index);																	
 					locationsPanel.deleteTableColumn(ele[0].toString());

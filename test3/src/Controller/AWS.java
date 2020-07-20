@@ -19,7 +19,7 @@ public class AWS {
 				int height = (int) screenSize.getHeight() * 3 / 5;
 
 				// read data
-				String path = "C:/Users/Kai Zhao/Desktop/AWSdata.xlsx";
+				String path = "C:/Users/Kai Zhao/Desktop/AWMdata.xlsx";
 				
 				// initial main frame and panel manager
 				JFrame frame = null;

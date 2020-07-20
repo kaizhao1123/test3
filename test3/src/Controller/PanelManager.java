@@ -34,9 +34,9 @@ public class PanelManager {
 	// the output data structures of each panel
 	public String[] startPanelOutput = new String[2];
 	public ArrayList<String> climatePanelOutout;
-	public ArrayList<AnimalPanelOutputElement> animalPanelOutput;
-	public ArrayList<LocationPanelOutputElement> locationPanelOutput;
-	public ArrayList<AdditionsPanelOutputElement> additionsPanelOutput;
+	public ArrayList<AnimalPanelOutputElement> animalsPanelOutput;
+	public ArrayList<ArrayList<LocationPanelOutputElement>> locationsPanelOutput;
+	public ArrayList<ArrayList<AdditionsPanelOutputElement>> additionsPanelOutput;
 	public ArrayList<String> runoffPanelOutput;
 	
 	/**
@@ -254,7 +254,7 @@ public class PanelManager {
 	
 	// To store the output data
 	public void storeAnimalPanelOutput(ArrayList<AnimalPanelOutputElement> o) {
-		animalPanelOutput = o;
+		animalsPanelOutput = o;
 	}
 	
 	/*************************************************************
@@ -267,11 +267,11 @@ public class PanelManager {
 	 */
 	public String[] getLocationColumnNames() {
 
-		int size = animalPanelOutput.size() + 1;
+		int size = animalsPanelOutput.size() + 1;
 		String[] name = new String[size];
 		name[0] = "Location";
 		int index = 1;
-		for(AnimalPanelOutputElement ele : animalPanelOutput) {
+		for(AnimalPanelOutputElement ele : animalsPanelOutput) {
 			name[index] = ele.name;
 			index ++;
 		}
@@ -293,8 +293,8 @@ public class PanelManager {
 	}*/
 
 	// To store the output data
-	public void storeLocationPanelOutput(ArrayList<LocationPanelOutputElement> o) {
-		locationPanelOutput = o;
+	public void storeLocationPanelOutput(ArrayList<ArrayList<LocationPanelOutputElement>> o) {
+		locationsPanelOutput = o;
 	}
 	
 	
@@ -306,15 +306,15 @@ public class PanelManager {
 	// get the element of the 1st column, from the locationPanelOutput
 	public ArrayList<String> getLocationElements(){
 		ArrayList<String> res = new ArrayList<>();
-		for(int i = 0; i < locationPanelOutput.size(); i++) {
-			res.add(locationPanelOutput.get(i).name);
+		for(int i = 0; i < locationsPanelOutput.get(0).size(); i++) {
+			res.add(locationsPanelOutput.get(0).get(i).name);
 		}
 		return res;
 	}
 	
 	
 	// To store the output data
-	public void storeAdditionsPanelOutput(ArrayList<AdditionsPanelOutputElement> o) {
+	public void storeAdditionsPanelOutput(ArrayList<ArrayList<AdditionsPanelOutputElement>> o) {
 		additionsPanelOutput = o;
 	}
 	
@@ -357,8 +357,8 @@ public class PanelManager {
 	// get all stream names of the 1st column, from the additionsPanelOutput
 	public ArrayList<String> getAllStreams(){
 		ArrayList<String> res = new ArrayList<>();
-		for(int i = 0; i < additionsPanelOutput.size(); i++) {
-			res.add(additionsPanelOutput.get(i).name);
+		for(int i = 0; i < additionsPanelOutput.get(0).size(); i++) {
+			res.add(additionsPanelOutput.get(0).get(i).name);
 		}
 		return res;
 	}
