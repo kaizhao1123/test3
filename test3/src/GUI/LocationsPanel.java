@@ -49,6 +49,7 @@ public class LocationsPanel extends JPanel {
 	PanelManager panelManager;
 	OperatingPeriodDialog periodDialog;
 	AdditionsPanel additionsPanel;
+	MgmtTrainPanel mgmtTrainPanel;
 	  
 	/***********************************************************
 	 * declare the data structures used in this panel
@@ -157,16 +158,39 @@ public class LocationsPanel extends JPanel {
 				if(textLocation != null) {
 					String s = textLocation.getText();
 					if(s.length() > 0) {
+						String preItem;
+						if(databaseTable1.getRowCount()>1)
+							preItem = myTable1.model.data[databaseTable1.getRowCount()-2][0].toString();
+						else
+							preItem = " ";
+
 						if(additionsPanel != null) {
 							if(!additionsPanel.streamNames.contains(s)) {								
 								addTableRow(s);
 							}
-							additionsPanel.addTableRow(s);
+							additionsPanel.addTableRow(s, preItem);
+							if(pane != null) {
+								//try {
+									int index = pane.indexOfTab("Mgmt Train"); 				
+									if(index >= 0) {
+										mgmtTrainPanel = (MgmtTrainPanel) pane.getComponentAt(index);
+										int r = 0;
+										System.out.print("data: ");
+										for(int i = 0; i < mgmtTrainPanel.jTable1.getRowCount(); i++) {
+											if(mgmtTrainPanel.myTable1.model.data[i][0].toString().equals(preItem))
+												r = i;											
+										}
+										mgmtTrainPanel.addRow(s, r+1);
+										
+									}
+								//}catch(Exception ef) {
+									
+							//}
+							}
 						}
 						else
 							addTableRow(s);						
-					}
-				
+					}				
 				}							
 			}
     	});
@@ -181,11 +205,24 @@ public class LocationsPanel extends JPanel {
 				if(additionsPanel != null) {
 					additionsPanel.deleteTableRow(deleteName);
 				}
-				deleteTableRow();
+				System.out.print("deleteName: " + deleteName + "/ ");
+				
+				deleteTableRow();				
+				if(pane != null) {
+					try {
+						int index = pane.indexOfTab("Mgmt Train"); 				
+						if(index >= 0) {
+							mgmtTrainPanel = (MgmtTrainPanel) pane.getComponentAt(index);							
+							mgmtTrainPanel.deleteRow(deleteName);
+						}
+					}catch(Exception ef) {
+						
+					}
+				}
+				
 				elementsInFirstCol.remove(deleteName);
 				data1 = myTable1.model.data;
-				data2 = myTable2.model.data;															
-				
+				data2 = myTable2.model.data;																			
 			}							
 		}						
 		);
@@ -213,11 +250,10 @@ public class LocationsPanel extends JPanel {
 						pane.setSelectedIndex(pane.indexOfTab("additions"));
 					}										
 				} else {
-					// get the location table and add column.
-					
-				}
-				
-						
+					if(locationsPanelOutput != null) {
+						updateOutput();
+					}					
+				}										
 			}							
 		});
         
@@ -315,6 +351,11 @@ public class LocationsPanel extends JPanel {
 		locationsPanelOutput.add(outputOfTable_1);
 		locationsPanelOutput.add(outputOfTable_2);
 	}
+	// update the output when values of this panel change
+	private void updateOutput() {
+		getOutput();
+		panelManager.storeLocationPanelOutput(locationsPanelOutput);
+	}
     
 	// Corresponding the first option of periodDialog, that is, only table1 will be shown
 	public void update1() {
@@ -365,8 +406,8 @@ public class LocationsPanel extends JPanel {
 			for(int i = 1 ; i < col; i++) {
 				rowData[i] = "0";
 			}
-			myTable1.model.addRow(rowData);									
-			myTable2.model.addRow(rowData);				
+			myTable1.model.insertRow(rowData, databaseTable1.getRowCount()-2);									
+			myTable2.model.insertRow(rowData, databaseTable2.getRowCount()-2);				
 			
 			databaseTable1.updateUI();
 			databaseTable2.updateUI();
@@ -408,8 +449,7 @@ public class LocationsPanel extends JPanel {
 		
 		myTable1.model.addColumn();
 		myTable2.model.addColumn();
-		updateTable(myTable1, myTable2);		
-	    
+		updateTable(myTable1, myTable2);    
     }
     
     // delete the column data from the table

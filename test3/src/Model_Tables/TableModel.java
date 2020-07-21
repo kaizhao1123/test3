@@ -31,7 +31,7 @@ public class TableModel extends AbstractTableModel {
 	
 	/**
 	 * insert one row into the table after the target index. i.g., 
-	 * the index of the inserted row is the target index +1.
+	 * the index of the inserted row is the target index.
 	 * @param s	the row data
 	 * @param index	the target index.
 	 */
@@ -50,18 +50,18 @@ public class TableModel extends AbstractTableModel {
 			l = data.length + 1;			
 			Object[][] np = new Object[l][cl];
 		
-			// copy the rows before index (include index) into new Object[][]
-			for (int i = 0; i < index+1 ; i++) {
+			// copy the rows before index into new Object[][]
+			for (int i = 0; i < index ; i++) {
 				for (int j = 0; j < columnName.length; j++) {
 					np[i][j] = data[i][j];
 				}
 			}
-			// add the target row data into the target index + 1
+			// add the target row data into the target index
 			for (int j = 0; j < s.length; j++) {
-				np[index+1][j] = s[j];
+				np[index][j] = s[j];
 			}
 			// copy the origin rows after the index into new Object[][]
-			for (int i = index+1; i < l-1 ; i++) {
+			for (int i = index; i < l-1 ; i++) {
 				for (int j = 0; j < columnName.length; j++) {
 					np[i + 1][j] = data[i][j];
 				}

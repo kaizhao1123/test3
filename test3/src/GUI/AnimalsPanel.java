@@ -597,7 +597,7 @@ public class AnimalsPanel extends JPanel {
 			rowData[8] = df.format(vsDou * qDou * wDou / 1000);
 			rowData[9] = df.format(tsDou * qDou * wDou / 1000);
 			rowData[10] = df.format(mDou * qDou * wDou * 60 / 1000);
-			animalsTable.model.addRow(rowData);
+			animalsTable.model.insertRow(rowData, animalsTable.model.getRowCount()-2);
 			
 			// set special value of the "total" row in column 1,3,4,5,6
 			animalsTable.model.mySetValueAt(" ", animalsTable.model.getRowCount() - 1, 1);

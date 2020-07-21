@@ -142,7 +142,7 @@ public class AddAnimalDialog extends JDialog{
 	    			rowData[9] = df.format(tsDou * qDou * wDou / 1000);
 	    			rowData[10] = df.format(mDou * qDou * wDou * 60 / 1000);
 	    			//rowData[10] = Double.toString(mDou * qDou * wDou * 60 / 1000);
-	    			myTable.model.addRow(rowData);	    					
+	    			myTable.model.insertRow(rowData, myTable.model.data.length-2);	    					
 					for(int i = 2; i < myTable.model.data[0].length; i++) {
 						myTable.model.mySetValueAt(myTable.model.getNewSum(i), myTable.model.getRowCount()-1, i);
 					}

@@ -56,33 +56,39 @@ public class TableModelWithTotal extends AbstractTableModel {
 	}
 
 	/**
-	 *  adds a row data into the model's data, locates at the last 2nd row, 
+	 *  inserts a row data into the model's data, locates at the row after the rowIndex. 
 	 *  that is, above the "total" row. 
 	 * @param s the row data will be added into the model
+	 * @param rowIndex the target index
 	 */
-	public void addRow(String[] s) {
+	public void insertRow(String[] s, int rowIndex) {
 		int l = data.length + 1;
 		int cl = columnName.length;
 		
 		//1. creates a new "data" with 1 more row than original "data".
 		Object[][] np = new Object[l][cl];
 		
-		//2. copy the original "data" without "total" to the new "data"
-		for (int i = 0; i < data.length - 1; i++) {
+		//2. copy the original "data", whose row index is less and equal the target rowIndex.
+		for (int i = 0; i < rowIndex+1; i++) {
 			for (int j = 0; j < columnName.length; j++) {
 				np[i][j] = data[i][j];
 			}
 		}
 		
-		//3. add the new row into the new "data"
-		for (int i = 0; i < s.length; i++) {
-			np[l - 2][i] = s[i];
+		//3. add the target row data into the target index + 1
+		for (int j = 0; j < s.length; j++) {
+			np[rowIndex+1][j] = s[j];
+		}
+		//4. copy the origin rows after the index except "total" row into new Object[][]
+		for (int i = rowIndex+1; i < l-2 ; i++) {
+			for (int j = 0; j < columnName.length; j++) {
+				np[i + 1][j] = data[i][j];
+			}
 		}
 		
 		//4. change the value of the last row: "total"
 		np[l-1][0] = "Total";		
 		for (int i = 1; i < columnName.length; i++) {
-			//np[l - 1][i] = data[l - 2][i];
 			np[l-1][i] = Double.toString(getNewSum(i));
 		}
 		data = np;

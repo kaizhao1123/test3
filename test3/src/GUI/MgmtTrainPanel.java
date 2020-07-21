@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.lang.reflect.Array;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -60,8 +61,6 @@ public class MgmtTrainPanel extends JPanel {
 	Object[][] tableData_2;			//to show the last 2 columns in above screen
 	Object[][] tableData_3;			//to show in bottom screen
 	Object[][] tableData_4;			//to show in bottom screen alternatively.
-
-	Boolean twoPeriod = false;
 	
 	MgmtTrainTable_1 myTable1;
 	JTable jTable1;
@@ -166,7 +165,8 @@ public class MgmtTrainPanel extends JPanel {
 		tableData_3 = null;
 		tableData_4 = null;
 
-		
+		firstPeriod = " ";
+    	secondPeriod = " ";
 		periods = new String[2];
 		resultComponents = new ArrayList<>();
 		liquidComponents = new ArrayList<>();
@@ -327,7 +327,7 @@ public class MgmtTrainPanel extends JPanel {
 		buttonHelp.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					
+					deleteRow("a");
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
@@ -337,7 +337,7 @@ public class MgmtTrainPanel extends JPanel {
 		buttonOK.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					
+					deleteRow("b");
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
@@ -375,15 +375,16 @@ public class MgmtTrainPanel extends JPanel {
 
 	// Corresponding the first option of periodDialog, that is, only table1 will be shown
 	public void update1() {
-		twoPeriod = false;
-    	label.setText("<HTML> <U>Component Volumens(cu.ft/day)</U></HTML>");    	
+    	label.setText("<HTML> <U>Component Volumens(cu.ft/day)</U></HTML>");  
+    	firstPeriod = " ";
+    	secondPeriod = " ";
     	panel.remove(operationPeriod);
     	scrollPane_2.setViewportView(jTable3);
     	panel.updateUI();
     }
 	// Corresponding the second option of periodDialog, that is, both table will be shown.
     public void update2() {
-    	twoPeriod = true;
+
     	periodDialog = parent.startPanel.periodDialog;
     	firstPeriod = periodDialog.firstOperatingPeriod;
     	secondPeriod = periodDialog.secondOperatingPeriod;
@@ -395,7 +396,7 @@ public class MgmtTrainPanel extends JPanel {
     	operationPeriod.setPreferredSize(new Dimension(160,25));
     	operationPeriod.setSelectedIndex(0);
     	scrollPane_2.setViewportView(jTable3);
-    	/*operationPeriod.addActionListener(new ActionListener() {
+    	operationPeriod.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					operationPeriod.setPrototypeDisplayValue(operationPeriod.getSelectedItem());
@@ -412,7 +413,7 @@ public class MgmtTrainPanel extends JPanel {
 					e1.printStackTrace();
 				}
 			}
-		});*/
+		});
   	
     	
     	
@@ -474,10 +475,10 @@ public class MgmtTrainPanel extends JPanel {
 				}
 				updateBottomJtables("jTable3");
 				updateBottomJtables("jTable4");
-				if(twoPeriod.equals(false))
-					scrollPane_2.setViewportView(jTable3);
-				else
-					scrollPane_2.setViewportView(jTable4);
+				if(firstPeriod.equals(" ") || operationPeriod.getSelectedItem().toString().equals(firstPeriod)) 
+					scrollPane_2.setViewportView(jTable3);			
+				else 
+					scrollPane_2.setViewportView(jTable4); 
 			}
 		});
 		return nullItem;
@@ -542,10 +543,10 @@ public class MgmtTrainPanel extends JPanel {
 				}
 				updateBottomJtables("jTable3");
 				updateBottomJtables("jTable4");
-				if(twoPeriod.equals(false))
-					scrollPane_2.setViewportView(jTable3);
-				else
-					scrollPane_2.setViewportView(jTable4);
+				if(firstPeriod.equals(" ") || operationPeriod.getSelectedItem().toString().equals(firstPeriod)) 
+					scrollPane_2.setViewportView(jTable3);			
+				else 
+					scrollPane_2.setViewportView(jTable4); 
 			}
 		});
 		return item;
@@ -703,11 +704,11 @@ public class MgmtTrainPanel extends JPanel {
 					myTable2.model.mySetValueAt(value, row, col);
 				}
 				updateBottomJtables("jTable3");
-				updateBottomJtables("jTable4");
-				if(twoPeriod.equals(false))
-					scrollPane_2.setViewportView(jTable3);
-				else
-					scrollPane_2.setViewportView(jTable4);
+				updateBottomJtables("jTable4");	
+				if(firstPeriod.equals(" ") || operationPeriod.getSelectedItem().toString().equals(firstPeriod)) 
+					scrollPane_2.setViewportView(jTable3);			
+				else 
+					scrollPane_2.setViewportView(jTable4); 
 			}
 		});
 		return item;
@@ -1104,13 +1105,13 @@ public class MgmtTrainPanel extends JPanel {
 				if (jTable3.getRowCount() == 0)
 					myTable3.model.insertRow(rowData, 0);
 				else
-					myTable3.model.insertRow(rowData, jTable3.getRowCount() - 1);
+					myTable3.model.insertRow(rowData, jTable3.getRowCount());
 			}
 			else {
 				if (jTable4.getRowCount() == 0)
 					myTable4.model.insertRow(rowData, 0);
 				else
-					myTable4.model.insertRow(rowData, jTable4.getRowCount() - 1);
+					myTable4.model.insertRow(rowData, jTable4.getRowCount());
 			}
 					
 			
@@ -1545,12 +1546,23 @@ public class MgmtTrainPanel extends JPanel {
 	 * @return
 	 */
 	private int firstKey(HashMap<Integer, Integer> map, int value) {
-		Set<Integer> keys = new HashSet<Integer>();
+		//Set<Integer> keys = new HashSet<Integer>();
+		ArrayList<Integer> keys = new ArrayList<>();
 		for (Integer key : map.keySet()) {
 			if (map.get(key).equals(value))
 				keys.add(key);
 		}
-		return Collections.min(keys);
+		if(keys.size() == 1) {
+			return keys.get(0);		
+		}
+		else {
+			int min = keys.get(0);
+			for(int i = 0 ; i < keys.size(); i++) {
+				if(keys.get(i) <= min)
+					min = keys.get(i);
+			}
+			return min;
+		}			
 	}
 
 	// check whether the components belongs to the terminal components
@@ -1641,6 +1653,7 @@ public class MgmtTrainPanel extends JPanel {
 			if (myTable1.model.data[i][0].toString().equals(s))
 				rowInTable1 = i;
 		}
+	
 		if (rowInTable1 > -1) {
 			int rowInTable2 = firstKey(indexMap, rowInTable1);
 			String v = myTable1.model.data[rowInTable1][1].toString();
@@ -1677,13 +1690,13 @@ public class MgmtTrainPanel extends JPanel {
 		
 		int rowInTable2 = firstKey(indexMap, rowIndex);
 		myTable1.model.insertRow(newData_1, rowIndex);
-		myTable1.model.mySetValueAt(s, rowIndex+1, 0);
-		myTable1.model.mySetValueAt(" ", rowIndex+1, 1);
+		myTable1.model.mySetValueAt(s, rowIndex, 0);
+		myTable1.model.mySetValueAt(" ", rowIndex, 1);
 		myTable2.model.insertRow(newData_2, rowInTable2);		
-		indexMap.put(jTable2.getRowCount(), jTable1.getRowCount());
-		
-		updateTable2();
-		jTable1.updateUI();
+		indexMap.put(jTable2.getRowCount()-1, jTable1.getRowCount()-1);
+	
+		updateTable2();		
+		jTable1.updateUI();		
 		subScrollPane_2.setViewportView(jTable2);
 		subScrollPane_1.setViewportView(jTable1);
 		scrollPane_1.setViewportView(panel_1);

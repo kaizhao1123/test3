@@ -52,6 +52,7 @@ public class AdditionsPanel extends JPanel {
 	RunoffPanel runoffPanel;
 	WashWaterDialog washDialog;
 	FlushWaterDialog flushDialog;
+	MgmtTrainPanel mgmtTrainPanel;
 
 	/***********************************************************
 	 * declare the data structures used in this panel
@@ -221,12 +222,28 @@ public class AdditionsPanel extends JPanel {
 					databaseTable2.getCellEditor().stopCellEditing();
 				if (textAdd != null) {
 					String s = textAdd.getText();
+					String preItem = myTable1.model.data[databaseTable1.getRowCount()-1][0].toString();
 					if(s.length() > 0) {
-						addTableRow(s);
+						addTableRow(s, preItem);
 						myTable1.updateElementList(s);
 					}
-										
-				}
+					if(pane != null) {
+						try {
+							int index = pane.indexOfTab("Mgmt Train"); 				
+							if(index >= 0) {
+								mgmtTrainPanel = (MgmtTrainPanel) pane.getComponentAt(index);
+								int r = 0;
+								for(int i = 0; i < mgmtTrainPanel.jTable1.getRowCount(); i++) {
+									if(mgmtTrainPanel.myTable1.model.data[i][0].toString().equals(preItem))
+										r = i;									
+								}
+								mgmtTrainPanel.addRow(s, r+1);
+							}
+						}catch(Exception ef) {
+							
+						}
+					}
+				}				
 			}
 		});
 		
@@ -241,22 +258,6 @@ public class AdditionsPanel extends JPanel {
 						databaseTable2.getCellEditor().stopCellEditing();
 					for(int i = 0; i < databaseTable1.getRowCount(); i++) {
 						Object[] ele = myTable1.model.data[i];
-						/*String s = ele[3].toString();
-						BeddingInfo bed = null;
-						for(int j = 0; j < beddingDataset.size(); j++) {
-							if(beddingDataset.get(j).name.equals(s)){
-								bed = beddingDataset.get(j);
-								ele[4] = bed.eff_Density;
-							}
-						}					
-						Double aDou = Double.parseDouble(ele[5].toString());
-						Double dDou = 0.00;
-						if(bed != null)
-							dDou = Double.parseDouble(bed.density);			
-						Double edDou = Double.parseDouble(ele[4].toString());
-						
-						ele[6] = df.format(aDou / dDou);
-						ele[7] = df.format(aDou / edDou);*/
 						resetEffectiveDensities(ele);
 					}					
 					databaseTable1.updateUI();
@@ -264,8 +265,7 @@ public class AdditionsPanel extends JPanel {
 						Object[] ele = myTable2.model.data[i];
 						resetEffectiveDensities(ele);
 					}					
-					databaseTable2.updateUI();
-					
+					databaseTable2.updateUI();				
 				}
 			}
 		});
@@ -281,10 +281,11 @@ public class AdditionsPanel extends JPanel {
 			public void mouseClicked(MouseEvent e) {	
 				int row = databaseTable1.rowAtPoint(e.getPoint()); 
 	            int col = databaseTable1.columnAtPoint(e.getPoint()); 
+	            if (databaseTable2.getCellEditor() != null)
+					databaseTable2.getCellEditor().stopCellEditing();
 	            if(col == 1) {
 	            	if(e.getClickCount() == 2) {
-	            		if (databaseTable2.getCellEditor() != null)
-							databaseTable2.getCellEditor().stopCellEditing();
+	            		
 	            		if(washDialog != null) {
 	            			washDialog.setDefaultCloseOperation(washDialog.DISPOSE_ON_CLOSE);
 							washDialog.setVisible(false);
@@ -298,8 +299,8 @@ public class AdditionsPanel extends JPanel {
 						databaseTable1.editCellAt(row, col);
 	            	}
 	            	else if(e.getClickCount() == 1) {
-	            		if (databaseTable2.getCellEditor() != null)
-							databaseTable2.getCellEditor().stopCellEditing();
+	            		//if (databaseTable2.getCellEditor() != null)
+						//	databaseTable2.getCellEditor().stopCellEditing();
 	            		if(washDialog != null) {
 	            			washDialog.setDefaultCloseOperation(washDialog.DISPOSE_ON_CLOSE);
 							washDialog.setVisible(false);
@@ -314,8 +315,8 @@ public class AdditionsPanel extends JPanel {
 	            }
 	            else if(col == 2) {
 	            	if(e.getClickCount() == 2) {
-	            		if (databaseTable2.getCellEditor() != null)
-							databaseTable2.getCellEditor().stopCellEditing();
+	            	//	if (databaseTable2.getCellEditor() != null)
+					//		databaseTable2.getCellEditor().stopCellEditing();
 	            		if(washDialog != null) {
 	            			washDialog.setDefaultCloseOperation(washDialog.DISPOSE_ON_CLOSE);
 							washDialog.setVisible(false);
@@ -328,8 +329,8 @@ public class AdditionsPanel extends JPanel {
 						databaseTable1.editCellAt(row, col);
 	            	}
 	            	else if(e.getClickCount() == 1) {
-	            		if (databaseTable2.getCellEditor() != null)
-							databaseTable2.getCellEditor().stopCellEditing();
+	            	//	if (databaseTable2.getCellEditor() != null)
+					//		databaseTable2.getCellEditor().stopCellEditing();
 	            		if(washDialog != null) {
 	            			washDialog.setDefaultCloseOperation(washDialog.DISPOSE_ON_CLOSE);
 							washDialog.setVisible(false);
@@ -363,10 +364,12 @@ public class AdditionsPanel extends JPanel {
 			public void mouseClicked(MouseEvent e) {	
 				int row = databaseTable2.rowAtPoint(e.getPoint()); 
 	            int col = databaseTable2.columnAtPoint(e.getPoint()); 
+	            if (databaseTable1.getCellEditor() != null)
+					databaseTable1.getCellEditor().stopCellEditing();
 	            if(col == 1) {
 	            	if(e.getClickCount() == 2) {
-	            		if (databaseTable1.getCellEditor() != null)
-							databaseTable1.getCellEditor().stopCellEditing();
+	            		//if (databaseTable1.getCellEditor() != null)
+						//	databaseTable1.getCellEditor().stopCellEditing();
 	            		if(washDialog != null) {
 	            			washDialog.setDefaultCloseOperation(washDialog.DISPOSE_ON_CLOSE);
 							washDialog.setVisible(false);
@@ -380,8 +383,8 @@ public class AdditionsPanel extends JPanel {
 						databaseTable2.editCellAt(row, col);
 	            	}
 	            	else if(e.getClickCount() == 1) {
-	            		if (databaseTable1.getCellEditor() != null)
-							databaseTable1.getCellEditor().stopCellEditing();
+	            	//	if (databaseTable1.getCellEditor() != null)
+					//		databaseTable1.getCellEditor().stopCellEditing();
 	            		if(washDialog != null) {
 	            			washDialog.setDefaultCloseOperation(washDialog.DISPOSE_ON_CLOSE);
 							washDialog.setVisible(false);
@@ -396,8 +399,8 @@ public class AdditionsPanel extends JPanel {
 	            }
 	            else if(col == 2) {
 	            	if(e.getClickCount() == 2) {
-	            		if (databaseTable1.getCellEditor() != null)
-							databaseTable1.getCellEditor().stopCellEditing();
+	            	//	if (databaseTable1.getCellEditor() != null)
+					//		databaseTable1.getCellEditor().stopCellEditing();
 	            		if(washDialog != null) {
 	            			washDialog.setDefaultCloseOperation(washDialog.DISPOSE_ON_CLOSE);
 							washDialog.setVisible(false);
@@ -410,8 +413,8 @@ public class AdditionsPanel extends JPanel {
 						databaseTable2.editCellAt(row, col);
 	            	}
 	            	else if(e.getClickCount() == 1) {
-	            		if (databaseTable1.getCellEditor() != null)
-							databaseTable1.getCellEditor().stopCellEditing();
+	            	//	if (databaseTable1.getCellEditor() != null)
+					//		databaseTable1.getCellEditor().stopCellEditing();
 	            		if(washDialog != null) {
 	            			washDialog.setDefaultCloseOperation(washDialog.DISPOSE_ON_CLOSE);
 							washDialog.setVisible(false);
@@ -457,6 +460,10 @@ public class AdditionsPanel extends JPanel {
 						runoffPanel = new RunoffPanel(panelManager);
 						runoffPanel.setParent(parent);
 						pane.add("runoff", runoffPanel);
+					}					
+					else {
+						if(additionsPanelOutput != null)
+							updateOutput();
 					}
 					/*
 					 * else { pane.remove(index);
@@ -477,7 +484,6 @@ public class AdditionsPanel extends JPanel {
 		buttonHelp.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
-				update2();
 			}
 		});
 	}
@@ -560,6 +566,11 @@ public class AdditionsPanel extends JPanel {
 		additionsPanelOutput.add(outputOfTable_1);
 		additionsPanelOutput.add(outputOfTable_1);
 	}
+	// update the output when values of this panel change
+		private void updateOutput() {
+			getOutput();
+			panelManager.storeAdditionsPanelOutput(additionsPanelOutput);
+		}
 	
 	// Corresponding the first option of periodDialog, that is, only table1 will be shown
 	public void update1() {
@@ -617,7 +628,7 @@ public class AdditionsPanel extends JPanel {
 	 * it is also associated with locationsPanel: the change of row count of the locationsPanel affect this table.
 	 * @param s
 	 */
-	public void addTableRow(String s) {
+	public void addTableRow(String s, String preItem) {
 		if(!streamNames.contains(s)) {
 			int col = myTable1.model.getColumnCount();
 			String[] dataTable = new String[col];
@@ -628,9 +639,13 @@ public class AdditionsPanel extends JPanel {
 				else
 					dataTable[i] = "0.00";
 			}
-
-			myTable1.model.insertRow(dataTable, myTable1.model.getRowCount()-1);
-			myTable2.model.insertRow(dataTable, myTable2.model.getRowCount()-1);
+			int rowIndex = -1;
+			for(int i = 0; i < myTable1.model.getRowCount(); i++) {
+				if(myTable1.model.data[i][0].toString().equals(preItem))
+					rowIndex = i;
+			}
+			myTable1.model.insertRow(dataTable, rowIndex+1);
+			myTable2.model.insertRow(dataTable, rowIndex+1);
 			databaseTable1.updateUI();
 			databaseTable2.updateUI();
 			
@@ -654,7 +669,12 @@ public class AdditionsPanel extends JPanel {
 		myTable2.model.deleteRow(rowIndex);
 		databaseTable1.updateUI();
 		databaseTable2.updateUI();
-		streamNames.remove(s);		
+		streamNames.remove(s);	
+
+		if(myTable1.model.data.length == 0) {
+			myTable1.model.data = null;
+			myTable2.model.data = null;
+		}		
 	}
 
 	public void setParent(MainFrame frame) {
