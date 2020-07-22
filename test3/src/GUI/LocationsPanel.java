@@ -156,6 +156,8 @@ public class LocationsPanel extends JPanel {
 				if (databaseTable2.isEditing())
 					databaseTable2.getCellEditor().stopCellEditing(); 
 				if(textLocation != null) {
+					pane = parent.tabbedPane;
+					
 					String s = textLocation.getText();
 					if(s.length() > 0) {
 						String preItem;
@@ -189,7 +191,9 @@ public class LocationsPanel extends JPanel {
 							}
 						}
 						else
-							addTableRow(s);						
+							addTableRow(s);	
+						myTable1.getTabbedPane(pane);
+						myTable2.getTabbedPane(pane);
 					}				
 				}							
 			}
@@ -228,7 +232,7 @@ public class LocationsPanel extends JPanel {
 		);
         buttonOK.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e){			
-				pane = parent.tabbedPane;
+				//pane = parent.tabbedPane;
 				if (databaseTable1.isEditing())
 					databaseTable1.getCellEditor().stopCellEditing(); 
 				if (databaseTable2.isEditing())

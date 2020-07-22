@@ -65,7 +65,7 @@ public class AnimalsPanel extends JPanel {
 	ArrayList<AnimalInfo> animalInTable; 			
 	
 	// store the output of panel: the name, and part of data of each animal(manure and ts).
-	ArrayList<AnimalPanelOutputElement> animalPanelOutput;  
+	public ArrayList<AnimalPanelOutputElement> animalPanelOutput;  
 	
 	// the header of table
 	String[]  columnNamess = { "<html> Animal  </html>", 
@@ -457,6 +457,11 @@ public class AnimalsPanel extends JPanel {
 				animalPanelOutput.add(ele);
 			}				
 		}				
+	}
+	// update output
+	public void updateOutput() {
+		getOutput();
+		panelManager.storeAnimalPanelOutput(animalPanelOutput);
 	}
 	
 
