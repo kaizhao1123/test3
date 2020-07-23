@@ -7,6 +7,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Enumeration;
 
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
@@ -14,8 +15,9 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 
+import GUI.AdditionsPanel;
+import GUI.MgmtTrainPanel;
 import Model_Entity.BeddingInfo;
-import Model_Tables.ClimateTable.MyCellRenderer;
 
 /**
  * The purpose of this class is to create a JTable based on the table model.
@@ -27,9 +29,13 @@ import Model_Tables.ClimateTable.MyCellRenderer;
  */
 public class AdditionsTable implements TableModelListener {
 
-	JTable ntable;
-	public TableModel model;	
-	ArrayList<String> newElementList = new ArrayList(); // To record all new streams, to mark to be Font.ITALIC
+	public JTabbedPane pane;
+	public JTable ntable;
+	public TableModel model;
+	public AdditionsPanel additionsPanel;
+	public MgmtTrainPanel mgmtTrainPanel;
+	
+	
 	
 	String[] columnNamess;
 	Object[][] dataa;
@@ -38,6 +44,7 @@ public class AdditionsTable implements TableModelListener {
 	// the color of the "total" row. The cell with this color can't be editable.
 	Color newColor = Color.cyan;
 		
+	ArrayList<String> newElementList = new ArrayList<>(); // To record all new streams, to mark to be Font.ITALIC
 	ArrayList<BeddingInfo> beddingDataset;
 	BeddingInfo bed = null;
 
@@ -67,6 +74,10 @@ public class AdditionsTable implements TableModelListener {
 		return ntable;
 	}
 
+	public void getTabbedPane(JTabbedPane jtp) {
+		pane = jtp;
+	}
+	
 	/**
 	 * Sets up cellRenderers of all cells following the column.
 	 */
@@ -191,11 +202,22 @@ public class AdditionsTable implements TableModelListener {
 			Double edDou = Double.parseDouble(ele[4].toString());
 			
 			ele[6] = df.format(aDou / dDou);
-			ele[7] = df.format(aDou / edDou);		
-			
-			ntable.repaint();
+			ele[7] = df.format(aDou / edDou);								
 		}
+		ntable.repaint();
 		
+		// update the output of additionsPanel
+		int addiIndex = pane.indexOfTab("additions");
+		additionsPanel = (AdditionsPanel) pane.getComponentAt(addiIndex);
+		if(additionsPanel.additionsPanelOutput != null) {
+			additionsPanel.updateOutput();
+		}
+		// update the bottom tables of mgmtTrainPanel
+		int mgmtIndex = pane.indexOfTab("Mgmt Train");
+		if(mgmtIndex >= 0) {
+			mgmtTrainPanel = (MgmtTrainPanel) pane.getComponentAt(mgmtIndex);
+			mgmtTrainPanel.updateDataOfBottomJtables();
+		}
 	}
 }
 

@@ -67,16 +67,16 @@ public class MgmtTrainPanel extends JPanel {
 	MgmtTrainTable_2 myTable2;
 	JTable jTable2;
 	MgmtTrainTable_3 myTable3;
-	JTable jTable3;
+	public JTable jTable3;
 	MgmtTrainTable_3 myTable4;
-	JTable jTable4;
+	public JTable jTable4;
 
 	JScrollPane subScrollPane_1; // contains jTable1.
 	JScrollPane subScrollPane_2; // contains jTable2.
 	JPanel panel_1; // contains subScrollPanel_1 and subScrollPanel_2
 	JPanel panel_2; // contains "help" and "ok" buttons.
 	JScrollPane scrollPane_1; // contains panel_1.
-	JScrollPane scrollPane_2; // contains jtable3.
+	public JScrollPane scrollPane_2; // contains jtable3 or jTable4.
 
 	JLabel label;
 	String firstPeriod;
@@ -327,7 +327,7 @@ public class MgmtTrainPanel extends JPanel {
 		buttonHelp.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					deleteRow("a");
+					//deleteRow("a");
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
@@ -337,7 +337,7 @@ public class MgmtTrainPanel extends JPanel {
 		buttonOK.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					deleteRow("b");
+					//deleteRow("b");
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
@@ -473,12 +473,13 @@ public class MgmtTrainPanel extends JPanel {
 					//myTable1.updateMyCellRender(" ");
 					jTable2.repaint();
 				}
-				updateBottomJtables("jTable3");
+				updateDataOfBottomJtables();
+				/*updateBottomJtables("jTable3");
 				updateBottomJtables("jTable4");
 				if(firstPeriod.equals(" ") || operationPeriod.getSelectedItem().toString().equals(firstPeriod)) 
 					scrollPane_2.setViewportView(jTable3);			
 				else 
-					scrollPane_2.setViewportView(jTable4); 
+					scrollPane_2.setViewportView(jTable4); */
 			}
 		});
 		return nullItem;
@@ -541,12 +542,13 @@ public class MgmtTrainPanel extends JPanel {
 					myTable2.model.mySetValueAt(n, row, col);
 					jTable2.repaint();
 				}
-				updateBottomJtables("jTable3");
+				updateDataOfBottomJtables();
+				/*updateBottomJtables("jTable3");
 				updateBottomJtables("jTable4");
 				if(firstPeriod.equals(" ") || operationPeriod.getSelectedItem().toString().equals(firstPeriod)) 
 					scrollPane_2.setViewportView(jTable3);			
 				else 
-					scrollPane_2.setViewportView(jTable4); 
+					scrollPane_2.setViewportView(jTable4); */
 			}
 		});
 		return item;
@@ -703,17 +705,29 @@ public class MgmtTrainPanel extends JPanel {
 					addOneItem(value);
 					myTable2.model.mySetValueAt(value, row, col);
 				}
-				updateBottomJtables("jTable3");
+				updateDataOfBottomJtables();
+				/*updateBottomJtables("jTable3");
 				updateBottomJtables("jTable4");	
 				if(firstPeriod.equals(" ") || operationPeriod.getSelectedItem().toString().equals(firstPeriod)) 
 					scrollPane_2.setViewportView(jTable3);			
 				else 
-					scrollPane_2.setViewportView(jTable4); 
+					scrollPane_2.setViewportView(jTable4); */
 			}
 		});
 		return item;
 	}
 
+	// update data of bottom Tables
+	public void updateDataOfBottomJtables() {
+		updateBottomJtables("jTable3");
+		updateBottomJtables("jTable4");	
+		if(firstPeriod.equals(" ") || operationPeriod.getSelectedItem().toString().equals(firstPeriod)) 
+			scrollPane_2.setViewportView(jTable3);			
+		else 
+			scrollPane_2.setViewportView(jTable4); 
+	}
+	
+	
 	// update jTable2 through creating a new table with listener.
 	private void updateTable2() {
 
@@ -1687,8 +1701,12 @@ public class MgmtTrainPanel extends JPanel {
 		String[] newData_2 = new String[2];		
 		newData_2[0] = " ";
 		newData_2[1] = " ";
-		
-		int rowInTable2 = firstKey(indexMap, rowIndex);
+		int rowInTable2;
+		if(rowIndex != jTable1.getRowCount())
+			rowInTable2 = firstKey(indexMap, rowIndex);
+		else
+			rowInTable2 = jTable2.getRowCount();
+		System.out.print("rowt2: " + rowInTable2 + "/ ");
 		myTable1.model.insertRow(newData_1, rowIndex);
 		myTable1.model.mySetValueAt(s, rowIndex, 0);
 		myTable1.model.mySetValueAt(" ", rowIndex, 1);

@@ -10,6 +10,8 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 
+import GUI.AnimalsPanel;
+import GUI.LocationsPanel;
 import GUI.MgmtTrainPanel;
 import Model_Tables.ClimateTable.MyCellRenderer;
 
@@ -26,6 +28,7 @@ public class LocationsTable implements TableModelListener {
 	public JTabbedPane pane;
 	public JTable ntable;
 	public TableModelWithTotal model;
+	public LocationsPanel locationsPanel;
 	public MgmtTrainPanel mgmtTrainPanel;
 
 	String[] columnNames;
@@ -99,11 +102,18 @@ public class LocationsTable implements TableModelListener {
 		int col = e.getColumn();
 		model.mySetValueAt(model.getNewSum(col), model.getRowCount() - 1, col);
 		ntable.repaint();
+		
+		// update the output of loctionsPanel
+		int locIndex = pane.indexOfTab("locations");
+		locationsPanel = (LocationsPanel) pane.getComponentAt(locIndex);
+		if(locationsPanel.locationsPanelOutput != null) {
+			locationsPanel.updateOutput();
+		}
+		// update the bottom tables of mgmtTrainPanel
 		int mgmtIndex = pane.indexOfTab("Mgmt Train");
 		if(mgmtIndex >= 0) {
 			mgmtTrainPanel = (MgmtTrainPanel) pane.getComponentAt(mgmtIndex);
-			mgmtTrainPanel.updateBottomJtables("jTable3");
-			mgmtTrainPanel.updateBottomJtables("jTable4");
+			mgmtTrainPanel.updateDataOfBottomJtables();
 		}
 	}
 }

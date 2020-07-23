@@ -201,7 +201,7 @@ public class AnimalsTable implements TableModelListener {
 		// update the output of animalsPanel
 		int aniIndex = pane.indexOfTab("animals");
 		animalsPanel = (AnimalsPanel) pane.getComponentAt(aniIndex);
-		if(animalsPanel.animalPanelOutput.size() > 0) {
+		if(animalsPanel.animalPanelOutput != null) {
 			animalsPanel.updateOutput();
 		}
 		
@@ -217,11 +217,16 @@ public class AnimalsTable implements TableModelListener {
 					locationsPanel = (LocationsPanel) pane.getComponentAt(locIndex);
 					if(!isContain(locationsPanel.columnName, ele[0].toString())) {
 						locationsPanel.addTableColumn(ele[0].toString());
+						// update locationPanel's output
+						if(locationsPanel.locationsPanelOutput != null)
+							locationsPanel.updateOutput();												
+					}
+					// update mgmtTrainPanel's bottom tables					
+					if(Double.parseDouble(ele[3].toString()) > 0.00) {
 						int mgmtIndex = pane.indexOfTab("Mgmt Train");
 						if(mgmtIndex >= 0) {
 							mgmtTrainPanel = (MgmtTrainPanel) pane.getComponentAt(mgmtIndex);
-							mgmtTrainPanel.updateBottomJtables("jTable3");
-							mgmtTrainPanel.updateBottomJtables("jTable4");
+							mgmtTrainPanel.updateDataOfBottomJtables();
 						}
 					}
 						
@@ -237,11 +242,14 @@ public class AnimalsTable implements TableModelListener {
 				if(locIndex >= 0) {
 					locationsPanel = (LocationsPanel) pane.getComponentAt(locIndex);																	
 					locationsPanel.deleteTableColumn(ele[0].toString());
-					int mgmtIndex = pane.indexOfTab("Mgmt Train");
+					// update locationPanel's output
+					if(locationsPanel.locationsPanelOutput != null)
+						locationsPanel.updateOutput();
+					// update mgmtTrainPanel's bottom tables
+					int mgmtIndex = pane.indexOfTab("Mgmt Train");					
 					if(mgmtIndex >= 0) {
 						mgmtTrainPanel = (MgmtTrainPanel) pane.getComponentAt(mgmtIndex);
-						mgmtTrainPanel.updateBottomJtables("jTable3");
-						mgmtTrainPanel.updateBottomJtables("jTable4");
+						mgmtTrainPanel.updateDataOfBottomJtables();
 					}
 				}
 			}catch(Exception ef) {

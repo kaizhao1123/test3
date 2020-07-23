@@ -565,7 +565,7 @@ public class AnimalsPanel extends JPanel {
 					//int col = panelManager.getColumn(itemName, locationPanel.columnName);
 					locationsPanel.deleteTableColumn(itemName);
 				}
-					
+				updateOutput();	
 			}
 			
 		}
@@ -615,6 +615,9 @@ public class AnimalsPanel extends JPanel {
 			jTable.updateUI();
 			// add this animal info into the data structure
 			animalInTable.add(ele);
+			// update the output if locationsPanel has been existed.
+			if(locationsPanel != null)
+				updateOutput();	
 			// transfer pane into the table.
 			pane = parent.tabbedPane;
 			animalsTable.getTabbedPane(pane);
