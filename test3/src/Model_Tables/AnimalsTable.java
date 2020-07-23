@@ -11,7 +11,9 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 
+import GUI.AnimalsPanel;
 import GUI.LocationsPanel;
+import GUI.MgmtTrainPanel;
 import GUI.RunoffPanel;
 import Model_Tables.ClimateTable.MyCellRenderer;
 
@@ -28,7 +30,9 @@ public class AnimalsTable implements TableModelListener {
 	public JTabbedPane pane;
 	public JTable ntable;
 	public TableModelWithTotal model;
+	public AnimalsPanel animalsPanel;
 	public LocationsPanel locationsPanel;
+	public MgmtTrainPanel mgmtTrainPanel;
 
 	String[] columnNames;
 	Object[][] data;
@@ -194,18 +198,38 @@ public class AnimalsTable implements TableModelListener {
 		}
 		ntable.repaint();
 		
+		// update the output of animalsPanel
+		int aniIndex = pane.indexOfTab("animals");
+		animalsPanel = (AnimalsPanel) pane.getComponentAt(aniIndex);
+		if(animalsPanel.animalPanelOutput != null) {
+			animalsPanel.updateOutput();
+		}
+		
 		/*
-		 *  The value of the "quantity" associate with the table in the location panel.
+		 *  The value of the "quantity" associate with the table in the location panel and mgmttrain panel.
 		 *  If the value > 0, then it will appear in the table in the location panel,
 		 *  otherwise, not.
 		 */
 		if(Double.parseDouble(ele[2].toString()) > 0.00) {			
 			try {
-				int index = pane.indexOfTab("locations"); 				
-				if(index >= 0) {
-					locationsPanel = (LocationsPanel) pane.getComponentAt(index);
-					if(!isContain(locationsPanel.columnName, ele[0].toString()))
+				int locIndex = pane.indexOfTab("locations"); 				
+				if(locIndex >= 0) {
+					locationsPanel = (LocationsPanel) pane.getComponentAt(locIndex);
+					if(!isContain(locationsPanel.columnName, ele[0].toString())) {
 						locationsPanel.addTableColumn(ele[0].toString());
+						// update locationPanel's output
+						if(locationsPanel.locationsPanelOutput != null)
+							locationsPanel.updateOutput();												
+					}
+					// update mgmtTrainPanel's bottom tables					
+					if(Double.parseDouble(ele[3].toString()) > 0.00) {
+						int mgmtIndex = pane.indexOfTab("Mgmt Train");
+						if(mgmtIndex >= 0) {
+							mgmtTrainPanel = (MgmtTrainPanel) pane.getComponentAt(mgmtIndex);
+							mgmtTrainPanel.updateDataOfBottomJtables();
+						}
+					}
+						
 				}
 			}catch(Exception ef) {
 				
@@ -214,10 +238,19 @@ public class AnimalsTable implements TableModelListener {
 		}
 		if(Double.parseDouble(ele[2].toString()) <= 0.00) {
 			try {
-				int index = pane.indexOfTab("locations"); 				
-				if(index >= 0) {
-					locationsPanel = (LocationsPanel) pane.getComponentAt(index);																	
+				int locIndex = pane.indexOfTab("locations"); 				
+				if(locIndex >= 0) {
+					locationsPanel = (LocationsPanel) pane.getComponentAt(locIndex);																	
 					locationsPanel.deleteTableColumn(ele[0].toString());
+					// update locationPanel's output
+					if(locationsPanel.locationsPanelOutput != null)
+						locationsPanel.updateOutput();
+					// update mgmtTrainPanel's bottom tables
+					int mgmtIndex = pane.indexOfTab("Mgmt Train");					
+					if(mgmtIndex >= 0) {
+						mgmtTrainPanel = (MgmtTrainPanel) pane.getComponentAt(mgmtIndex);
+						mgmtTrainPanel.updateDataOfBottomJtables();
+					}
 				}
 			}catch(Exception ef) {
 				

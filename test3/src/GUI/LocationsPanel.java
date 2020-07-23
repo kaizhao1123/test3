@@ -62,7 +62,7 @@ public class LocationsPanel extends JPanel {
 	String deleteName; // the location name to be delete.
     ArrayList<LocationPanelOutputElement> outputOfTable_1;	   // to store the output of table1
     ArrayList<LocationPanelOutputElement> outputOfTable_2;	   // to store the output of table2
-    ArrayList<ArrayList<LocationPanelOutputElement>> locationsPanelOutput; // to store the output of locationPanel
+    public ArrayList<ArrayList<LocationPanelOutputElement>> locationsPanelOutput; // to store the output of locationPanel
 	
 	/***********************************************************
 	 * declare the elements used in this panel
@@ -156,6 +156,8 @@ public class LocationsPanel extends JPanel {
 				if (databaseTable2.isEditing())
 					databaseTable2.getCellEditor().stopCellEditing(); 
 				if(textLocation != null) {
+					pane = parent.tabbedPane;
+					
 					String s = textLocation.getText();
 					if(s.length() > 0) {
 						String preItem;
@@ -164,32 +166,31 @@ public class LocationsPanel extends JPanel {
 						else
 							preItem = " ";
 
-						if(additionsPanel != null) {
+						int addiIndex = pane.indexOfTab("additions");
+						if(addiIndex >= 0) {
+							additionsPanel = (AdditionsPanel) pane.getComponentAt(addiIndex);
 							if(!additionsPanel.streamNames.contains(s)) {								
 								addTableRow(s);
+								updateOutput();
 							}
 							additionsPanel.addTableRow(s, preItem);
-							if(pane != null) {
-								//try {
-									int index = pane.indexOfTab("Mgmt Train"); 				
-									if(index >= 0) {
-										mgmtTrainPanel = (MgmtTrainPanel) pane.getComponentAt(index);
-										int r = 0;
-										System.out.print("data: ");
-										for(int i = 0; i < mgmtTrainPanel.jTable1.getRowCount(); i++) {
-											if(mgmtTrainPanel.myTable1.model.data[i][0].toString().equals(preItem))
-												r = i;											
-										}
-										mgmtTrainPanel.addRow(s, r+1);
-										
-									}
-								//}catch(Exception ef) {
-									
-							//}
+							additionsPanel.updateOutput();
+							int mgmtIndex = pane.indexOfTab("Mgmt Train"); 				
+							if(mgmtIndex >= 0) {
+								mgmtTrainPanel = (MgmtTrainPanel) pane.getComponentAt(mgmtIndex);
+								int r = -1;
+								for(int i = 0; i < mgmtTrainPanel.jTable1.getRowCount(); i++) {
+									if(mgmtTrainPanel.myTable1.model.data[i][0].toString().equals(preItem))
+										r = i;											
+								}
+								mgmtTrainPanel.addRow(s, r+1);								
 							}
 						}
 						else
-							addTableRow(s);						
+							addTableRow(s);
+						
+						myTable1.getTabbedPane(pane);
+						myTable2.getTabbedPane(pane);
 					}				
 				}							
 			}
@@ -202,23 +203,24 @@ public class LocationsPanel extends JPanel {
 				if (databaseTable2.isEditing())
 					databaseTable2.getCellEditor().stopCellEditing(); 
 				deleteName = myTable1.model.data[rowIndex][0].toString();
-				if(additionsPanel != null) {
-					additionsPanel.deleteTableRow(deleteName);
-				}
-				System.out.print("deleteName: " + deleteName + "/ ");
 				
-				deleteTableRow();				
-				if(pane != null) {
-					try {
-						int index = pane.indexOfTab("Mgmt Train"); 				
-						if(index >= 0) {
-							mgmtTrainPanel = (MgmtTrainPanel) pane.getComponentAt(index);							
-							mgmtTrainPanel.deleteRow(deleteName);
-						}
-					}catch(Exception ef) {
-						
+				int addiIndex = pane.indexOfTab("additions");
+				if(addiIndex >= 0) {
+					deleteTableRow();
+					
+					additionsPanel = (AdditionsPanel) pane.getComponentAt(addiIndex);					
+					additionsPanel.deleteTableRow(deleteName);
+					additionsPanel.updateOutput();
+					
+					int mgmtIndex = pane.indexOfTab("Mgmt Train"); 				
+					if(mgmtIndex >= 0) {
+						mgmtTrainPanel = (MgmtTrainPanel) pane.getComponentAt(mgmtIndex);
+						mgmtTrainPanel.deleteRow(deleteName);
+						mgmtTrainPanel.updateDataOfBottomJtables();
 					}
 				}
+				else
+					deleteTableRow();
 				
 				elementsInFirstCol.remove(deleteName);
 				data1 = myTable1.model.data;
@@ -228,7 +230,7 @@ public class LocationsPanel extends JPanel {
 		);
         buttonOK.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e){			
-				pane = parent.tabbedPane;
+				//pane = parent.tabbedPane;
 				if (databaseTable1.isEditing())
 					databaseTable1.getCellEditor().stopCellEditing(); 
 				if (databaseTable2.isEditing())
@@ -352,7 +354,7 @@ public class LocationsPanel extends JPanel {
 		locationsPanelOutput.add(outputOfTable_2);
 	}
 	// update the output when values of this panel change
-	private void updateOutput() {
+	public void updateOutput() {
 		getOutput();
 		panelManager.storeLocationPanelOutput(locationsPanelOutput);
 	}
@@ -414,7 +416,7 @@ public class LocationsPanel extends JPanel {
 			textLocation.setText("");	
 			data1 = myTable1.model.data;
 			data2 = myTable2.model.data;
-			elementsInFirstCol.add(s);
+			elementsInFirstCol.add(s);			
 		}
 		else
 			JOptionPane.showMessageDialog(null,"You cannot have two waste streams with"

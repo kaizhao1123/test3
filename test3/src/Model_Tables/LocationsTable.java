@@ -4,11 +4,15 @@ import java.awt.Color;
 import java.awt.Component;
 import java.text.DecimalFormat;
 
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 
+import GUI.AnimalsPanel;
+import GUI.LocationsPanel;
+import GUI.MgmtTrainPanel;
 import Model_Tables.ClimateTable.MyCellRenderer;
 
 /**
@@ -21,8 +25,11 @@ import Model_Tables.ClimateTable.MyCellRenderer;
  */
 public class LocationsTable implements TableModelListener {
 
+	public JTabbedPane pane;
 	public JTable ntable;
 	public TableModelWithTotal model;
+	public LocationsPanel locationsPanel;
+	public MgmtTrainPanel mgmtTrainPanel;
 
 	String[] columnNames;
 	Object[][] data;
@@ -50,6 +57,10 @@ public class LocationsTable implements TableModelListener {
 		
 		ntable.setVisible(true);
 		return ntable;
+	}
+	
+	public void getTabbedPane(JTabbedPane jtp) {
+		pane = jtp;
 	}
 
 	/**
@@ -91,5 +102,18 @@ public class LocationsTable implements TableModelListener {
 		int col = e.getColumn();
 		model.mySetValueAt(model.getNewSum(col), model.getRowCount() - 1, col);
 		ntable.repaint();
+		
+		// update the output of loctionsPanel
+		int locIndex = pane.indexOfTab("locations");
+		locationsPanel = (LocationsPanel) pane.getComponentAt(locIndex);
+		if(locationsPanel.locationsPanelOutput != null) {
+			locationsPanel.updateOutput();
+		}
+		// update the bottom tables of mgmtTrainPanel
+		int mgmtIndex = pane.indexOfTab("Mgmt Train");
+		if(mgmtIndex >= 0) {
+			mgmtTrainPanel = (MgmtTrainPanel) pane.getComponentAt(mgmtIndex);
+			mgmtTrainPanel.updateDataOfBottomJtables();
+		}
 	}
 }

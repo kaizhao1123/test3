@@ -64,7 +64,7 @@ public class AdditionsPanel extends JPanel {
 	
 	ArrayList<AdditionsPanelOutputElement> outputOfTable_1; 
 	ArrayList<AdditionsPanelOutputElement> outputOfTable_2; 
-	ArrayList<ArrayList<AdditionsPanelOutputElement>> additionsPanelOutput;
+	public ArrayList<ArrayList<AdditionsPanelOutputElement>> additionsPanelOutput;
 
 	/************************************************************
 	 * declare the elements of this panel
@@ -213,9 +213,29 @@ public class AdditionsPanel extends JPanel {
 	// initial listeners of this panel
 	private void initalListeners() {
 
+		comboboxType.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					if(pane == null) {
+						pane = parent.tabbedPane;	
+						myTable1.getTabbedPane(pane);
+						myTable2.getTabbedPane(pane);
+					}
+					
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
+		
 		// adds new waste stream, the stream names cannot be duplicated.
 		buttonAdd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if(pane == null) {
+					pane = parent.tabbedPane;	
+					myTable1.getTabbedPane(pane);
+					myTable2.getTabbedPane(pane);
+				}
 				if (databaseTable1.isEditing())
 					databaseTable1.getCellEditor().stopCellEditing();
 				if (databaseTable2.isEditing())
@@ -227,22 +247,17 @@ public class AdditionsPanel extends JPanel {
 						addTableRow(s, preItem);
 						myTable1.updateElementList(s);
 					}
-					if(pane != null) {
-						try {
-							int index = pane.indexOfTab("Mgmt Train"); 				
-							if(index >= 0) {
-								mgmtTrainPanel = (MgmtTrainPanel) pane.getComponentAt(index);
-								int r = 0;
-								for(int i = 0; i < mgmtTrainPanel.jTable1.getRowCount(); i++) {
-									if(mgmtTrainPanel.myTable1.model.data[i][0].toString().equals(preItem))
-										r = i;									
-								}
-								mgmtTrainPanel.addRow(s, r+1);
-							}
-						}catch(Exception ef) {
-							
+					
+					int index = pane.indexOfTab("Mgmt Train"); 				
+					if(index >= 0) {
+						mgmtTrainPanel = (MgmtTrainPanel) pane.getComponentAt(index);
+						int r = -1;
+						for(int i = 0; i < mgmtTrainPanel.jTable1.getRowCount(); i++) {
+							if(mgmtTrainPanel.myTable1.model.data[i][0].toString().equals(preItem))
+								r = i;									
 						}
-					}
+						mgmtTrainPanel.addRow(s, r+1);
+					}				
 				}				
 			}
 		});
@@ -250,7 +265,11 @@ public class AdditionsPanel extends JPanel {
 		// Resets back the original effective densities if some EFF changed.
 		buttonReset.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
+				if(pane == null) {
+					pane = parent.tabbedPane;	
+					myTable1.getTabbedPane(pane);
+					myTable2.getTabbedPane(pane);
+				}
 				if (databaseTable1 != null) {
 					if (databaseTable1.isEditing())
 						databaseTable1.getCellEditor().stopCellEditing();
@@ -265,7 +284,12 @@ public class AdditionsPanel extends JPanel {
 						Object[] ele = myTable2.model.data[i];
 						resetEffectiveDensities(ele);
 					}					
-					databaseTable2.updateUI();				
+					databaseTable2.updateUI();	
+					int index = pane.indexOfTab("Mgmt Train"); 				
+					if(index >= 0) {
+						mgmtTrainPanel = (MgmtTrainPanel) pane.getComponentAt(index);						
+						mgmtTrainPanel.updateDataOfBottomJtables();
+					}		
 				}
 			}
 		});
@@ -278,7 +302,13 @@ public class AdditionsPanel extends JPanel {
 		 * 
 		 */	
 		databaseTable1.addMouseListener(new MouseAdapter() {
-			public void mouseClicked(MouseEvent e) {	
+			public void mouseClicked(MouseEvent e) {
+				if(pane == null) {
+					pane = parent.tabbedPane;
+					myTable1.getTabbedPane(pane);
+					myTable2.getTabbedPane(pane);
+				}
+				
 				int row = databaseTable1.rowAtPoint(e.getPoint()); 
 	            int col = databaseTable1.columnAtPoint(e.getPoint()); 
 	            if (databaseTable2.getCellEditor() != null)
@@ -362,6 +392,11 @@ public class AdditionsPanel extends JPanel {
 		
 		databaseTable2.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {	
+				if(pane == null) {
+					pane = parent.tabbedPane;
+					myTable1.getTabbedPane(pane);
+					myTable2.getTabbedPane(pane);
+				}
 				int row = databaseTable2.rowAtPoint(e.getPoint()); 
 	            int col = databaseTable2.columnAtPoint(e.getPoint()); 
 	            if (databaseTable1.getCellEditor() != null)
@@ -447,8 +482,12 @@ public class AdditionsPanel extends JPanel {
 
 		buttonOK.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-
-				pane = parent.tabbedPane;
+				if(pane == null) {
+					pane = parent.tabbedPane;
+					myTable1.getTabbedPane(pane);
+					myTable2.getTabbedPane(pane);
+				}
+					
 				if (databaseTable1.isEditing())
 					databaseTable1.getCellEditor().stopCellEditing();
 				if (databaseTable2.isEditing())
@@ -460,6 +499,7 @@ public class AdditionsPanel extends JPanel {
 						runoffPanel = new RunoffPanel(panelManager);
 						runoffPanel.setParent(parent);
 						pane.add("runoff", runoffPanel);
+						
 					}					
 					else {
 						if(additionsPanelOutput != null)
@@ -567,10 +607,10 @@ public class AdditionsPanel extends JPanel {
 		additionsPanelOutput.add(outputOfTable_1);
 	}
 	// update the output when values of this panel change
-		private void updateOutput() {
-			getOutput();
-			panelManager.storeAdditionsPanelOutput(additionsPanelOutput);
-		}
+	public void updateOutput() {
+		getOutput();
+		panelManager.storeAdditionsPanelOutput(additionsPanelOutput);
+	}
 	
 	// Corresponding the first option of periodDialog, that is, only table1 will be shown
 	public void update1() {
@@ -651,6 +691,9 @@ public class AdditionsPanel extends JPanel {
 			
 			textAdd.setText("");
 			streamNames.add(s);
+			
+			if(runoffPanel != null)
+				updateOutput();
 		}
 		else
 			JOptionPane.showMessageDialog(null,"You cannot have two waste streams with"
@@ -674,7 +717,9 @@ public class AdditionsPanel extends JPanel {
 		if(myTable1.model.data.length == 0) {
 			myTable1.model.data = null;
 			myTable2.model.data = null;
-		}		
+		}
+
+			
 	}
 
 	public void setParent(MainFrame frame) {

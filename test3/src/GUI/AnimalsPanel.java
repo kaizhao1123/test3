@@ -65,7 +65,7 @@ public class AnimalsPanel extends JPanel {
 	ArrayList<AnimalInfo> animalInTable; 			
 	
 	// store the output of panel: the name, and part of data of each animal(manure and ts).
-	ArrayList<AnimalPanelOutputElement> animalPanelOutput;  
+	public ArrayList<AnimalPanelOutputElement> animalPanelOutput;  
 	
 	// the header of table
 	String[]  columnNamess = { "<html> Animal  </html>", 
@@ -458,6 +458,11 @@ public class AnimalsPanel extends JPanel {
 			}				
 		}				
 	}
+	// update output
+	public void updateOutput() {
+		getOutput();
+		panelManager.storeAnimalPanelOutput(animalPanelOutput);
+	}
 	
 
 	//move the target animal from the "choiceList" to "selectedList", and add into the table.
@@ -560,7 +565,7 @@ public class AnimalsPanel extends JPanel {
 					//int col = panelManager.getColumn(itemName, locationPanel.columnName);
 					locationsPanel.deleteTableColumn(itemName);
 				}
-					
+				updateOutput();	
 			}
 			
 		}
@@ -610,6 +615,9 @@ public class AnimalsPanel extends JPanel {
 			jTable.updateUI();
 			// add this animal info into the data structure
 			animalInTable.add(ele);
+			// update the output if locationsPanel has been existed.
+			if(locationsPanel != null)
+				updateOutput();	
 			// transfer pane into the table.
 			pane = parent.tabbedPane;
 			animalsTable.getTabbedPane(pane);

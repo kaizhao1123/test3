@@ -362,10 +362,5 @@ public class PanelManager {
 		}
 		return res;
 	}
-	
-	
-	// To store the output data
-	//public void storeMgmtPanelOutput(ArrayList<AdditionsPanelOutputElement> o) {
-	//	additionsPanelOutput = o;
-	//}
+
 }
